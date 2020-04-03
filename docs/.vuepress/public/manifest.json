@@ -1,10 +1,10 @@
 {
-    "name": "测试网页",
-    "short_name": "测试网页",
+    "name": "Chauncey的学习笔记",
+    "short_name": "Chauncey的学习笔记",
     "start_url": "index.html",
     "display": "standalone",
     "background_color": "#ffffff",
-    "description": "测试网页",
+    "description": "Chauncey的学习笔记",
     "theme_color": "blue",
     "icons": [
       {
