@@ -8,7 +8,7 @@
     "build": "vuepress build docs",
     "deploy": "bash deploy.sh"
   },
-  "keywords": [''],
+  "keywords": [],
   "author": "Chauncey",
   "license": "MIT"
 }
