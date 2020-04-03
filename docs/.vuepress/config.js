@@ -17,7 +17,7 @@ module.exports = {
             { text: '项目', link: '/pages/project-notes/wc-money.md' },
             { text: 'Node', link: '/pages/node-notes/test.md' },
             { text: '面试题', link: '/pages/interview-notes/js-questions.md' },
-            { text: '工具', link: '/pages/tool/tool-use.md' },
+            { text: '工具', link: '/pages/tool-notes/tool-use.md' },
             { text: '关于我', link: '/pages/about-me/about-me.md' },
             { text: 'Github', link: 'https://github.com/chaunceym' },
         ],
