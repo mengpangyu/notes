@@ -1,4 +1,5 @@
 module.exports = {
+    base: '/notes/',
     title: 'Learning',
     description: 'Chauncey 的的学习记录',
     head: [
