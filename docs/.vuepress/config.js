@@ -37,7 +37,8 @@ module.exports = {
                     title: 'React',
                     collapsable: false,
                     children: [
-                        ['re-class.md', 'class组件']
+                        ['re-class.md', 'class组件'],
+                        ['re-function.md', '函数组件'],
                     ]
                 },
                 {
@@ -144,6 +145,32 @@ module.exports = {
                     sidebarDepth: 1,
                     children: [
                         ['node-questions.md', 'Node'],
+                    ]
+                },
+            ],
+            '/pages/tool-notes/':[
+                {
+                    title: '常用工具',
+                    collapsable: false,
+                    sidebarDepth: 1,
+                    children: [
+                        ['tool-use.md', '工具'],
+                    ]
+                },
+                {
+                    title: 'webpack',
+                    collapsable: false,
+                    sidebarDepth: 1,
+                    children: [
+                        ['webpack-use.md', 'webpack'],
+                    ]
+                },
+                {
+                    title: 'parcel',
+                    collapsable: false,
+                    sidebarDepth: 1,
+                    children: [
+                        ['parcel-use.md', 'parcel'],
                     ]
                 },
             ],
