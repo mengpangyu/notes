@@ -30,7 +30,8 @@ module.exports = {
                     sidebarDepth: 1,
                     children: [
                         ['js-this.md', 'JS三座大山之this'],
-                        ['js-ajax.md', 'JS三座大山之ajax']
+                        ['js-ajax.md', 'JS三座大山之ajax'],
+                        ['js-promise.md', 'Promise'],
                     ]
                 },
                 {
