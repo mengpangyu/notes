@@ -10,5 +10,8 @@
   },
   "keywords": [],
   "author": "Chauncey",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  }
 }

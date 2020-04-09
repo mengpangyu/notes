@@ -34,6 +34,20 @@ module.exports = {
                     ]
                 },
                 {
+                    title: 'React',
+                    collapsable: false,
+                    children: [
+                        ['re-class.md', 'class组件']
+                    ]
+                },
+                {
+                    title: 'TS',
+                    collapsable: false,
+                    children: [
+                        ['ts-start.md', 'TS初体验']
+                    ]
+                },
+                {
                     title: 'HTML',
                     collapsable: false,
                     children: [
