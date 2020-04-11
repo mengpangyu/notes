@@ -40,6 +40,8 @@ module.exports = {
                     children: [
                         ['re-class.md', 'class组件'],
                         ['re-function.md', '函数组件'],
+                        ['re-hooks1.md', 'Hooks原理解析'],
+                        ['re-hooks2.md', 'Hooks各个击破'],
                     ]
                 },
                 {
