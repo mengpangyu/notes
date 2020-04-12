@@ -43,7 +43,7 @@ promise1和promise2只有一个成功就会调用success1
 
 ## 手写函数防抖和函数节流
 
-- 防抖
+- 防抖: 接外卖, 一直来一直等, 如果五分钟没来, 那就去送
 
 ```js
  // 节流（一段时间执行一次之后，就不执行第二次）
@@ -65,7 +65,7 @@ throttled() //在canUse变为true之前只能调用一次throttled函数
 有些地方认为节流函数不是立刻执行的，而是在冷却时间末尾执行的（相当于施法有吟唱时间），那样说也是对的。
 :::
 
-- 节流 
+- 节流: 相当于游戏 CD, 等 CD 好了才能再次施放
 
 ```js
 // 防抖（一段时间会等，然后带着一起做了）
@@ -211,7 +211,115 @@ Access-Control-Allow-Origin: 允许跨域访问的网站
 
 ## async/await 怎么用,如何捕获异常?
 
+await 操作符用于等待一个Promise 对象。它只能在异步函数 async function 中使用
+如果一个 Promise 被传递给一个 await 操作符，await 将等待 Promise 正常处理完成并返回其处理结果
 
+async 与 await 组合使用, 用于说明一个函数是处理异步函数
 
+```js
+function resolveAfter2Seconds(x) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(x);
+    }, 2000);
+  });
+}
 
+async function f1() {
+  var x = await resolveAfter2Seconds(10);
+  console.log(x); // 10
+}
+f1();
+```
+
+捕获异常
+
+```js
+async function f3() {
+  try {
+    var z = await Promise.reject(30);
+  } catch (e) {
+    console.log(e); // 30
+  }
+}
+f3();
+```
+
+## 如何实现浅拷贝
+
+1. ES6: object.assign()
+
+```js
+let a = { name : 'hello' };
+let b = Object.assign( { },a );
+b.name = 'hi';
+console.log(a);
+```
+
+2. 展开运算符
+ 
+```js
+let a = {name: 'hello'}
+let b = {...a}
+b.name = 'he'
+console.log(a)
+```  
+
+3. 自己实现 for in
+
+```js
+function shallowCopy(obj){
+  let newObj = {}
+  for(let key in obj){
+    if(obj.hasOwnProperty(key)){
+        newObj[key] = obj[key]
+    }
+  }
+  return newObj
+}
+let a = {name: 'hello'}
+let b = shallowCopy(a)
+console.log(b)
+```
+  
 ## 如何实现深拷贝?
+
+- 递归
+- 判断对象类型
+- 检查循环引用(环)
+- 需要忽略原型
+
+1. 用 JSON 
+
+```js
+let a = {name: 'hello'}
+let b = JSON.parse(JSOn.stringify(a))
+console.log(b)
+```
+
+:::tip 注意
+JSON 深拷贝只可以拷贝JSON对应的类型, 函数就不可以拷贝
+:::
+
+2. 自己实现 for in 加递归
+
+```js
+function deepCopy(obj){
+  let newObj = {}
+  for(let key in obj){
+    if(obj.hasOwnProperty(key)){
+        if(typeof obj[key]==='object'){ 
+          newObj[key] = deepCopy(obj[key])
+        }else{
+          newObj[key] = obj[key]
+        }
+    }
+  }
+  return newObj
+}
+let a = {name: 'hello'}
+let b = deepCopy(a)
+console.log(b)
+```
+## 如何用正则实现 .trim()
+
