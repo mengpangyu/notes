@@ -45,6 +45,13 @@ module.exports = {
                     ]
                 },
                 {
+                    title: 'Vue',
+                    collapsable: false,
+                    children: [
+                        ['vue-form.md', '表单'],
+                    ]
+                },
+                {
                     title: 'TS',
                     collapsable: false,
                     children: [
