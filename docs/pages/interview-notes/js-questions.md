@@ -271,9 +271,7 @@ console.log(a)
 function shallowCopy(obj){
   let newObj = {}
   for(let key in obj){
-    if(obj.hasOwnProperty(key)){
-        newObj[key] = obj[key]
-    }
+    newObj[key] = obj[key]
   }
   return newObj
 }
@@ -303,23 +301,300 @@ JSON 深拷贝只可以拷贝JSON对应的类型, 函数就不可以拷贝
 
 2. 自己实现 for in 加递归
 
+- 解决数组
 ```js
-function deepCopy(obj){
-  let newObj = {}
-  for(let key in obj){
-    if(obj.hasOwnProperty(key)){
-        if(typeof obj[key]==='object'){ 
-          newObj[key] = deepCopy(obj[key])
-        }else{
-          newObj[key] = obj[key]
-        }
+function deepClone(target) { 
+  if (typeof target === 'object') {
+    let cloneTarget = Array.isArray(target) ? [] : {}; 
+    for (const key in target) {
+      cloneTarget[key] = clone(target[key]); 
     }
+    return cloneTarget; 
+  } else { 
+    return target; 
   }
-  return newObj
-}
-let a = {name: 'hello'}
-let b = deepCopy(a)
-console.log(b)
+}; 
 ```
+- 解决循环引用, 加入 WeakMap(因为WeakMap是弱引用, 利于垃圾回收)
+
+```js
+function deepClone(target, map = new Map()) {
+  if (typeof target === 'object') {
+    let cloneTarget = Array.isArray(target) ? [] : {}; 
+    if (map.get(target)) return map.get(target)  
+    map.set(target, cloneTarget); 
+    for (const key in target) { 
+      cloneTarget[key] = clone(target[key], map); 
+    } 
+    return cloneTarget; 
+  } else {
+    return target;
+  } 
+}
+```
+:::tip 注意
+为什么要用 WeakMap 而不用 Map 呢?
+
+WeakMap 对象是一组键/值对的集合, 其中的键是弱引用的, 其键必须是对象, 而值可以是任意的
+使用弱引用会在下一次的垃圾回收中自动回收, 不用自己做处理, 所以当 WeakMap 中的数据占用内存较多时, WeakMap 回比 Map 好用很多
+:::
+
+- 解决 for in 带来的性能优化
+
+创建一个遍历函数 foreach, 实现 while 的一个 iteratee 的回调函数
+```js
+function forEach(array, iteratee) { 
+  let index = -1; const length = array.length; 
+  while (++index < length) { 
+    iteratee(array[index], index); 
+  } 
+  return array; 
+}
+```
+
+新的优化性能的深拷贝
+```js
+function clone(target, hash = new WeakMap()) { 
+  if (typeof target === 'object') {
+    const isArray = Array.isArray(target); 
+    let cloneTarget = isArray ? [] : {}; 
+    if (hash.get(target)) { return hash.get(target); }
+    hash.set(target, cloneTarget); 
+    const keys = isArray ? undefined : Object.keys(target); 
+    forEach(keys || target, (value, key) => { 
+      if (keys) { key = value; }
+      cloneTarget[key] = clone(target[key], hash); 
+    }); 
+    return cloneTarget; 
+  } else {
+    return target;
+  } 
+}
+```
+当遍历数组时, 直接用 foreach 遍历
+当遍历对象时, 先取出对象的 keys 然后把 keys 的 value 当 key 用, 在到对象上遍历
+
+- 判断是否为对象加上 null 和 function 两种特殊情况
+
+```js
+function isObject(target) { 
+	const type = typeof target; 
+	return target !== null && 
+		(type === 'object' || type === 'function');
+} 
+if (!isObject(target)) { 
+	return target; 
+} 
+```
+
+- 获取多种数据类型, ES6 出现了多种数据类型, 所以一个深拷贝里可能会有很多种数据类型, 可以用 toString 来获取他们的类型
+
+>由于很多引用类型重写了 toString 方法, 所以得从他们的原型调用 toString 方法
+
+```js
+function getType(target) { 
+  return Object.prototype.toString.call(target); 
+}
+```
+
+- 研究多种引用类型的深拷贝
+
+上述条件只说明了 Array 和 Object 的引用类型, 那么还有 Map 和 Set 两种类型没有说明
+在声明克隆的引用类型时, 其实上面的声明方法是一个语法糖, 真正的声明方法是
+```js
+const cloneTarget  = new Object() // 这种方法不会原型丢失
+```
+所以我们就可以用 Constructor 来创建一个通用声明的函数
+
+```js
+function getInit(target) { 
+  const Ctor = target.constructor; 
+  return new Ctor(); 
+}
+```
+
+接下来是四种引用类型的完整深拷贝代码
+
+```js
+const mapTag = '[object Map]';
+const setTag = '[object Set]';
+const arrayTag = '[object Array]';
+const objectTag = '[object Object]';
+const boolTag = '[object Boolean]';
+const dateTag = '[object Date]';
+const errorTag = '[object Error]';
+const numberTag = '[object Number]';
+const regexpTag = '[object RegExp]';
+const stringTag = '[object String]';
+const symbolTag = '[object Symbol]';
+
+function getInit(target) {
+  const Ctor = target.constructor;
+  return new Ctor();
+}
+
+function getType(target) {
+  return Object.prototype.toString.call(target);
+}
+
+function isObject(target) {
+  const type = typeof target;
+  return target !== null &&
+    (type === 'object' || type === 'function');
+}
+
+function forEach(array, iteratee) {
+  let index = -1; const length = array.length;
+  while (++index < length) {
+    iteratee(array[index], index);
+  }
+  return array;
+}
+
+function clone(target, hash = new WeakMap()) {
+  // 克隆原始类型
+  const deepTag = [mapTag, setTag, arrayTag, objectTag]
+
+  if (!isObject(target)) { return target; }
+  // 初始化
+  const type = getType(target);
+  let cloneTarget;
+  if (deepTag.includes(type)) {
+    cloneTarget = getInit(target);
+  }
+  // 防止循环引
+  if (hash.get(target)) { return hash.get(target); }
+  hash.set(target, cloneTarget); // 克隆set
+  if (type === setTag) {
+    target.forEach(value => { cloneTarget.add(clone(value, hash)); });
+    return cloneTarget;
+  }
+  // 克隆map
+  if (type === mapTag) {
+    target.forEach((value, key) => { cloneTarget.set(key, clone(value, hash)); });
+    return cloneTarget;
+  }
+  // 克隆对象和数组
+  const keys = type === arrayTag ? undefined : Object.keys(target);
+  forEach(keys || target, (value, key) => {
+    if (keys) { key = value; }
+    cloneTarget[key] = clone(target[key], hash);
+  });
+  return cloneTarget;
+}
+```
+
+- 克隆其他类型
+
+```js
+function cloneOtherType(target, type) {
+  const Ctor = target.constructor;
+  switch (type) {
+    case boolTag:
+    case numberTag:
+    case stringTag:
+    case errorTag:
+    case dateTag:
+      return new Ctor(target);
+    case regexpTag:
+      return cloneReg(target);
+    case symbolTag:
+      return cloneSymbol(target);
+    default:
+      return null;
+  }
+}
+
+function cloneSymbol(target) {
+  return Object(Symbol.prototype.valueOf.call(target));
+}
+
+function cloneReg(target) {
+  const reFlags = /\w*$/;
+  const result = new target.constructor(target.source, reFlags.exec(target));
+  result.lastIndex = target.lastIndex;
+  return result;
+}
+```
+
 ## 如何用正则实现 .trim()
+
+```js
+String.prototype.trim = function(){
+  return this.replace(/^\s+|\s+$/,'')
+}
+
+function trim(string){
+  return string.replact(/^\s+|\s$/g,'')
+} 
+```
+
+## 不同 class 如何实现继承? 用 class 如何实现?
+
+- 不用 class 实现
+```js
+function  Animal(color) {
+  this.color = color
+}
+Animal.prototype.move = function(){}
+function Dog(color, name){
+  Animal.call(this, color)
+  this.name = name
+}
+function temp() {}
+temp.prototype = Animal.prototype
+Dog.prototype = new temp() // 这样做的目的是, 不让 Animal 的属性放在 __proto__ 中
+
+Dog.prototype.constructor = Dog
+Dog.prototype.say = function(){console.log('汪')}
+
+let dog = new Dog('黄色', '阿黄')
+```
+
+- 用 class 实现
+
+```js
+class Animal{
+ constructor(color){
+     this.color = color
+ }
+ move(){}
+}
+class Dog extends Animal{
+ constructor(color, name){
+     super(color)
+     this.name = name
+ }
+ say(){}
+}
+```
+
+## 如何实现数组去重?
+
+- 计数排序变形
+
+```js
+
+```
+
+- 使用 Set
+
+```js
+new Set([1,1,2,2,3,3,4,5])
+```
+
+- 使用 WeakMap
+
+```js
+
+```
+
+## 看到可以放弃的题目
+
+- `1 == ''` 放弃: 我从来不用三个等于,一直用两个等于
+
+## 手写一个 Promise(高级前端)
+
+
+
 

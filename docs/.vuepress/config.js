@@ -134,6 +134,22 @@ module.exports = {
                     ]
                 },
                 {
+                    title: 'Dom面试题',
+                    collapsable: true,
+                    sidebarDepth: 1,
+                    children: [
+                        ['dom-questions.md', 'dom'],
+                    ]
+                },
+                {
+                    title: 'Http面试题',
+                    collapsable: true,
+                    sidebarDepth: 1,
+                    children: [
+                        ['http-questions.md', 'Http'],
+                    ]
+                },
+                {
                     title: 'Css面试题',
                     collapsable: true,
                     sidebarDepth: 1,
