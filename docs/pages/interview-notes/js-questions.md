@@ -525,7 +525,7 @@ String.prototype.trim = function(){
 }
 
 function trim(string){
-  return string.replact(/^\s+|\s$/g,'')
+  return string.replace(/^\s+|\s+$/g,'')
 } 
 ```
 
