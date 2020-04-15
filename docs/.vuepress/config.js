@@ -166,11 +166,35 @@ module.exports = {
                     ]
                 },
                 {
+                    title: 'Webpack面试题',
+                    collapsable: true,
+                    sidebarDepth: 1,
+                    children: [
+                        ['webpack-questions.md', 'Webpack'],
+                    ]
+                },
+                {
+                    title: 'TypeScript面试题',
+                    collapsable: true,
+                    sidebarDepth: 1,
+                    children: [
+                        ['ts-questions.md', 'TypeScript'],
+                    ]
+                },
+                {
                     title: 'Node面试题',
                     collapsable: true,
                     sidebarDepth: 1,
                     children: [
                         ['node-questions.md', 'Node'],
+                    ]
+                },
+                {
+                    title: '开放题和刁钻题',
+                    collapsable: true,
+                    sidebarDepth: 1,
+                    children: [
+                        ['open-questions.md', 'Other'],
                     ]
                 },
             ],
