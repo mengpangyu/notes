@@ -68,7 +68,7 @@ var a = {name: 'a'}
 a.x = a = {}
 // a.x = undefined 
 ```
-![代码解析](./image/open-question-1.png)
+![代码解析](image/open-questions-1.png)
 
 ### (a ==1 && a== 2 && a==3) 可能为 true 吗？
 
@@ -103,8 +103,200 @@ a ===1 && a=== 2 && a===3 // true
 ### JS 垃圾回收
 
 - 什么是垃圾
-    - 
-- 如何捡垃圾
-    - 
-- 前端又有其特殊性
-    -  
+    - 不再需要, 即为垃圾
+    - 所有变量都有生命周期
+    - 没有被引用的对象可能是垃圾(双引用)
+    - 三个对象互相引用, 那也有可能是垃圾(环)
+
+
+>举例子
+
+#### 全局变量引用一个对象
+
+```js
+let user = {
+  name: 'John'
+}
+```
+
+![单个对象引用](./image/open-questions-3.png)
+
+当把 user 重写
+```js
+user = null
+```
+
+![单个对象引用改变](./image/open-questions-4.png)
+
+#### 两个变量引用一个对象
+
+
+```js
+let user = {
+  name: "John"
+};
+
+let admin = user;
+```
+
+![多个对象引用](./image/open-questions-5.png)
+
+当把 user 重写
+```js
+user = null
+```
+
+这样的话, 对象还是存在的, 它还被 admin 引用的, 所以不会被垃圾回收
+
+#### 引用环
+
+```js
+function marry(man, woman) {
+  woman.husband = man;
+  man.wife = woman;
+
+  return {
+    father: man,
+    mother: woman
+  }
+}
+
+let family = marry({
+  name: "John"
+}, {
+  name: "Ann"
+});
+```
+
+![引用环](./image/open-questions-6.png)
+
+去除两个引用
+
+```js
+delete family.father;
+delete family.mother.husband;
+```
+
+![引用环去除](./image/open-questions-7.png)
+
+你会看到 family 和 mother 都消除了对 father 的引用, 所以
+
+![垃圾回收father](./image/open-questions-8.png)
+
+### 引用环的孤岛
+
+继续引用环的代码
+```js
+family = null
+```
+
+![引用环的孤岛](./image/open-questions-9.png)
+
+可以看到, 虽然孤岛里的都有相互引用, 但是与他们连接的 family 断开了连接, 所以这个引用孤岛也要被垃圾回收
+
+:::tip 注意
+1. 如果全局变量基本不会消除
+2. 局部变量, 在执行后就消除
+3. 如果存在双引用, 删除一个, 其中一个还有
+4. 环引用, 只要存在相互引用, 就不会消除
+5. 不合群就消除, 需要有桥梁连接外界
+:::
+
+>如何捡垃圾? --- 垃圾回收算法
+
+1. 标记清除算法
+
+全局作用域开始把所有用到的对象都标记一下, 一直标记到没有被引用的变量王为止
+
+![标记清除算法](./image/open-questions-2.png)
+
+- 缺点: 时间太长, 每一个都要标记遍历
+
+- 优化: 
+    - 新生代和老一代
+    - 增量收集
+    - 空闲时间收集
+
+>前端的特性: 有 DOM 进程和 JS 进程, 如果把 DOM 元素指为 null, 那么也应该删除 DOM 元素
+
+```js
+div.remove()
+div.onclick = null // 这句兼容 IE
+div = null
+```
+
+2. 标记压缩算法
+
+和“标记－清除”相似, 不过在标记阶段后它将所有活动对象紧密的排在堆的一侧(压缩), 消除了内存碎片, 不过压缩是需要花费计算成本的
+
+3. 引用计数算法
+
+引用计数，就是记录每个对象被引用的次数，每次新建对象、赋值引用和删除引用的同时更新计数器，如果计数器值为0则直接回收内存
+
+4. 分代回收
+
+- 新生代 = 生成空间 + 2 * 幸存区 复制算法
+- 老年代 标记-清除算法
+
+对象在生成空间创建, 当生成空间满之后进行 minor gc, 将活动对象复制到第一个幸存区, 并增加其“年龄” age, 当这个幸存区满之后再将此次生成空间和这个幸存区的活动对象复制到另一个幸存区, 如此反复, 当活动对象的 age 达到一定次数后将其移动到老年代: 当老年代满的时候就用标记-清除或标记-压缩算法进行major gc
+
+### EventLoop(事件循环) Node.js 的概念
+
+- 事件: 操作系统给浏览器触发的一个行为
+- 操作系统轮询键盘
+- 当 JS 执行异步任务时, 发了一个消息给 C++, 执行轮询来监听 AJAX 到底变化了没, 变了就给 JS 发回去事件
+
+#### EventLoop 阶段
+
+1. timers: 执行异步函数
+2. I/O callback
+3. poll(EventLoop大部分时间在的阶段): 等待异步时间
+4. check: 主要存 setImmediate API
+5. close callback **nextTick 当前阶段马上执行**
+
+
+![EventLoop](./image/open-questions-10.png)
+
+举例一个面试题
+
+![EventLoop Example](./image/open-questions-11.png)
+
+>宏任务 和 微任务
+
+1. Event Loop 
+    - Node.js: timers poll check
+    - chrome(一会:宏任务, 马上:微任务)
+2. Node.js
+    - setTimeout ==> timer
+    - setImmediate ==> check
+    - nextTick ==> 当前队列的后面
+3. Chrome
+    - setTimeout ==> 一会
+    - then(fn) ==> 马上
+    
+**一定要画图解题**
+
+#### 总结
+
+EventLoop 是一个阶段, 分为 Node.js 和 Chrome
+
+- Node.js:
+    1. timers: setTimeout
+    2. poll: 等待
+    3. check: setImmediate
+    4. 附加 nextTick 强行来说是微任务, 在当前的阶段后面执行
+- Chrome:
+    1. 宏(一会) 
+    2. 微(马上)
+
+
+![总结](./image/open-questions-12.png)
+
+## 个性化题目
+
+- PWA
+- echarts.js / d3.js
+- three.js
+- flutter
+- SSR
+
