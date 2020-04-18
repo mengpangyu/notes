@@ -3,7 +3,7 @@ home: true
 heroText: Chauncey的学习笔记 
 tagline: 一点一滴都是进步
 actionText: 开始学习 →
-actionLink: /pages/base-notes/js-this.md
+actionLink: /pages/base-notes/js/js-this.md
 features:
 - title: 极简主义 
   details: 喜欢简单的东西,崇尚干净的事物

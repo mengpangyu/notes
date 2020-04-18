@@ -24,7 +24,7 @@ function App(){
 ReactDOM.render(<App/>, rootElement)
 ```
 
-![渲染过程](./image/re-hooks1-1.png)
+![渲染过程](../image/re-hooks1-1.png)
 
 ### 分析
 
@@ -140,7 +140,7 @@ ReactDOM.render(<App/>, rootElement)
 - setState 会修改 state, 并触发更新
 - 每次渲染时 n 都是一个新的数, 函数式编程的特点
 
-![useState的运行过程](./image/re-hooks1-2.png)
+![useState的运行过程](../image/re-hooks1-2.png)
 
 ### 拓展
 
