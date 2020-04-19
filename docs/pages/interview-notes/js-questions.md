@@ -660,9 +660,10 @@ function unique(arr){
 
 ```js
 function unique(arr) {
-    var obj = {};
+    let obj = {};
     return arr.filter(function(item){
         return obj.hasOwnProperty(typeof item + item) ? false : (obj[typeof item + item] = true)
+        // filter 返回的就是数组, 带上类型是防止转换
     })
 }
 ```
