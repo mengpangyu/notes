@@ -89,7 +89,7 @@ module.exports = {
           title: 'mySlide',
           collapsable: false,
           children: [
-            ['myslide/my-index.md', 'mySlide首页']
+            ['myslide/my-index.md', 'mySlide介绍']
           ]
         },
         {
