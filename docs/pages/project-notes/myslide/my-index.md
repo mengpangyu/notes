@@ -8,7 +8,7 @@ My Slide 是一款简洁的制作 PPT 的网页应用(基于 reveal.js)
 
 源码链接: [https://gitee.com/chaunceym/myslide](https://gitee.com/chaunceym/myslide)
 
-## 功能面板
+## 功能板块
 
 ### 文档编辑
 

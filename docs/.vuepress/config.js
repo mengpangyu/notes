@@ -96,7 +96,7 @@ module.exports = {
           title: 'Point UI',
           collapsable: false,
           children: [
-            ['pointui/po-layout.md', 'layout轮子']
+            ['pointui/po-index.md', 'Point UI介绍']
           ]
         },
       ],
