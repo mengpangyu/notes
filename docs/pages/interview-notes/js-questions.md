@@ -571,22 +571,153 @@ class Dog extends Animal{
 
 ## 如何实现数组去重?
 
-- 计数排序变形
-
-```js
-
-```
-
 - 使用 Set
 
 ```js
 new Set([1,1,2,2,3,3,4,5])
 ```
+:::tip 注意
+无法去除空对象
+:::
 
-- 使用 WeakMap
+- 使用 for 嵌套 for, 然后 splice 去重(ES5 最常用)
 
 ```js
+function unique(arr){
+  for(let i=0;i<arr.length;i++){
+    for(let j=i+1;j<arr.length;j++){
+      if(arr[i]===arr[j]){
+        arr.splice(j,1)
+        j-- //元素去除所以索引也要变化, j-- 为了紧跟继续遍历
+      }
+    } 
+  }
+  return arr
+}
+```
 
+- indexOf 去重
+
+```js
+function unique(arr){
+  if(!Array.isArray(arr)){
+    return console.log('type error')
+  }
+  let array = []
+  for(let i = 0; i < arr.length; i++) {
+    if(array.indexOf(arr[i]) === -1){
+      array.push(arr[i])
+    }
+  }
+  return array
+}
+```
+
+- 利用 sort() 去重
+
+```js
+function unique(arr){
+  if(!Array.isArray(arr)){
+    return console.log('type error')
+  }
+  arr = arr.sort()
+  let array = [arr[0]]
+  for(let i=1;i<arr.length;i++){
+    if(arr[i] !== arr[i-1]){
+      array.push(arr[i])
+    }
+  }
+  return array
+}
+```
+
+:::tip 注意
+影响了数组顺序
+:::
+
+- 利用 includes 去重
+
+和 indexOf 一个道理, 只不过换了一个 API
+
+```js
+function unique(arr){
+  if(!Array.isArray(arr)){
+    return console.log('type error')
+  }
+  let array = []
+  for(let i=0;i<arr.length;i++){
+    if(!array.includes(arr[i])){
+      array.push(arr[i])
+    }
+  }
+  return array
+}
+```
+
+- 利用 hasOwnProperty 去重
+
+利用hasOwnProperty 判断是否存在对象属性
+
+```js
+function unique(arr) {
+    var obj = {};
+    return arr.filter(function(item){
+        return obj.hasOwnProperty(typeof item + item) ? false : (obj[typeof item + item] = true)
+    })
+}
+```
+
+- 利用 filter 去重
+
+```js
+function unique(arr) {
+  return arr.filter(function(item, index, arr) {
+    return arr.indexOf(item) === index; 
+    // arr.indexOf 只会匹配第一次相同的索引, 所以可以实现去重
+  });
+}
+```
+
+- 利用递归去重
+
+```js
+function unique(arr) {
+        var array= arr;
+        var len = array.length;
+
+    array.sort(function(a,b){   //排序后更加方便去重
+        return a - b;
+    })
+
+    function loop(index){
+        if(index >= 1){
+            if(array[index] === array[index-1]){
+                array.splice(index,1);
+            }
+            loop(index - 1);    //递归loop，然后数组去重
+        }
+    }
+    loop(len-1);
+    return array;
+}
+```
+
+- 利用 Map 数据结构去重
+
+```js
+function unique(arr) {
+  let map = new Map();
+  let array = new Array();  // 数组用于返回结果
+  for (let i = 0; i < arr.length; i++) {
+    if(map .has(arr[i])) {  // 如果有该key值
+      map .set(arr[i], true); 
+    } else { 
+      map .set(arr[i], false);   // 如果没有该key值
+      array .push(arr[i]);
+    }
+  } 
+  return array ;
+}
 ```
 
 ## 看到可以放弃的题目
@@ -595,6 +726,42 @@ new Set([1,1,2,2,3,3,4,5])
 
 ## 手写一个 Promise(高级前端)
 
+```js
+function Promise(executor) {
+    let self = this;
+    self.status = 'pending'; //等待态
+    self.value = undefined;  //成功的返回值
+    self.reason = undefined; //失败的原因
 
-
+    function resolve(value){
+        if(self.status === 'pending'){
+            self.status = 'resolved';
+            self.value = value;
+        }
+    }
+    function reject(reason) {
+        if(self.status === 'pending') {
+            self.status = 'rejected';
+            self.reason = reason;
+        }
+    }
+    try{
+        executor(resolve, reject);
+    }catch(e){
+        reject(e);// 捕获时发生异常，就直接失败
+    }
+}
+//onFufiled 成功的回调
+//onRejected 失败的回调
+Promise.prototype.then = function (onFufiled, onRejected) {
+    let self = this;
+    if(self.status === 'resolved'){
+        onFufiled(self.value);
+    }
+    if(self.status === 'rejected'){
+        onRejected(self.reason);
+    }
+}
+module.exports = Promise;
+```
 
