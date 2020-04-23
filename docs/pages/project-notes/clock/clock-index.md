@@ -36,3 +36,8 @@ return (
 
 [原文在 Stack Overflow 上](https://stackoverflow.com/questions/44153517/how-to-access-history-object-outside-of-a-react-component)
 
+## 下载 Node-sass 出错问题?
+
+搜了很久原来是国外版本不一样的问题, 才导致我的 node-sass 一直出错, 后来换成**淘宝源**贼快, 而且安装成功可以使用 scss
+
+[这是一篇 Node-sass 的调错文章](https://www.jianshu.com/p/4609564e31dc)
