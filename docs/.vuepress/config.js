@@ -99,6 +99,13 @@ module.exports = {
             ['pointui/po-index.md', 'Point UI介绍']
           ]
         },
+        {
+          title: '计划吧',
+          collapsable: false,
+          children: [
+            ['clock/clock-index.md', '计划吧']
+          ]
+        },
       ],
       '/pages/node-notes/': [
         {
