@@ -41,3 +41,79 @@ return (
 搜了很久原来是国外版本不一样的问题, 才导致我的 node-sass 一直出错, 后来换成**淘宝源**贼快, 而且安装成功可以使用 scss
 
 [这是一篇 Node-sass 的调错文章](https://www.jianshu.com/p/4609564e31dc)
+
+## Redux 的使用
+
+- state 状态
+- action 对 state 做出某些改变的描述
+- reducer 是一个函数, 参数为 state 和 action, 相当于一个控制器, 把 action 的描述改为真实逻辑去修改 state
+
+>举例
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Redux basic example</title>
+    <script src="https://unpkg.com/redux@latest/dist/redux.min.js"></script>
+  </head>
+  <body>
+    <div>
+      <p>
+        点击: <span id="value">0</span> 次数
+        <button id="increment">+</button>
+        <button id="decrement">-</button>
+        <button id="incrementIfOdd">如果是奇数，+1</button>
+        <button id="incrementAsync">延迟1s +1 </button>
+      </p>
+    </div>
+    <script>
+      const reducer = function(state,action){
+        if(state === undefined){
+          state = 0
+        }
+        switch(action.type){
+          case 'INCREMENT':
+            return state + 1;
+          case 'DECREMENT':
+            return state - 1;
+          default:
+            return state
+        }
+      }
+      const store = Redux.createStore(reducer)
+      const render = function(){
+        document.getElementById('value').innerHTML = store.getState()
+      }
+      
+      render()
+      
+      store.subscribe(render)
+      
+      const addOne = function(){
+        store.dispatch({type: 'INCREMENT'})// 派发 action
+      }
+      const minusOne = function(){
+        store.dispatch({type: 'DECREMENT'})// 派发 action
+      }
+      document
+      .getElementById('increment')
+      .addEventListener('click',addOne)
+      document
+      .getElementById('decrement')
+      .addEventListener('click',minusOne)
+      document
+      .getElementById('incrementIfOdd')
+      .addEventListener('click',()=>{
+        if(store.getState()%2 === 1){
+          addOne()
+        }
+      })
+      document
+      .getElementById('incrementAsync')
+      .addEventListener('click',()=>{
+        setTimeout(addOne,1000)
+      })
+    </script>
+  </body>
+</html>
+```
