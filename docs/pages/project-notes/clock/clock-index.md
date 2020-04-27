@@ -117,3 +117,13 @@ return (
   </body>
 </html>
 ```
+
+## React Hooks 、排序插件和处理日期插件
+
+- [React Hooks](https://reactjs.org/docs/hooks-intro.html)
+- [Lodash](https://lodash.com/docs/4.17.15)
+- [date-fns](https://date-fns.org/docs/Getting-Started)
+
+::: tip 注意
+本项目涉及上面三项技术代码很少, 不过这三个技术的使用起到了关键作用, 根据 get start 就可以快速上手
+:::
