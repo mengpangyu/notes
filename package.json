@@ -13,5 +13,10 @@
   "license": "MIT",
   "devDependencies": {
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "global": "^4.4.0",
+    "parcel": "^1.12.4",
+    "vuepress": "^1.4.1"
   }
 }

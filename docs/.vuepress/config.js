@@ -100,10 +100,10 @@ module.exports = {
           ]
         },
         {
-          title: '计划吧',
+          title: '土豆炖牛肉',
           collapsable: false,
           children: [
-            ['clock/clock-index.md', '计划吧']
+            ['clock/clock-index.md', '土豆炖牛肉介绍']
           ]
         },
       ],
