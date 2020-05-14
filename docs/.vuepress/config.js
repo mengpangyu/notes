@@ -17,6 +17,7 @@ module.exports = {
       {text: '基础笔记', link: '/pages/base-notes/js/js-this.md'},
       {text: '项目', link: '/pages/project-notes/cat/wc-money.md'},
       {text: 'Node', link: '/pages/node-notes/test.md'},
+      {text: 'Linux', link: '/pages/linux-notes/linux-bash.md'},
       {text: '面试题', link: '/pages/interview-notes/js-questions.md'},
       {text: '工具', link: '/pages/tool-notes/tool-use.md'},
       {text: '关于我', link: '/pages/about-me/about-me.md'},
@@ -113,7 +114,17 @@ module.exports = {
           collapsable: false,
           sidebarDepth: 1,
           children: [
-            ['test.md', '测试'],
+            ['test.md', 'Express初探'],
+          ]
+        },
+      ],
+      '/pages/linux-notes/': [
+        {
+          title: 'linux笔记',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['linux-bash.md', 'bash命令详解'],
           ]
         },
       ],
