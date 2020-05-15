@@ -16,7 +16,7 @@ module.exports = {
       {text: '首页', link: '/'},
       {text: '基础笔记', link: '/pages/base-notes/js/js-this.md'},
       {text: '项目', link: '/pages/project-notes/cat/wc-money.md'},
-      {text: 'Node', link: '/pages/node-notes/test.md'},
+      {text: 'Node', link: '/pages/node-notes/node-callback.md'},
       {text: 'Linux', link: '/pages/linux-notes/linux-start.md'},
       {text: '面试题', link: '/pages/interview-notes/js-questions.md'},
       {text: '工具', link: '/pages/tool-notes/tool-use.md'},
@@ -114,7 +114,10 @@ module.exports = {
           collapsable: false,
           sidebarDepth: 1,
           children: [
-            ['test.md', 'Express初探'],
+            ['node-callback.md', 'Node回调函数'],
+            ['node-event-loop.md', 'Node事件循环'],
+            ['node-emitter.md', 'Node事件触发器'],
+            ['express-start.md', 'Express初探'],
           ]
         },
       ],
