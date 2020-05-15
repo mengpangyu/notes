@@ -128,6 +128,8 @@ module.exports = {
             ['linux-files.md', 'linux系统目录结构'],
             ['linux-files-attr.md', 'linux文件基本属性'],
             ['linux-files-manager.md', 'linux文件和目录管理'],
+            ['linux-disk-manager.md', 'linux磁盘管理'],
+            ['linux-shell.md', 'Shell编程'],
             ['linux-bash.md', 'bash命令详解'],
           ]
         },
