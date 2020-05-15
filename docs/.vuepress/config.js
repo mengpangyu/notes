@@ -124,6 +124,9 @@ module.exports = {
           collapsable: false,
           sidebarDepth: 1,
           children: [
+            ['linux-start.md', 'linux系统启动过程'],
+            ['linux-files.md', 'linux系统目录结构'],
+            ['linux-files-attr.md', 'linux文件基本属性'],
             ['linux-bash.md', 'bash命令详解'],
           ]
         },
