@@ -120,13 +120,14 @@ module.exports = {
       ],
       '/pages/linux-notes/': [
         {
-          title: 'linux笔记',
+          title: 'Linux笔记',
           collapsable: false,
           sidebarDepth: 1,
           children: [
             ['linux-start.md', 'linux系统启动过程'],
             ['linux-files.md', 'linux系统目录结构'],
             ['linux-files-attr.md', 'linux文件基本属性'],
+            ['linux-files-manager.md', 'linux文件和目录管理'],
             ['linux-bash.md', 'bash命令详解'],
           ]
         },
