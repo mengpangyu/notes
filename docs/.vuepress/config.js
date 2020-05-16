@@ -117,6 +117,8 @@ module.exports = {
             ['node-callback.md', 'Node回调函数'],
             ['node-event-loop.md', 'Node事件循环'],
             ['node-emitter.md', 'Node事件触发器'],
+            ['node-buffer.md', 'Node缓冲区'],
+            ['node-global.md', 'Node全局对象'],
             ['express-start.md', 'Express初探'],
           ]
         },
