@@ -13,17 +13,83 @@ module.exports = {
     logo: '/logo.png',
     lastUpdated: '最后更新于',
     nav: [
-      {text: '首页', link: '/'},
-      {text: '基础笔记', link: '/pages/base-notes/js/js-this.md'},
+      {text: '基础', link: '/pages/base-notes/js/js-this.md'},
       {text: '项目', link: '/pages/project-notes/cat/wc-money.md'},
       {text: 'Node', link: '/pages/node-notes/node-buffer.md'},
       {text: 'Linux', link: '/pages/linux-notes/linux-start.md'},
-      {text: '面试题', link: '/pages/interview-notes/js-questions.md'},
+      {text: '算法', link: '/pages/suanfa-notes/array/suanfa-day01.md'},
+      {text: '技巧', link: '/pages/interview-notes/js-questions.md'},
       {text: '工具', link: '/pages/tool-notes/tool-use.md'},
       {text: '关于我', link: '/pages/about-me/about-me.md'},
       {text: 'Github', link: 'https://github.com/chaunceym'},
     ],
     sidebar: {
+      '/pages/suanfa-notes/': [
+        {
+          title: '数组',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['array/suanfa-day01.md', 'Hello, 数组'],
+          ]
+        },
+        {
+          title: '列表',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['list/list01.md', 'Hello, 列表'],
+          ]
+        },
+        {
+          title: '栈',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['stack/stack01.md', 'Hello, 栈'],
+          ]
+        },
+        {
+          title: '队列',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['queue/queue01.md', 'Hello, 队列'],
+          ]
+        },
+        {
+          title: '链表',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['linked/linked01.md', 'Hello, 链表'],
+          ]
+        },
+        {
+          title: '树与递归',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['tree/tree01.md', 'Hello, 树与递归'],
+          ]
+        },
+        {
+          title: '哈希表',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['hash/hash01.md', 'Hello, 哈希表'],
+          ]
+        },
+        {
+          title: '双指针',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['pointer/pointer01.md', 'Hello, 双指针'],
+          ]
+        },
+      ],
       '/pages/base-notes/': [
         {
           title: 'JS',
@@ -141,7 +207,7 @@ module.exports = {
       ],
       '/pages/interview-notes/': [
         {
-          title: 'JS面试题',
+          title: 'JS技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -149,7 +215,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Vue面试题',
+          title: 'Vue技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -157,7 +223,7 @@ module.exports = {
           ]
         },
         {
-          title: 'React面试题',
+          title: 'React技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -165,7 +231,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Dom面试题',
+          title: 'Dom技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -173,7 +239,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Http面试题',
+          title: 'Http技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -181,7 +247,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Css面试题',
+          title: 'Css技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -189,7 +255,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Html面试题',
+          title: 'Html技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -197,7 +263,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Webpack面试题',
+          title: 'Webpack技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -205,7 +271,7 @@ module.exports = {
           ]
         },
         {
-          title: 'TypeScript面试题',
+          title: 'TypeScript技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [
@@ -213,7 +279,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Node面试题',
+          title: 'Node技巧',
           collapsable: true,
           sidebarDepth: 1,
           children: [

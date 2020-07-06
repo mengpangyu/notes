@@ -1,4 +1,4 @@
-# webpack 面试题
+# webpack 技巧
 
 
 ## webpack 与 grunt、gulp 的不同?

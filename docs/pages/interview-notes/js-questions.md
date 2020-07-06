@@ -1,4 +1,4 @@
-# JavaScript 面试题
+# JavaScript 技巧
 
 ## ES 6 语法知道哪些?
 
@@ -46,26 +46,21 @@ promise1和promise2只有一个成功就会调用success1
 - 防抖: 接外卖, 一直来一直等, 如果五分钟没来, 那就去送
 
 ```js
-const 接外卖 = (fn, delay)=>{
-    let timer;
-    return () => {
-        if (timer) clearTimeout(timer)
-		console.log('接单')
-        timer = setTimeout(() =>{
-          fn()
-        }, delay)
-    }
+// 防抖（一段时间会等，然后带着一起做了）
+function debounce(fn, delay){
+ let timerId = null
+ return function(){
+     const context = this
+     if(timerId){window.clearTimeout(timerId)}
+     timerId = setTimeout(()=>{
+         fn.apply(context, arguments)
+         timerId = null
+     },delay)
+ }
 }
-
-const 送外卖 = ()=> {
-    console.log('没单了，可以送了')
-}
-
-const 我是接外卖返回的函数 = 接外卖(送外卖, 5000)
-
-div.onclick = ()=> {
-    我是接外卖返回的函数()
-}
+const debounced = debounce(()=>console.log('hi'))
+debounced()
+debounced()
 ```
 :::tip
 有些地方认为节流函数不是立刻执行的，而是在冷却时间末尾执行的（相当于施法有吟唱时间），那样说也是对的。
@@ -74,25 +69,20 @@ div.onclick = ()=> {
 - 节流: 相当于游戏 CD, 等 CD 好了才能再次施放
 
 ```js
-const 技能CD = (fn, delay)=>{
-    let timer;
-    return () => {
-        if (timer) return console.log('CD还没好')
-        timer = setTimeout(() =>{
-            fn()
-        }, delay)
-    }
+ // 节流（一段时间执行一次之后，就不执行第二次）
+function throttle(fn, delay){
+ let canUse = true
+ return function(){
+     if(canUse){
+         fn.apply(this, arguments)
+         canUse = false
+         setTimeout(()=>canUse = true, delay)
+     }
+ }
 }
-
-const 放技能 = ()=> {
-    console.log('技能可以放了')
-}
-
-const 我是技能CD返回的函数 = 技能CD(放技能, 5000)
-
-div.onclick = ()=> {
-    我是技能CD返回的函数()
-}
+const throttled = throttle(()=>console.log('hi'))
+throttled() //hi
+throttled() //在canUse变为true之前只能调用一次throttled函数
 ```
 
 ## 手写 AJAX

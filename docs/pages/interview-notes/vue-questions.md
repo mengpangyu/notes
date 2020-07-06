@@ -1,4 +1,4 @@
-# Vue 面试题
+# Vue 技巧
 
 ## watch 和 computed 和 methods 区别是什么?
 

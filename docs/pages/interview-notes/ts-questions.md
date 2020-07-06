@@ -1,4 +1,4 @@
-# TypeScript 面试题
+# TypeScript 技巧
 
 ## never 类型是什么?
 
