@@ -89,6 +89,14 @@ module.exports = {
             ['pointer/pointer01.md', 'Hello, 双指针'],
           ]
         },
+        {
+          title: '图',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['chart/chart01.md', 'Hello, 图'],
+          ]
+        },
       ],
       '/pages/base-notes/': [
         {
