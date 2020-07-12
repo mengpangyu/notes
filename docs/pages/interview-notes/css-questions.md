@@ -347,6 +347,11 @@ BFC 特性及应用
 
 ## 清除浮动说一下?
 
+- 法一: clear 属性的空元素, 在元素最后加一个空 div
+- 法二: 浮动元素加 overflow 属性
+- 法三: 浮动元素的容器添加浮动
+- 法四: 伪元素 .clearfix 添加到父容器上, 子元素会自动清除浮动
+
 ```css
 .clearfix:after{
   content:'';
@@ -354,4 +359,47 @@ BFC 特性及应用
   clear: both;
 }
 ```
-- 把 .clearfix 加到父容器上, 里面的子元素的浮动就会清除 
+
+## link 标签和 import 标签的区别
+
+- link 属于 html 标签, 而 @import 是 css 提供的
+- 页面被加载时, link 同时会被加载, 而 @import 引用的 css 是等到页面加载结束后加载
+- link 没有兼容性, @import 在 ie5+ 才能识别
+- link 方式优先 @import
+
+## transition 和 animation 的区别
+
+大部分属性都是相同的, 主要区别是 transition 需要触发一个事件才能改变属性, 而 animation 不需要触发任何事件的情况下
+才会随时间改变属性值, 并且 transition 为 2 帧, 而 animation 是 1 帧
+
+## 关于 JS 动画和 CSS 动画的差异
+
+渲染线程为 main thread 和 compositer thread, 如果 css 动画只改变, transform 和 opacity, 这是整个 css 动画得以在 
+compositer thread 完成, 而动画会在 main thread 完成, 然后再 compositer thread 进行操作
+
+- 功能涵盖方面, JS 比 CSS 大
+- 实现难度不一, CSS 比 JS 容易
+- CSS 动画有天然事件支持
+- CSS3 有兼容性问题
+
+## 重绘和重排
+
+DOM 的变化影响到了宽高, 浏览器重新计算元素的几何属性, 其他元素的几何属性也会受到影响, 浏览器需要重构渲染, 过程为重排
+
+浏览器将受到影响的部分重新绘制在屏幕上的过程称为重绘
+
+>引起重绘和重排的原因有
+
+- 添加或者删除可见的 DOM 元素
+- 元素尺寸位置的变化
+- 浏览器页面初始化
+- 浏览器窗口大小发生改变, 重排一定导致重绘, 重绘不一定导致重排
+
+>减少重绘重排的方法有
+
+- 不在布局信息改变时做 DOM 查询
+- 使用 csstext, className 一次性改变属性
+- 使用 fragment
+- 对于多次重排的元素, 比如说使用动画, 使用决定定位, 使其不受其他元素影响
+
+
