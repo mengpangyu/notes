@@ -8,6 +8,17 @@
     
 - 获取用户的输入, 不用innerHtml,用innerText
 - 对用户的输入进行过滤, 如对& < > " ' /等进行转义
+
+## Cookie 如果防范 XSS 攻击?
+
+httponly 这个属性可以防止 XSS 攻击, 它会禁止 js 脚本来访问 Cookie
+
+secure 这个属性告诉浏览器尽在请求为 https 的时候发送 Cookie
+
+
+## 一句话概括 RestFul 
+
+用 URL 定位资源, 用 HTTP 描述操作
     
 ## 什么是 CSRF? 如何预防?
 

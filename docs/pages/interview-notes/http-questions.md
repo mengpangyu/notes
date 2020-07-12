@@ -170,3 +170,224 @@ GET 会把请求头和数据一起发到服务器, POST 会先发请求头告诉
 - 多路复用: 根据 Request id 来区分
 - header 压缩: 缓存 header 列表, 避免重复传送
 - 服务器推送: 在请求 style.css 的时候服务器自动把 main.js 放在浏览器的缓存里
+
+## 说一下 HTTP 和 HTTPS
+
+https 的 SSL 加密是在传输层实现的
+
+### 基本概念
+
+http: 超文本传输协议, 是互联网上应用最为广泛的一种网络协议, 是一个客户端和服务器端请求和应答的标准(TCP), 用于 WWW 服务器传输
+超文本到本地浏览器的传输协议, 他可以使浏览器更加高效, 是网络传输减少
+
+https: 是以安全为目标的 HTTP 通道, 简单讲 HTTP 的安全版, 既 HTTP 下加入 SSL 层, HTTPS 的安全基础是 SSL, 因此加密的详细内容就需要 SSL
+
+https协议主要作用: 建立一个信息安全通道, 确保数组的传输, 确保网站的真实性
+
+### http 和 https 的区别
+
+http 传输的数据是未加密的, 也就是明文的, 网景公司设置了 SSL 协议来对 http 协议传输的数据进行加密处理, 简单来说 https 协议
+是由 http 和 ssl 协议建构的可进行加密传输和身份确认的网络协议, 比 http 协议的安全性更高
+
+1. https 协议需要 ca 证书, 费用较高
+2. http 是超文本传输协议, 信息是明文传输, https 贼是安全性的 ssl 加密传输协议
+3. 使用不同的链接方式, 端口也不同, 一般而言, http 端口为 80, https 端口为 443
+4. http 连接很简单, 是无状态的, https 协议是由 ssl + http 协议构建的加密传输, 身份确认网络协议
+
+### https 协议的工作原理
+
+客户端在使用 https 方式与 web 服务器通信时有以下几个步骤
+
+1. 客户端在使用 https url 访问服务器, 则要求 web 服务器建立 ssl 连接
+2. web 服务器收到客户端请求后, 会将网站的证书(包含公钥), 返回或者说传输给客户端
+3. 客户端和 web 服务器端开始协商建立 ssl 链接的安全等级
+4. 客户端浏览器通过双方协商一致的安全等级, 建立会话秘钥, 然后通过网站的公钥来加密会话秘钥, 并传送给网站
+5. web 服务器通过自己的私钥解密出会话秘钥
+6. 服务器通过会话加密与客户端之间的通信
+
+### https 的优缺点
+
+>优点
+
+- 使用 https 的可认证用户和服务器, 确保数据发送到正确的客户机和服务器
+- https 协议由 ssl + http 协议构建的可进行加密传输, 身份认证的网络协议, 要比 http 安全, 可防止数据在传输过程中不被盗取, 
+改变, 确保数据的完整性
+- https 是现行架构下最安全的解决方案, 大幅度增加了中间人攻击的成本
+- 谷歌曾在 2014 年调整搜索引擎算法, 并称采用 https 加密的网站在搜索中的排名将会更高
+
+>缺点
+
+- https 握手阶段比较费时, 也会使页面加载时间延长 50%. 增加 10%~20% 的耗电 
+- https 缓存不如 http 高效, 会增加数据开销
+- ssl 证书也需要钱, 功能越强大的证书费用越高
+- ssl 需要绑定 ip, 不能在同一 ip 上绑定多个域名, ipv4 资源支持不了这种消耗
+
+## TCP 三次握手, 一句话概括
+
+客户端和服务端需要直到各自可收发, 因此需要三次握手
+
+## TCP 和 UDP 的区别
+
+1. TCP 是面向连接的, UDP 是无连接的即发送数据前不需要先建立连接
+2. TCP 提供可靠的服务, 也就是说, 通过 TCP 传输的数据, 无差错, 不丢失, 不重复, 且按顺序到达, UDP 尽最大努力交付, 即不保证
+可靠交付, 并且因为 TCP 可靠, 面向连接, 不会丢失数据因此适合大量数据的交换
+3. TCP 面向字节流(适合银行交付, 金融交付等), UDP 面向报文, 并且网络出现拥塞不会使得其发送效率降低(因此会出现丢包, 对事实时的应用比如 ip 电话, 直播, 游戏等)
+4. TCP 只能是一对一的, UDP 支持一对一, 一对多
+5. TCP 的首部较大为 20 字节, 而 UDP 只有八字节
+6. TCP 是面向连接的可靠性传输, 而 UDP 是不可靠的
+
+## WebSocket 的实现和应用
+
+### 什么是 WebSocket?
+
+WebSocket 是 HTML5 中的协议, 支持持久连接, HTTP 协议支持持久性连接, HTTP1.0 和 HTTP1.1 都不支持持久性的连接, 
+HTTP1.1 中的 keep-alive, 将多个 http 请求合并为 1 个
+
+### WebSocket 是什么样的协议, 具体有什么优点?
+
+HTTP 的生命周期通过 Request 来界定, 也就是 Request 一个 Response, 那么在 HTTP1.0 当中, 这次 HTTP 请求就结束了, 
+在 HTTP1.1 中进行了改进, 有一个 `connection: Keep-alive`, 也就是说, 在一个 HTTP 连接中, 可以发送多个 Request, 接收
+多个 Response, 但是必须记住, 在 HTTP 中只有一个 Request 只能对应一个 Response, 而且这个 Response 是被动的, 
+不能主动发起
+
+WebSocket 是基于 HTTP 协议的, 或者说借用了 HTTP 协议来完成一部分握手, 在握手阶段与 HTTP 是相同的
+
+一个例子: 
+
+```http request
+GET /chat HTTP/1.1
+Host: server.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Origin: http://example.com
+```
+
+多了两个属性, Upgrade 和 Connection
+
+告诉服务器发送的是 WebSocket
+
+```http request
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+```
+
+## HTTP 请求方式, HEAD 方式
+
+head: 类似于 get 请求, 只不过返回的响应里没有具体的内容, 用户获取报头
+
+options: 允许客户端查看服务器的性能, 比如服务器支持的请求方式等
+
+## 一个图片 url 访问后直接下载怎样实现
+
+请求的返回头里面, 用于浏览器解析的重要参数就是 OSS 的 API 文档里面的返回 HTTP 头, 就决定用户下载行为的参数
+
+下载情况下:
+
+1. x-oss-object-type: Normal
+2. x-oss-request-id: 12jkdfgs53jwkt5436
+3. x-oss-storage-class: Standard
+
+## 说一下 web Quality (无障碍)
+
+能够被残障人士使用的网站才能称得上一个易用的网站
+
+使用 alt 属性, 有时候浏览器无法显示图像, 具体原因有, 用户关闭了图像显示
+
+浏览器是语音浏览器, 如果提供了 alt 属性, 那么浏览器至少可以显示有关图像的文字
+
+## BOM 有哪些方法?
+
+>location
+
+- location.href 返回或设置当前文档的的 URL
+- location.search 返回 URL 中的查询字符串部分(包括?)
+- location.hash 返回 URL# 后面的内容
+- location.host 返回域名
+- location.hostname 返回主域名
+- location.pathname 返回域名后部分
+- location.port 返回端口
+- location.protocol 返回 URL 中的协议
+- location.assign 返回当前文档的 URL 
+- location.replace() 设置当前文档的 URL, 并在 history 对象中的地址列表中移出这个 URL
+- location.reload 重新加载页面
+
+>history
+
+- history.go() 前进或后退页数数
+- history.back() 后退一页
+- history.forward() 前进一页
+
+>navigator
+
+- navigator.userAgent 返回用户代理头的字符串表示
+- navigator.cookieEnabled 返回浏览器是否支持(启用) Cookie
+
+## fetch 发送两次请求的原因
+
+fetch 发送 post 请求, 第一次发送了一个 Options 请求, 访问服务器是否支持修改的请求, 如果服务器支持, 那么在第二次中发送
+真正的请求
+
+## HTTP 常用请求头
+
+|  协议头   | 说明  |
+|  ----  | ----  |
+| Accept   | 可接受的响应内容类型(Content-Types)|
+| Accept-Charset  | 可接受的字符集 |
+| Accept-Encoding  | 可接受的编码方式 |
+| Accept-Language  | 可接受的语言 |
+| Accept-Datetime  | 可接受的按照时间来表示的响应内容版本 |
+| Authorization  | 用于表示 HTTP 协议中需要认证资源的认证信息 |
+| Cache-Control  | 用来指定当前请求/回复中是否使用缓存机制 |
+| Connection  | 客户端(浏览器)想要优先使用的连接类型 |
+| Cookie  | Cookie 信息 |
+| Content-Length  | 以8进制表示请求提的长度 |
+| Content-MD%  | 请求体的内容二进制 MD5 取散列值, 以 Base64 编码的结果 |
+| Content-Type  | 请求体的 MIME 类型(用于POST和PUT) |
+| Date  | 发送日期和时间 |
+| Expect  | 表示客户端要求服务端做出特定的行为 |
+| HOST  | 端口 |
+| UserAgent  | 浏览器的身份标识字符串 |
+| Upgrade  | 要求服务器升级到一个高版本协议 |
+
+## 强缓存、协商缓存
+
+缓存分为两种: 强缓存和协商缓存, 根据响应 header 内容来决定
+
+| 缓存分类| 获取资源形式 | 状态码 | 发送请求到服务器 |
+| --- | --- | --- | --- |
+| 强缓存 | 从缓存中取 | 200(from cache) | 否, 直接从缓存取 |
+| 协商缓存 | 从缓存中取 | 304(not modified) | 是, 通过服务器来告知缓存是否可用 |
+
+:::tip 注意
+强缓存相关字段有 expires, cache-control, 如果两个同时存在, cache-control 的优先级高
+
+协商缓存相关字段 Last-Modified/if-Modified-Since, Etag/if-None-Match
+:::
+
+ **普通刷新会启用弱缓存，忽略强缓存。只有在地址栏或收藏夹输入网址、通过链接引用资源等情况下，浏览器才会启用强缓存**
+
+## 前端优化
+
+降低请求量: 合并资源, 减少 HTTP 请求, minify/gzip 压缩, webP, lazyload
+
+加快请求速度: 预解析 DNS, 减少域名数, 并行加载, CDN 分发
+
+缓存: HTTP 协议缓存请求, 离线缓存 manifest, 离线数据缓存 localStorage
+
+渲染: JS/CSS 优化, 加载顺序, SSR
+
+## 浏览器输入到渲染全过程
+
+- DNS 解析
+- TCP 连接
+- 发送 HTTP 请求
+- 服务器处理请求并返回 HTTP 报文
+- 浏览器解析渲染页面
+- 连接结束
+
+
+
