@@ -1,1 +1,58 @@
 # Node 技巧
+
+## 简单实现 Node 的 Events 模块
+
+- 观察者模式或者说订阅者模式, 它定义了对象间的一种一对多的关系, 让多个观察者对象同时监听某一主题对象, 当一个对象发生
+改变时, 所有依赖于它的对象都将得到通知
+
+node 中的 Events 模块就是通过观察者模式实现的:
+
+```js
+let events = require('events')
+let eventEmitter = new events.EventEmitter
+eventEmitter.on('say',name=>{
+  console.log('hello',name)
+})
+eventEmitter.emit('say','chauncey')
+```
+
+eventEmitter 触发 say 事件, 用过 On 接收, 并且输出结果, 这就是一个订阅模式的实现
+
+```js
+function Events() {
+  this.on = function(eventName,callback) {
+    this.handles = this.handles ? this.handles : {} 
+    this.handles[eventName] = this.handles[eventName] ? this.handles[eventName] : [] 
+    this.handles[eventName].push(callback)
+  }
+  this.emit = function(eventName,obj) {
+    if(this.handles[eventName]){
+      for(var i = 0; i < this.handles[eventName].length; i++) {
+        this.handles[eventName][i](obj) 
+      } 
+    } 
+  } 
+  return this
+}
+let events = new Events()
+events.on('say',(name)=>{
+  console.log(name)
+})
+events.emit('say','chauncey')
+```
+
+因为 new 出来的 events 对象, 所以每个事件监听器都不受其他影响
+
+```js
+let events1 = new Events()
+let events2 = new Events()
+events1.on('say',(name)=>{
+  console.log(name)
+})
+events1.emit('say','meng')
+events2.on('say',(name)=>{
+  console.log(name)
+})
+events2.emit('say','xiang')
+```
+

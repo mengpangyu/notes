@@ -776,3 +776,333 @@ Promise.prototype.then = function (onFufiled, onRejected) {
 module.exports = Promise;
 ```
 
+## 类的创建和继承
+
+### 原型链继承
+
+```js
+// Animal 自身的方法
+function Animal(name){
+  this.name = name|| 'Animal'
+  this.sleep = function(){
+    console.log(`${this.name} is sleeping`) 
+  }
+}
+
+// Animal 上的方法
+Animal.prototype.eat = function(food) {
+  console.log(`${this.name} is eat ${food}`)
+}
+function Cat() {}
+Cat.prototype = new Animal()
+Cat.prototype.name = 'cat' 
+```
+
+利用 new 继承, 基于原型链, 既是父类的实例, 也是子类的实例, 无法实现多继承
+
+### 构造继承
+
+```js
+// Animal 自身的方法
+function Animal(name){
+  this.name = name|| 'Animal'
+  this.sleep = function(){
+    console.log(`${this.name} is sleeping`) 
+  }
+}
+// Animal 上的方法
+Animal.prototype.eat = function(food) {
+  console.log(`${this.name} is eat ${food}`)
+}
+function Cat() {
+  Animal.call(this)
+  this.name = name || 'cat'
+}
+```
+
+可以实现多继承, 但是只能实现父类的属性方法, 不能实现原型的方法
+
+### 组合继承
+
+```js
+// Animal 自身的方法
+function Animal(name){
+  this.name = name|| 'Animal'
+  this.sleep = function(){
+    console.log(`${this.name} is sleeping`) 
+  }
+}
+// Animal 上的方法
+Animal.prototype.eat = function(food) {
+  console.log(`${this.name} is eat ${food}`)
+}
+
+function Cat() {
+  Animal.call(this)
+  this.name = name || 'cat'
+}
+Cat.prototype = new Animal()
+Cat.prototype.constructor = Cat
+```
+
+可以继承实例属性方法, 也可以继承原型属性/方法, 但是调用两次父类构造函数, 生成两份实例
+
+### 寄生组合继承
+
+通过寄生方式, 砍掉父类的实例属性, 这样在调用父类的构造的时候, 就不会初始化两次实例方法
+```js
+// Animal 自身的方法
+function Animal(name){
+  this.name = name|| 'Animal'
+  this.sleep = function(){
+    console.log(`${this.name} is sleeping`) 
+  }
+}
+// Animal 上的方法
+Animal.prototype.eat = function(food) {
+  console.log(`${this.name} is eat ${food}`)
+}
+
+function Cat() {
+  Animal.call(this)
+  this.name = name || 'cat'
+}
+(function() {
+  let Super = function() {}
+  Super.prototype = Animal.prototype
+  Cat.prototype = new Super()
+})()
+```
+这种方法较为推荐
+
+## 说说前端事件流
+
+事件流描述的是从页面中接收事件的顺序, DOM 级事件流包括以下阶段
+
+- 事件捕获阶段
+- 处于目标阶段
+- 事件冒泡阶段
+
+## 图片懒加载和预加载
+
+- 预加载: 提前加载图片, 当用户需要查看时刻直接从本地缓存中渲染
+- 懒加载: 主要目的为了前端优化, 减少请求数或延迟数
+
+## clientHeight, scrollHeight, scrollTop, offsetTop, clientTop 区别
+
+- clientHeight: 表示可视区域高度, 不包含 border 和滚动条
+- offsetHeight: 表示可视区域的高度, 包含了 border 和滚动条
+- scrollHeight: 表示所有区域高度, 包含因为滚动条被隐藏的部分
+- clientTop: 表示边框 border 的厚度, 在未指定的情况下为 0
+- scrollTop: 滚动后被隐藏的高度, 获取对象相对于 offsetParent 属性指定的父坐标距离顶端的高度
+
+## Commonjs, AMD 和 CMD
+
+- CommonJS: 服务端的模块化, Nodejs 
+- AMD: 异步模块定义, 解决多个文件依赖关系, requireJS 实现了 AMD
+- CMD: 推崇就近依赖, seaJS 实现了 CMD
+
+## 实现一个 once 函数
+
+```js
+const once = (callback) => {
+  let tag = true
+  return ()=>{
+    if(tag){
+      callback()
+      tag = false 
+    }
+  }
+}
+```
+
+## JS 监听对象属性的改变
+
+>ES5 利用 defineProperty(Vue2响应式)
+
+```js
+Object.defineProperty(user,'name',{
+  set(key,value){
+    // todo 
+  }
+})
+```
+如果 id 不在 user 对象中, 则不能监听 id 的变化
+
+>ES6 用 Proxy(Vue3响应式)
+
+```js
+let user = new Proxy({},{
+  set(target,key,value,receiver){
+    // todo 
+  }
+})
+```
+
+即使有属性在 user 中不存在, 通过 user.id 来定义也可以同样监听这个属性
+
+
+## 实现一个私有变量
+
+>Ojbect.defineProperty
+
+```js
+obj = {name: 'chauncey', getName(){
+  return this.name 
+}}
+Object.defineProperty(obj,'name',{
+  // 不可枚举, 不可配置, 默认就是
+  get(){
+    return undefined 
+  }
+})
+```
+
+>通过函数
+
+```js
+function product(){
+  let name = 'chauncey';
+  this.getName = function(){
+    return name;
+  }
+}
+const obj = new product();
+```
+
+>通过 class
+
+```js
+class Person{
+  #name = 'chauncey'
+  getName(){
+    return this.#name 
+  }
+}
+```
+
+## setTimeout, setInterval 和 requestAnimationFrame 的区别
+
+RAF 不需要设置时间间隔, 它采用的是系统时间间隔, 不会因为前面的任务而受影响
+
+- RAF 会把每一帧的所有 DOM 操作集中起来, 再一次重绘或回流中完成
+- 在隐藏或不可见的元素中, RAF 将不会执行重绘或回流, 意味着更少的 CPU 的使用量
+- RAF 是专为浏览器动画提供的 API, 在运行时浏览器会自动优化方法调用
+
+## 手写 bind
+
+bind 函数可以指定 this 的指向, 可以手写一个 bind 函数
+
+>ES6 写法 
+
+```js
+Function.prototype.myBind = function(context,...args){
+  if (typeof this !== 'function') return
+  let fn = this
+  return function(...rest) {
+    return fn.apply(context,[...args,...rest]) 
+  } 
+}
+```
+
+>ES5 写法
+
+```js
+Function.prototype.myBind = function() {
+  if (typeof this !== 'function') return
+  let args = Array.prototype.slice.call(arguments)  // slice 方法的应用就是实现深拷贝
+  const context = args.splice(0,1)[0] // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
+  const fn = this // bind 把 this 保存
+  return function() {
+    let rest = Array.prototype.slice.call(arguments)
+    return fn.apply(context,args.concat(rest))  // 利用 bind 函数的 this 调用 apply 实现委托给上下文
+  }
+}
+```
+
+这样写有错误, 需要把原型留下, 因为在 new 的时候会直接走 bind 的 this, 而忽略 new 的 this
+
+修改:
+
+```js
+Function.prototype.myBind = function() {
+  if (typeof this !== 'function') return
+  let args = Array.prototype.slice.call(arguments)  // slice 方法的应用就是实现深拷贝
+  const context = args.splice(0,1)[0] // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
+  const fn = this // bind 把 this 保存
+  const middleFun = function() {} // 定义一个空函数来当做中间人, 可以实现继承原型链
+  const callback =  function() {
+    let rest = Array.prototype.slice.call(arguments)
+    return fn.apply(this instanceof context ? this : context,args.concat(rest))  // 利用 bind 函数的 this 调用 apply 实现委托给上下文
+  }
+  if(this.prototype){
+    middleFun.prototype = this.prototype
+  }
+  callback.prototype = new middleFun()
+  return callback
+}
+```
+
+## Ajax 解决浏览器缓存问题
+
+- 发送请求前加 anyAjaxObj.setRequestHeader('If-Modified-Since','0')
+- 发送请求前加 anyAjaxObj.setRequestHeader('Cache-Control','no-cache')
+- URL后面加随机数: fresh= Math.random()
+- URL后加时间戳: nowtime= new Date().getTime()
+- jQuery 直接: $.ajaxSetup({cache:false})
+
+## 如何实现 sleep 效果
+
+- Promise 实现
+
+```js
+function sleep(ms) {
+  return new Promise(resolve=>{
+    console.log('start sleep') 
+    setTimeout(resolve,ms)
+  }) 
+}
+sleep(1000).then(()=>{
+   console.log('sleep end') 
+})
+```
+
+- async 实现封装
+
+```js
+function sleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve,ms)
+    console.log('start sleep') 
+  })
+}
+async function test(){
+  await sleep(1000)
+  console.log('sleep end') 
+}
+test()
+```
+
+- 通过 generate 来实现
+
+generate 函数是一个生成器函数, 他返回一个 Generator 对象, yield 是每个区域, next.value 可以获取它的值
+async await 其实是 generator 的语法糖
+
+```js
+function* sleep(ms) {
+  yield new Promise(resolve => {
+    console.log('start sleep') 
+    setTimeout(resolve,ms) 
+  }) 
+}
+sleep(1000).next().value.then(()=>console.log('sleep end'))
+```
+
+## 说一下虚拟 DOM
+
+用 JS 表示 DOM 树的结构, 用这个树建立真正的 DOM 树, 插入到文档中, 当状态变更的时候, 重新构造一棵新的对象树
+, 然后用新的树和旧的树比较, 如果两棵树有差异, 然后就把差异应用到真正的 DOM 树中, 本质上就是在 JS 和 DOM 之间做了一个缓存
+
+## JS 加载过程阻塞, 怎样解决
+
+指定 script 的 async 属性
