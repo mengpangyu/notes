@@ -26,6 +26,14 @@ module.exports = {
     sidebar: {
       '/pages/suanfa-notes/': [
         {
+          title: '算法',
+          collapsable: false,
+          sidebarDepth: 1,
+          children: [
+            ['suanfa/sort.md', 'Hello, 排序'],
+          ]
+        },
+        {
           title: '数据结构',
           collapsable: false,
           sidebarDepth: 1,
@@ -39,14 +47,6 @@ module.exports = {
             ['structure/stack01.md', 'Hello, 栈'],
             ['structure/queue01.md', 'Hello, 队列'],
             ['structure/tree01.md', 'Hello, 二叉树']
-          ]
-        },
-        {
-          title: '算法',
-          collapsable: false,
-          sidebarDepth: 1,
-          children: [
-            ['suanfa/sort.md', 'Hello, 排序'],
           ]
         },
       ],
