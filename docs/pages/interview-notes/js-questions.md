@@ -289,6 +289,8 @@ let a = {name: 'hello'}
 let b = shallowCopy(a)
 console.log(b)
 ```
+
+concat() slice() 方法也可实现数组浅拷贝
   
 ## 如何实现深拷贝?
 
@@ -317,7 +319,7 @@ function deepClone(target) {
   if (typeof target === 'object') {
     let cloneTarget = Array.isArray(target) ? [] : {}; 
     for (const key in target) {
-      cloneTarget[key] = clone(target[key]); 
+      cloneTarget[key] = deepClone(target[key]); 
     }
     return cloneTarget; 
   } else { 
@@ -328,13 +330,13 @@ function deepClone(target) {
 - 解决循环引用, 加入 WeakMap(因为WeakMap是弱引用, 利于垃圾回收)
 
 ```js
-function deepClone(target, map = new Map()) {
+function deepClone(target, map = new WeakMap()) {
   if (typeof target === 'object') {
     let cloneTarget = Array.isArray(target) ? [] : {}; 
     if (map.get(target)) return map.get(target)  
     map.set(target, cloneTarget); 
     for (const key in target) { 
-      cloneTarget[key] = clone(target[key], map); 
+      cloneTarget[key] = deepClone(target[key], map); 
     } 
     return cloneTarget; 
   } else {
