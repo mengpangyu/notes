@@ -1106,3 +1106,5 @@ sleep(1000).next().value.then(()=>console.log('sleep end'))
 ## JS 加载过程阻塞, 怎样解决
 
 指定 script 的 async 属性
+
+

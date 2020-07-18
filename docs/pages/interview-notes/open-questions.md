@@ -346,3 +346,84 @@ EventLoop 是一个阶段, 分为 Node.js 和 Chrome
 7. 共享内存: 共享内存就是映射一段能被其他进程所访问的内存, 这段内存由一个进程创建, 但是多个进程可以访问
 8. 套接字: 可用于不同机器之间的进程通信
 
+## JS 常用设计模式
+
+- 单例模式: 任意对象都是单例, 无须特别处理
+
+```js
+let obj = {name:'chauncey',age:30}
+```
+
+- 工厂模式: 就是同样形式参数返回不同的实例
+
+```js
+function Person(name){this.name = 'chauncey'}
+function Animal(name){this.name = 'cat'}
+function Factory() {}
+Factory.prototype.getInstance = function(className) {
+  return eval('new ' + className + '()') 
+}
+let factory = new Factory()
+let person = factory.getInstance('Person','chauncey')
+let animal = factory.getInstance('Animal','cat')
+console.log(person.name)
+console.log(animal.name)
+```
+
+- 代理: 就是新建一个类调用老类的接口, 包裹一下
+
+```js
+function Person() {}
+Person.prototype.sayName = function() { console.log('chauncey') }
+Person.prototype.sayAge = function() { console.log(11) }
+function PersonProxy() {
+  this.person = new Person()
+  this.callMethod = (functionName)=>{
+    this.person[functionName]() 
+  }
+}
+let pp = new PersonProxy()
+pp.callMethod('sayName')
+pp.callMethod('sayAge')
+```
+
+- 观察者: 就是事件模式, 比如 onclick 
+
+```js
+// 发布者
+function Publisher() {
+  this.listeners = []
+}
+Publisher.prototype = {
+    'addListener': function(listener) {
+      this.listeners.push(listener)
+    },
+    'removeListener': function(listener) {
+      delete this.listeners[this.listeners.indexOf(listener)]
+    },
+    'notify': function(obj) {
+      for(let i=0;i<this.listeners.length;i++){
+        let listener = this.listeners[i] 
+        if(typeof listener !== 'undefined'){
+          listener.process(obj) 
+        }
+      }
+    }
+}
+// 订阅者
+function Subscriber() { }
+Subscriber.prototype = {
+  'process': function(obj) {
+    console.log(obj) 
+  }
+}
+
+let publisher = new Publisher()
+publisher.addListener(new Subscriber())
+publisher.addListener(new Subscriber())
+// 添加了两个订阅者去监听事件, 如果触发, 那么就获取, 打印
+publisher.notify({name:'meng',age:'30'})
+```
+
+
+
