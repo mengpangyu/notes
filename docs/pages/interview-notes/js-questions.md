@@ -1105,8 +1105,312 @@ sleep(1000).next().value.then(()=>console.log('sleep end'))
 用 JS 表示 DOM 树的结构, 用这个树建立真正的 DOM 树, 插入到文档中, 当状态变更的时候, 重新构造一棵新的对象树
 , 然后用新的树和旧的树比较, 如果两棵树有差异, 然后就把差异应用到真正的 DOM 树中, 本质上就是在 JS 和 DOM 之间做了一个缓存
 
-## JS 加载过程阻塞, 怎样解决
+## Set 实现并集, 交集, 差集
 
-指定 script 的 async 属性
+```js
+let set1 = new Set([1,2,3])
+let set2 = new Set([4,3,2])
 
+let intersect = new Set([...set1].filter(value=>set2.has(value)))
+let union = new Set([...set1,...set2])
+let difference = new Set([...set1].filter(value=>!set2.has(value)))
+console.log(intersect)
+console.log(union)
+console.log(difference)
+```
+
+### WeakSet 
+
+WeakSet 对象允许你将弱引用对象储存在一个集合中
+
+与 Set 区别:
+
+- WeakSet 只能存储对象引用, 不能存值, Set 可以
+- weakSet 弱引用的, 垃圾回收机制不考虑 WeakSet 对该对象的应用, 如果没有其他的变量或属性引用这个对象值, 那么这个对象就会被垃圾回收掉
+- WeakSet 无法遍历, 也没有办法拿到它包含的所有元素
+
+
+### 总结 Set, WeakSet, Map, WeakMap
+
+- Set 
+    - 成员唯一, 无序且不重复
+    - [value,value], 键值与键名是一致的, (或者说只有键值, 没有键名)
+    - 可以遍历: add, delete, has
+- WeakSet 
+    - 成员都是对象
+    - 成员都是弱引用, 可以被垃圾回收, 可以用来保存 DOM 节点, 不容易造成内存泄露
+    - 不能遍历, 方法有 add, delete, has
+- Map
+    - 本质上是键值对的集合, 类似集合
+    - 可以遍历, 方法很多可以跟各种数据格式转换
+- WeakMap
+    - 只接受对象作为键名, 不接受其他类型作为键名
+    - 键名是弱引用, 键值可以是任意的, 键名所指向的对象可以被垃圾回收, 此时键名是无效的
+    - 不能遍历, 方法有 get, set, has, delete
+    
+## Object.prototype.toString.call(), instanceof, Array.isArray() 区别和优劣
+
+1. Object.prototype.toString.call()
+
+每一个继承 Object 的对象都有 toString 方法, 如果 toString 方法没有重写的话, 会返回 `[Object type]`, 其中 type 为对象的 类型
+, 但当除了 Object 类型的对象外, 其他类直接使用 toString 方法时, 会直接返回都是内容的字符串, 所以我们需要 call 或者 apply 方法来改变
+toString 的上下文
+
+```js
+const arr = [1,2]
+Object.prototype.toString.call(arr) // [object Array]
+```
+
+`Ojbect.prototype.toString.call()` 常用判断浏览器内置对象
+
+2. instanceof
+
+instanceof 的内部机制是通过判断对象的原型链中是不是能找到类型的 prototype
+
+但 instanceof 只能用来判断对象的类型, 原始类型不可以, 并且所有对象的 instanceof Object 都是 true
+
+```js
+[] instanceof Array // true
+[] instanceof Object // true
+```
+
+3. Array.isArray() 
+
+ES6 新语法, 用来判断是否为数组
+
+当检测 Array 时, `Array.isArray()` 优于 `instanceof`, 因为 `Array.isArray()` 可以检查出 `iframs`
+
+
+## 全局作用域中, const let 声明不在 window 上到底在哪里?
+
+```js
+let a = 2
+const b = 3
+console.log(new Function()) // script 中
+```
+
+## 下面代码打印结果
+
+```js
+var a = 10;
+(function () {
+    console.log(a)
+    a = 5
+    console.log(window.a)
+    var a = 20;
+    console.log(a)
+})()
+// undefined 10 20 
+```
+
+在函数内已经声明了 a, 变量提升, 所以一开始 undefined, 然后 a = 5, 是给函数内部的 a 赋值, 所以 window.a 还是 10
+最后 a 赋值给 20, 打印 20
+
+
+## 为什么 for 循环的性能远远高于 forEach 的性能
+
+- for 循环没有任何额外的函数调用栈和上下文
+- forEach 函数实际上是 arr.forEach((currentValue,index,arr),thisValue)
+
+不是普通的 for 语法糖, 还有诸多上下文和参数考虑, 可能拖慢性能
+
+## 以下代码结果
+
+```js
+// example 1
+var a={}, b='123', c=123;  
+a[b]='b';
+a[c]='c';  
+console.log(a[b]); // c, b 默认为 123, c 会覆盖 b
+
+// example 2
+var a={}, b=Symbol('123'), c=Symbol('123');  
+a[b]='b';
+a[c]='c';  
+console.log(a[b]); // b, symbol 是唯一的
+
+// example 3
+var a={}, b={key:'123'}, c={key:'456'};  
+a[b]='b';
+a[c]='c';  
+console.log(a[b]); // c, 对象做为键, 会调用 toString, 所以 c 会覆盖 b
+```
+
+本题考查的是对象键名的转换
+
+- 对象的键名只能是字符串和 Symbol 类型
+- 其他类型的键名会被转换为字符串
+- 对象转字符串会默认调用 toString 方法
+
+
+## input 搜索如何防抖, 如何处理中文输入
+
+防抖就是送外卖
+
+处理中文输入, elementui 的源码, 
+
+- compositionstart: 触发于一段文字输入之前
+- compositionupdate: 每打一个拼音字母触发
+- compositiononend: 打好的中文输入完触发
+
+## var, let, const 区别
+
+- var: 会在栈内存里分配内存空间, 等到实际语句执行的时候, 在存储对应的变量, 如果传的是引用类型, 那么就会在栈内存一个指向堆内存的指针
+- let: 不会预分配内存空间, 而且在分配空间时, 做一个检查, 如果已有相同变量名, 那么就报错
+- const: 不会预分配内存空间, 存储的变量不会修改, 存储对象指针不会修改, 但可以修改对象里得属性
+
+## 下面代码打印结果
+
+```js
+// 定义一个构造函数 Foo
+function Foo() {
+ Foo.a = function() {
+   console.log(1)
+ }
+ this.a = function() {
+   console.log(2)
+ }
+}
+
+// 给 Foo 的原型上挂载一个方法
+Foo.prototype.a = function() {
+console.log(3)
+}
+
+// 给 window 对象上挂在一个函数 Foo
+Foo.a = function() {
+console.log(4)
+}
+
+//  调用 window 上的函数
+Foo.a(); // 4
+
+// 创建了 Foo 构造函数的实例, 这时候给 window 的 Foo 改变了方法, obj 成了 this
+let obj = new Foo();
+
+// 调用 obj 实例的函数 a
+obj.a(); // 2
+
+// 再次调用 window 上的方法, 就为 1
+Foo.a(); // 1
+```
+
+## 判断以下代码结果
+
+```js
+String('11') == new String('11') // == 会隐式转换 new String('11').toString() true
+String('11') === new String('11') // === 是全等, 类型不同 false
+// true false
+```
+
+```js
+var name = 'Tom';
+(function() {
+    console.info('name', name);
+    console.info('typeof name', typeof name);
+    if (typeof name == 'undefined') {
+        var name = 'Jack';
+        console.log('Goodbye ' + name);
+    } else {
+        console.log('Hello ' + name);
+    }
+})();
+
+// var 穿透了块作用域, name 提升至 if() 之前, 为 undefined
+```
+
+```js
+function wait() {
+  return new Promise(resolve =>
+    setTimeout(resolve, 10 * 1000)
+  )
+}
+
+async function main() {
+  console.time();
+  const x = wait();
+  const y = wait();
+  const z = wait();
+  await x;
+  await y;
+  await z;
+  console.timeEnd();
+}
+main();
+// 三个方法都是异步执行, 所以加起来最大的时间为 10 * 1000 ms, 
+async function two() {
+  console.time();
+  const x = await wait();
+  const y = await wait();
+  const z = await wait();
+  console.timeEnd();
+}
+// 改成下面这样就是为同步执行, 执行时间从上到下, 一个 10 * 1000ms, 所以结果为 30 * 1000ms
+```
+
+## setTimeout, Promise, Async/Await 的区别
+
+1. setTimeout
+
+```js
+console.log('script start')
+setTimeout(function() {
+  console.log('setTimeout') 
+})
+console.log('script end')
+// script start => script end => setTimeout
+```
+
+2. Promise 
+
+Promise 本身是同步的立即执行函数, 当在 executor 中执行 resolve 或 reject 的时候, 此时是异步操作, 会先执行
+then / catch 等, 当主栈完成后, 才会执行 resolve / reject 中存放的方法
+
+```js
+console.log('script start')
+let promise1 = new Promise(function (resolve) {
+    console.log('promise1')
+    resolve()
+    console.log('promise1 end')
+}).then(function () {
+    console.log('promise2')
+})
+setTimeout(function(){
+    console.log('settimeout')
+})
+console.log('script end')
+// 输出顺序: script start->promise1->promise1 end->script end->promise2->settimeout
+```
+
+3. async / await
+
+```js
+async function async1(){
+   console.log('async1 start');
+    await async2();
+    console.log('async1 end')
+}
+async function async2(){
+    console.log('async2')
+}
+
+console.log('script start');
+async1();
+console.log('script end')
+
+// 输出顺序：script start->async1 start->async2->script end->async1 end
+```
+
+async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。可以理解为，是让出了线程，跳出了 async 函数体。
+
+- 宏任务
+    - setTimeout
+    - setInterval
+    - setImmediate
+    - I/O
+    - UI 渲染
+- 微任务
+    - process.nextTick
+    - promise
+    - MutationObserver
 

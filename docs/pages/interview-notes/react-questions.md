@@ -52,18 +52,60 @@ ajax 放在 componentDidMount
 
 基于策略一, React 对树的算法进行了简明的优化, 对树进行分层比较, 两棵树只会对同一层次的节点进行比较
 
-React 通过 updateDepth 对 Virtual DOM 树进行层级控制, 当发现节点不存在, 那么该节点和其子节点就会删除, 不会用于进一步比较
+基于 DOM 节点跨层级的移动可以少到忽略不计, React 通过 updateDepth 对 Virtual DOM 树进行层级控制, 当发现节点不存在, 那么该节点和其子节点就会删除, 不会用于进一步比较
+, 不会用于进一步的比较, 这样只需要对树进行一次遍历, 便能完成整个 DOM 树的比较
+
+```js
+// 源码
+updateChildren: function (nextNestedChildrenElements,transaction,context) {
+  updateDepth++
+  let errorThrown = true
+  try{
+    this._updateChildren(nextNestedChildrenElements,transaction,context) 
+    errorThrown = false
+  }finally {
+    updateDepth--
+    if(!updateDepth){
+      if(errorThrown){
+        clearQueue() 
+      }else{
+        processQueue() 
+      }
+    }
+  }
+  
+}
+```
+
+那如果出现了跨层级的操作, diff 会怎样表现
+
+![跨层级移动dom节点](./image/react-question01.png)
+
+我们让上图的 a 节点包括其子节点移动到 d 节点下, React 会怎样操作
+
+由于 React 只考虑简单的同层节点操作, 对于不同层级的只能删除和创建, 所以当根节点发现 a 消失了, 就会删除 a, 再在
+d 节点下方创建 a 节点, 在创建 a 的子节点 b 和 c
+
+:::tip 注意
+所以当出现跨级移动时, 并不会像想象中的那样移动, 会先删除在创建, 所以官方不建议进行 DOM 节点的跨层级操作
+:::
 
 >component diff
 
 React 是基于组件构建应用的, 对于组件间的比较所采取的策略也是简介高效
 
-如果同一类型组件, 安装原策略比较 Virtual DOM tree
-
-如果不是, 则将该组件判断为 dirty component, 从而替换整个组件下所有节点
-
-对于同一类型组件, 有可能 Virtual DOM 没有任何变化, 如果确切知道这点可以节省大量的 diff 运算时间, 因此 React 允许
+- 如果同一类型组件, 安装原策略比较 Virtual DOM tree
+- 如果不是, 则将该组件判断为 dirty component, 从而替换整个组件下所有节点
+- 对于同一类型组件, 有可能 Virtual DOM 没有任何变化, 如果确切知道这点可以节省大量的 diff 运算时间, 因此 React 允许
 用户通过 shouldComponentUpdate 来判断该组件是否需要 diff
+
+![component diff](./image/react-question02.png)
+
+当 e 组件变成 h 时, React 就不会比较这两个组件结构, 直接进行删除组件 e, 重写创建 h 及子组件, 虽然两个组件时不同类型结构类似,
+dif 算法会影响性能, 正如博客所言
+
+**不同类型的组件很少存在相似 DOM 数的情况, 因此, 这种极端因素很难在实际开发过程中造成重大影响**
+
 
 >element diff 
 
@@ -73,6 +115,53 @@ React 是基于组件构建应用的, 对于组件间的比较所采取的策略
 - MOVE_EXISTING: 在老集合里有新 component 类型, 且 element 是可更新的类型, generateComponentChildren 已调用 receiveComponent, 这种情况下
 pervChild = nextChild, 就需要移动操作, 可以复用以前的 DOM 节点
 - REMOVE_NODE: 在老 component 类型, 在新集合里有, 但对应的 element 不同贼不能直接复用和更新, 需要执行删除操作, 或者老 component 不在新集合里的, 也要执行删除操作
+
+```js
+// element diff 源码
+// INSERT_MARKUP
+function makeInsertMarkup(markup, afterNode, toIndex) {
+    return {
+        type: ReactMultiChildUpdateTypes.INSERT_MARKUP,
+        content: markup,
+        fromIndex: null,
+        fromNode: null,
+        toIndex: toIndex,
+        afterNode: afterNode
+    }
+}
+// MOVE_EXISTING
+function makeMove(child, afterNode, toIndex) {
+    return {
+        type: ReactMultiChildUpdateTypes.MOVE_EXISTING,
+        content: null,
+        fromIndex: child._mountIndex,
+        fromNode: ReactReconciler.getNativeNode(child),
+        toIndex: toIndex,
+        afterNode: afterNode
+    }
+}
+// REMOVE_NODE
+function makeRemove(child, node) {
+    return {
+        type: ReactMultiChildUpdateTypes.REMOVE_NODE,
+        content: null,
+        fromIndex: child._mountIndex,
+        fromNode: node,
+        toIndex: null,
+        afterNode: null
+    }
+}
+```
+
+举个例子加深印象
+
+![element diff](./image/react-questions03.png)
+
+旧集合 a,b,c,d 四个节点, 更新后新集合为 b,a,c,d 节点, 依次对比, 依次删除在创建
+
+React 发现这样太繁琐, 因为只是节点位置发生变化而已, 所以没必要删除在创建, 只需移动下位置即可
+
+**所以 React 针对同一层级的同组节点, 添加唯一 key 进行区分, 虽然只是小小的改动, 但性能上提高了很多**
 
 
 ## Redux 是什么?
