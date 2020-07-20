@@ -7,6 +7,49 @@
 <FInput defaultValue={x} ref={input}/> // 非受控组件
 ```
 
+>受控组件: 输入的值始终都由 React 的 state 驱动
+
+```jsx harmony
+import {useState} from 'react'
+const controlComponent = () => {
+  const [inputValue,setInputValue] = useState('')
+  const handleChange = (e) => {
+    setInputValue(e.target.value) 
+  } 
+  return (
+    <div>
+      <label>
+         <input type="text" value={inputValue} onChange={handleChange}/> 
+      </label>
+    </div> 
+  )
+}
+```
+
+input 的值始终都是通过 inputValue 来控制
+
+>非受控组件: 表单数据将由 DOM 节点来处理
+
+```jsx harmony
+import React, {useState} from 'react'
+const uncontrolComponent = () => {
+  const [inputValue,setInputValue] = useState(React.createRef())
+  const handleSubmit = e => {
+    console.log(inputValue.current.value) 
+    e.preventDefault()
+  } 
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+         <input type="text" value={inputValue} ref={inputValue} /> 
+      </label>
+    </form> 
+  )
+}
+```
+因为非受控组件将真实数据存在 DOM 节点中, 所以使用非受控组件时, 有时候反而容易同时集成 React 和非 React 代码, 如果
+不介意代码美观性, 并且希望快速编写代码, 使用非受控组件能减少代码量, 否则该使用受控组件
+
 区别: 
 
 - 受控组件的状态由开发者维护
@@ -183,4 +226,67 @@ Redux 是 JavaScript 状态容器, 提供可预测化的状态管理, 重点是�
 react-redux 提供的一个 api, connect 的作用是把组件和 store 连接起来, 产生一个新的组件, connect 是高阶组件
 
 provider 可以让你整个 app 访问到 redux store 的数据
+
+## React 的 setState 什么时候是同步的, 什么时候是异步的
+
+React 中, 如果是由 React 引发的事件处理(通过onClick等引发的事件处理), 调用 setState 不会同步更新 this.state,
+除此之外的 setState 调用会同步执行 this.state, 所谓除此之外, 指的是绕过 React 通过 addEventListener 直接添加
+事件处理函数, 还有通过 setTimeout 和 setInterval 产生的异步调用
+
+>原因: 在 React 的 setState 函数实现中, 会根据一个变量 isBatchingUpdates 判断是直接更新 this.state 还是放到队列中
+>回头再说, 而 isBatchingUpdates 默认为 false, 也便是 setState 会同步更新 this.state, 但是有一个函数 batchedUpdates, 
+>这个函数会把 isBatchingUpdate 修改为 true, 而当 React 在调用事件处理之前就会调用这个 batchedUpdates, 造成的后果, 就是有 React 控制
+>的时间处理过程 setState 不会同步更新 this.state
+
+:::tip 注意
+setState 的`异步`并不是说内部由异步代码实现, 其实本身执行的过程和代码都是同步的, 只是合成事件和钩子函数的调用顺序在
+更新之前, 导致在合成事件和钩子函数中没发立马拿到更新后的值, 形成了所谓的`异步`, 当然可以通过第二个参数 setState(partialState,callback) 中
+的 callback 拿到更新后的结果
+:::
+
+## Virtual DOM 真的比原生 DOM 快么?
+
+[这个回答可以说是无懈可击了](https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/47)
+
+## Redux 为什么要把 reducer 设计成纯函数
+
+redux三大原则:
+
+1. 单一数据流, 整个应用 state 都被存储在一个 store 里面, 构成一个 Object tree
+2. State 是只读的, 唯一改变 state 的方法就是触发 action, action 是一个用于描述已发生事件的普通对象
+3. 使用纯函数来执行修改, 为了描述 action 如何修改 state tree, 你需要编写 reducers, 把 reducer 设计成纯函数,
+可以实现时间旅行, 记录/回放或热加载
+
+## React-router 里的 <link> 标签和 <a> 标签有什么区别
+
+link 源码
+
+```jsx harmony
+if (_this.props.onClick) _this.props.onClick(event);
+
+if (!event.defaultPrevented && // onClick prevented default
+event.button === 0 && // ignore everything but left clicks
+!_this.props.target && // let browser handle "target=_blank" etc.
+!isModifiedEvent(event) // ignore clicks with modifier keys
+) {
+  event.preventDefault();
+
+  var history = _this.context.router.history;
+  var _this$props = _this.props,
+      replace = _this$props.replace,
+      to = _this$props.to;
+
+
+  if (replace) {
+    history.replace(to);
+  } else {
+    history.push(to);
+  }
+}
+```
+
+1. 有 onclick 就执行 onclick
+2. click 的时候阻止 a 标签默认事件
+3. 再取得跳转 href, 用 history 跳转, 此时只是链接变了, 并没有刷新页面
+
 

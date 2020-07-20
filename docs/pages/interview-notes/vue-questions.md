@@ -87,3 +87,113 @@ v-model 就是双向绑定
     - this.$router.push: 这个方法会向 **history 栈添加一个新的记录,** 所以, 当用户点击浏览器后退按钮时, 则回到之前的 URL
     - this.$router.replace: 跟 router.push 很像, 唯一的不同就是, **它不会向 history 添加新记录**, 而是跟它的方法名一样 —— 替换掉当前的 history 记录
     - this.$route.params: **表示当前的参数**即冒号后面的东西组成的对象
+    
+## React 和 Vue 为什么要在写列表组件时写 key, 作用是什么
+
+>Vue: key 的作用是为了在数据变化时强制更新组件, 以避免原地复用带来的副作用
+
+**Vue diff 算法根据属性**
+
+- Vue 官网提到了如果不加 key 的话就是默认使用就地更新的策略, 即当元数据项的顺序改变时, Vue 不会移动 DOM 元素来顺应
+数据项的更新, 而是就地更新每个元素, 确保他们在每个位置的索引位置正确
+- 就地更新是更高效的, 但是会出现副作用, 只适用于不依赖子组件或临时 DOM 状态的列表(简单列表渲染)
+- Vue 官方也建议尽可能的使用 key, 除非遍历的列表非常简单, 因为 key 是识别节点的一个通用机制
+- key 主要用在 Vue 的虚拟 DOM 算法, 在新旧 nodes 对比时识别 VNodes, 如果不使用 key, Vue 会最大限度的减少动态元素
+并且尝试修改/复用相同类型
+- key 的使用场景: 完整触发组件声明周期钩子, 触发过渡效果
+
+>React: key 的作用是为了优化 diff 算法, 
+
+**React diff 算法自顶向下**
+
+- React 官网提到了在不使用 key 的情况下, 在列表后面插入节点是很容易的, 但是在列表前面插入节点就会使整个列表重新删除在创建, 这样是低效的
+- 所以 React 建议加上 key 属性, 这样 React 在 diff 就可以比对 key 属性来判断是否需要删除或插入
+- key 最好不要使用下标, 因为当基于下标重新排序时, 组件 state 可能会遇到一些问题, 由于组件实例时基于他们的 key 来决定是否更新及复用, 如果 key
+是一个下标, 那么修改顺序时会修改当前的 key, 导致非受控组件的 state(比如输入框) 可能相互篡改导致无法预期的变动
+- key 也不要使用 Math.random(), 不稳定
+
+:::tip 注意
+更确切的说应该是 diff 算法在你的复杂列表稳定的时候才能明显提高性能, 因为节点可以重用, 但是对于列表频繁更新的场景, 节点不能重用,
+但是 diff 可以省略一部分逻辑, 因此性能也会更好, 但是两者的性能优化不在同一个维度, 一个是创建和更新节点(渲染器)的优化, 
+一个是 DOM diff 算法(核心引擎)的优化
+:::
+
+## 聊聊 Redux 和 Vuex 的设计思想
+
+相同点:
+
+- 两者都是处理全局状态的工具库, 大都是 store 保存状态, dispatch(action), reducer(mutation), 生成 newState
+
+不同点:
+
+- 最大的区别处理异步的不同, Vuex 里多了异步的操作, action 之后 commit(mutation) 之前处理异步, redux 里面则通过中间件处理异步(redux-chunk,redux-saga)
+
+## Vue 中的 Object.definedProperty 有什么缺陷/为什么 Vue3 采用了 Proxy, 抛弃了 Object.definedProperty
+
+1. Object.definedProperty 无法监控到数组下标变化, 导致通过数组下标添加元素, 不能实现响应
+2. Object.definedProperty 只能劫持对象的属性, 从而需要对每个对象, 每个属性进行遍历, 如果属性值是对象, 还需要深度遍历,
+ Proxy 可以劫持整个对象, 并返回一个新对象
+3. Proxy 不仅可以代理对象, 还可以代理数组, 还可以代理动态增加的属性
+
+## 双向绑定和 Vuex 是否冲突
+
+严格模式使用 Vuex 时, 当用户输入时 v-model 会视图修改属性值, 但这个修改不是在 mutation 中修改的, 所以会抛出一个
+错误, 当需要在组件中使用 Vuex 的 state 时, 有两种解决方案
+
+1. input 绑定 value(vuex中的state), 然后监听 input 的 change 或者 input 事件, 在时间回调中调用 mutation 修改
+value的值
+2. 使用带有 setter 的双向绑定计算属性
+
+## 在 Vue 中, 子组件为何不能修改父组件传递的 Prop?
+
+一个父组件下不只有一个子组件, 使用这份 Prop 数据的也不知一个子组件, 如果每个子组件都能修改 props 的话, 将会导致修改数据的
+源头不止一处
+
+所以我们需要将修改数据的源头统一为父组件, 子组件要修改要委托父组件帮它, 从而保证父数据修改源唯一
+
+## Vue 的父组件和子组件生命周期钩子执行顺序是什么?
+
+1. 加载渲染过程: 父beforeCreate => 父created => 父beforeMount => 子beforeCreate => 子created =>
+子beforeMount => 子mounted => 父mounted
+2. 子组件更新过程: 父beforeUpdate => 子beforeUpdate => 子updated => 父updated 
+3. 父组件更新过程: 父beforeUpdate => 父updated
+4. 销毁过程: 父beforeDestroy => 子beforeDestroy => 子destroyed => 父destroyed
+
+## Vue 渲染大量数据时应该怎么优化?
+
+1. 添加加载动画, 优化用户体验
+2. 利用服务器渲染 SSR, 在服务端渲染组件
+3. 避免浏览器处理大量 DOM, 比如懒加载, 异步渲染组件, 使用分页
+4. 对于固定费响应式数据, 使用 Object.freeze 冻结
+
+## Vue 如何优化首页的加载速度? 首页白屏是什么问题引起的? 解决方案?
+
+>白屏原因: 单页面应用的 html 靠 js 生成, 因为首屏需要加载很大的 js 文件, 所以当网速差的时候会产生一定程度的白屏
+
+解决方案:
+
+1. 优化 webpack 减少模块打包体积, code-split 按需加载
+2. 服务端渲染, 在服务端实现渲染好首页
+3. 首页加 loading 或骨架屏
+4. cdn, 减少请求, gzip, 浏览器缓存
+5. 异步渲染
+6. service worker
+
+## Vue 如何对数组方法进行变异? 
+
+拦截 prototype 进行方法创建
+
+## nextTick 原理
+
+在改变 state 的时候不会立即改变, 而是进入一个队列里, 然后把重复的操作去掉, 然后把最后的结果push进去
+nextTick 后就可以看到改变的新 state
+
+## v-if, v-show, v-html 的原理是什么, 它是如何封装的?
+
+v-if 会调用addIfCondition 方法, 生成 vnode 的时候会忽略对应节点, render 就不会渲染
+
+v-show 会生成 vnode, render 的时候也会渲染成真实节点, 只是在 render 过程中在节点的属性修改 show 属性值, 也就是常说的 display
+
+v-html 通过 addProp 添加 innerHtml 属性, 归根结底设置 innerHtml 为 v-html 的值
+
+
