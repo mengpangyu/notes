@@ -56,3 +56,9 @@ events2.on('say',(name)=>{
 events2.emit('say','xiang')
 ```
 
+## 如何实现 token 加密
+
+1. 需要一个 secret(随机数)
+2. 后端利用 secret 和加密算法生成一个字符串
+3. 前端每次 request 在 header 中带上 token
+4. 后端用同样的算法解密

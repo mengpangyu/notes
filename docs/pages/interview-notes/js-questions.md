@@ -1414,3 +1414,34 @@ async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇�
     - promise
     - MutationObserver
 
+## 说说浏览器和 Node 的事件循环区别
+
+看完这三个链接就明白了
+
+[浏览器与Node的事件循环(Event Loop)有何区别?](https://juejin.im/post/5c337ae06fb9a049bc4cd218#heading-12)
+
+[node官网](https://nodejs.org/zh-cn/docs/guides/event-loop-timers-and-nexttick/)
+
+[html#event-loop](https://html.spec.whatwg.org/multipage/webappapis.html#event-loops)
+
+
+>浏览器
+
+- 执行一次 task(宏任务)
+- 执行完 microtask(微任务)
+
+>Node
+
+- timers 定时器: 本阶段执行 setTimeout() 和 setInterval() 的回调
+- pending callbacks: 执行延迟到下一个循环的 I/O 回调
+- idle, prepare: 仅系统内部使用
+- poll: 轮询, 检索新的 I/O 事件, 执行与 I/O 相关的回调(几乎所情况下, 除了关闭的回调, 他们有计时器和 setImmediate() 排定的之外)
+, 其余情况 node 将在此阻塞
+- check: setImmediate() 回调在这里执行
+- close callbacks: 关闭的回调函数: 一些准备关闭的回调, 例如 socket.on('close',...)
+
+微任务和宏任务在 Node 的执行顺序
+
+Node 10 之前: 执行完一个阶段所有任务, 执行 nextTick 任务, 然后在执行完微任务队列的所有内容
+
+Node 11 之后: 和浏览器行为统一, 执行一个宏任务就执行完微任务任务队列

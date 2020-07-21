@@ -95,3 +95,17 @@ Loader 就相当于把浏览器不认识的文件翻译成新的可以认识的�
 - **删除死代码:** 可以通过在启动webpack时追加参数--optimize-minimize来实现
 - **提取公共代码**
 
+
+## webpack 热更新原理, 如何自动刷新页面
+
+当修改了一个或多个文件, 文件系统接收更改并通知 webpack, webpack 重新编译构建模块, 并通知 HMR 服务器进行更新,
+HMR Server 使用 webSocket 通知 HMR runtime 需要更新, HMR 运行时通过 HTTP 请求更新 jsonp, HTR 运行时替换更新中的
+模块, 如果确定这些模块无法更新, 则触发整个页面刷新
+ 
+## webpack 中 loader 和 plugin 的区别
+
+- loader: 一个转换器, 将 A 文件转成 B 文件, 比如 A.scss 转成 A.css
+- plugin: 一个扩展器, 丰富了 webpack 本身, 针对 loader 结束后, webpack 打包的整个过程, 并不直接操作文件, 
+而是基于事件机制工作, 会监听 webpack 打包过程中某个点, 执行广泛的任务
+
+

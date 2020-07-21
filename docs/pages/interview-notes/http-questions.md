@@ -340,6 +340,32 @@ https 协议有 http + ssl 协议构成
 
 防范措施: 服务端在发送浏览器的公钥中加入 CA 证书, 浏览器可以验证 CA 证书的有效性
 
+## 浏览器缓存读取规则
+
+可以分成 Service Worker, MemoryCache, Disk Cache 和 Push Cache, 那请求 from memory cache 和 for disk cache
+的依据是什么, 哪些数据什么时候放在 Memory Cache 和 Disk Cache 中
+
+[深入理解浏览器缓存机制](https://www.jianshu.com/p/54cc04190252)
+
+上面链接已经说明问题, 我来总结一下
+
+缓存要经过这四个顺序命中后拿缓存, 否则去请求服务器
+
+1. Service Worker: 是运行在浏览器背后的独立线程, 一般用来实现缓存功能, 使用 Service Worker 必须是 HTTPS 协议
+因为涉及到请求拦截, 所以必须保证安全, Service Worker 的缓存可以自己配置, 如何匹配缓存, 如何读取缓存, 并且缓存是持续性的
+2. Memory Cache: 内存中的缓存, 短时间存在, 一旦关闭页面就会消失, 适合存取度高, 但是容量较小的
+3. Disk Cache: 硬盘中的缓存, 关闭页面不会消失, 适合存取度不高, 持久化容量大的数据
+4. Push Cache: 推送缓存, HTTP2 中的内容, 只在 Session 中存在, 会话结束就会释放, 缓存时间很短, chrome 5分钟左右
+
+
+## 为什么通常在发送数据埋点请求的时候使用的是 1*1 像素的透明 gif 图片
+
+1. 能够完成整个 HTTP 请求 + 响应
+2. 触发 get 请求后不需要获取和处理数据, 服务器也不需要发送数据
+3. 跨域友好
+4. 执行过程无阻塞
+5. 相比 XMLHttpRequest 对象发送 get 请求, 性能上更好
+6. GIF 最低合法体积最小
 
 ## TCP 三次握手
 
