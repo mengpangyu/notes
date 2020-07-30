@@ -124,7 +124,7 @@ const shellSort2 = arr => {
       let j = i
       // 要插入的值
       let temp = arr[j]
-      if (arr[j] < arr[j - gap]){
+      if (arr[j] < arr[j - gap]) {
         // 简单插入排序的套路, 如果前面还有数, 而且前面的数比当前数小, 进入循环交换
         while (j - gap >= 0 && temp < arr[j - gap]) {
           arr[j] = arr[j - gap]
@@ -143,25 +143,51 @@ const shellSort2 = arr => {
 
 // 归并排序
 
-function mergeSort(arr){
-  if(arr.length <= 1) return arr
-  let middle = Math.floor(arr.length/2)
-  let left = arr.slice(0,middle)
+function mergeSort(arr) {
+  if (arr.length <= 1) return arr
+  let middle = Math.floor(arr.length / 2)
+  let left = arr.slice(0, middle)
   let right = arr.slice(middle)
-  return merge(mergeSort(left),mergeSort(right))
+  return merge(mergeSort(left), mergeSort(right))
 }
-function merge(left,right){
+
+function merge(left, right) {
   let result = []
-  while(left.length && right.length){
+  while (left.length && right.length) {
     if (left[0] <= right[0]) {
       result.push(left.shift())
-    }else{
+    } else {
       result.push(right.shift())
     }
   }
-  while(left.length) result.push(left.shift())
-  while(right.length) result.push(right.shift())
+  while (left.length) result.push(left.shift())
+  while (right.length) result.push(right.shift())
   return result
 }
 
-console.log(mergeSort([5,4,3,2,1]))
+console.log(mergeSort([5, 4, 3, 2, 1]))
+
+const radixSort = (arr, max) => {
+  let dev = 1
+  let mod = 10
+  let counter = []
+  for (let i = 0; i < max; i++, mod *= 10, dev *= 10) {
+    for (let j = 0; j < arr.length; j++) {
+      let bucket = Math.floor((arr[j] % mod) / dev)
+      if (counter[bucket] === undefined) {
+        counter[bucket] = []
+      }
+      counter[bucket].push(arr[j])
+    }
+
+    let pos = 0
+    for (let j = 0; j < counter.length; j++) {
+      if (counter[j] !== undefined) {
+        while (counter[j].length) {
+          arr[pos++] = counter[j].shift()
+        }
+      }
+    }
+  }
+  return arr
+}
