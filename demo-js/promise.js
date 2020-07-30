@@ -1,3 +1,4 @@
+// 实现一个完整的 promise
 class Promise {
   constructor(executor) {
     // 参数校检
@@ -168,3 +169,13 @@ Promise.resolvePromise = function(promise2, x, resolve, reject) {
   }
 }
 
+console.log(1)
+const p1 = new Promise((resolve, reject) => {
+  setTimeout(()=>{
+    console.log(3)
+    resolve('dd')
+  })
+}).then(data=>{
+  return p1
+}).then(data => console.log(data)).then(data=>console.log(data))
+console.log(2)
