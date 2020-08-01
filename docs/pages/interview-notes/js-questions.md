@@ -33,12 +33,42 @@ Promise.all([promise1, promise2]).then(success1, fail1)
 ```
 promise1和promise2都成功才会调用success1
 
+>实现 Promise.all
+
+```js
+const all = promiseArr => {
+  return new Promise((resolve,reject)=>{
+    let result = []
+    let completed = 0
+    promiseArr.forEach((promise,index)=>{
+      promise.then(data=>{
+        result[index] = data
+        completed += 1
+        if(completed === promiseArr.length){
+          resolve(result) 
+        } 
+      }).catch(err=>reject(err))
+    }) 
+  })
+}
+```
+
 - Promise.race用法
 
 ```js
 Promise.race([promise1, promise2]).then(success1, fail1)
 ```
 promise1和promise2只有一个成功就会调用success1
+
+>实现 Promise.race
+
+```js
+const race = promiseArr => {
+  return new Promise((resolve,reject)=>{
+    promiseArr.forEach(promise=>p.then(result).catch(reject)) 
+  })
+}
+```
 
 
 ## 手写函数防抖和函数节流
@@ -79,6 +109,7 @@ const 技能CD = (fn, delay)=>{
     return () => {
         if (timer) return console.log('CD还没好')
         timer = setTimeout(() =>{
+            timer = false
             fn()
         }, delay)
     }
@@ -739,43 +770,123 @@ function unique(arr) {
 
 ## 手写一个 Promise(高级前端)
 
-```js
-function Promise(executor) {
-    let self = this;
-    self.status = 'pending'; //等待态
-    self.value = undefined;  //成功的返回值
-    self.reason = undefined; //失败的原因
+- 解决 fulfill: 指一个 promise 成功时进行的一系列操作, 状态的改变, 回调的执行
+- 拒绝 reject: 指一个 promise 失败时进行的一系列操作
+- 终值 eventual value: 指的是 promise 被解决时传递给解决回调的值
+- 据因 reason: 拒绝原因, 指在 promise 被拒绝时传递给拒绝回调的值
+- Promise: 是一个拥有 then 方法的对象或函数, 其行为符合本规范
+- thenable: 定义了 then 方法的对象或函数
+- 值: 任何 JS 的合法值, undefined, thenable, promise
+- 异常: 适用 throw 语句抛出的一个值
 
-    function resolve(value){
-        if(self.status === 'pending'){
-            self.status = 'resolved';
-            self.value = value;
-        }
+```js
+class myPromise {
+  constructor(fn) {
+    // 判断参数类型
+    if (typeof fn !== 'function') {
+      throw new Error('我需要一个函数')
     }
-    function reject(reason) {
-        if(self.status === 'pending') {
-            self.status = 'rejected';
-            self.reason = reason;
-        }
+    // 初始化需要用到的值
+    this.initValue()
+    // 修改 this 绑定
+    this.initBind()
+    // 给 fn 处理回调
+    try {
+      fn(this.resolve, this.reject)
+    } catch (e) {
+      this.reject(e)
     }
-    try{
-        executor(resolve, reject);
-    }catch(e){
-        reject(e);// 捕获时发生异常，就直接失败
+  }
+
+  initValue() {
+    this.value = null
+    this.reason = null
+    this.state = 'padding'
+    // 下面两个变量是为了异步中套异步使得状态为 padding, 将异步方法存起来等下次在调用
+    this.resolveCallbacks = []
+    this.rejectCallbacks = []
+  }
+
+  initBind() {
+    this.resolve = this.resolve.bind(this)
+    this.reject = this.reject.bind(this)
+  }
+
+  resolve(value) {
+    if (this.state === 'padding') {
+      this.state = 'fulfilled'
+      this.value = value
+      this.resolveCallbacks.forEach(fn => fn(this.value))
     }
+  }
+
+  reject(reason) {
+    if (this.state === 'padding') {
+      this.state = 'rejected'
+      this.reason = reason
+      this.rejectCallbacks.forEach(fn => fn(this.reason))
+    }
+  }
+
+  then(onFulfilled, onRejected) {
+    if (typeof onFulfilled !== 'function') {
+      onFulfilled = function(value) {
+        return value 
+      }
+    }
+    if (typeof onRejected !== 'function') {
+      onRejected = function(reason) {
+        throw reason 
+      }
+    }
+    // 实现链式调用
+    return new myPromise((resolve, reject) => {
+      if (this.state === 'fulfilled') {
+        setTimeout(() => {
+          try {
+            const x = onFulfilled(this.value)
+            resolve(x)
+          } catch (e) {
+            reject(e)
+          }
+        })
+      }
+      if (this.state === 'rejected') {
+        setTimeout(() => {
+          try {
+            const x = onRejected(this.reason)
+            resolve(x)
+          } catch (e) {
+            reject(e)
+          }
+        })
+      }
+      // 当异步中还有异步状态可能就来不及更新为 padding 所以把所有的方法存到数组内, 下次调用在执行
+      if (this.state === 'padding') {
+        this.resolveCallbacks.push(value => {
+          setTimeout(() => {
+            try {
+              const x = onFulfilled(value)
+              resolve(x)
+            } catch (e) {
+              reject(e)
+            }
+          })
+        })
+        this.rejectCallbacks.push(reason => {
+          setTimeout(() => {
+            try {
+              const x = onRejected(this.reason)
+              resolve(x)
+            } catch (e) {
+              reject(e)
+            }
+          })
+        })
+      }
+    })
+  }
 }
-//onFufiled 成功的回调
-//onRejected 失败的回调
-Promise.prototype.then = function (onFufiled, onRejected) {
-    let self = this;
-    if(self.status === 'resolved'){
-        onFufiled(self.value);
-    }
-    if(self.status === 'rejected'){
-        onRejected(self.reason);
-    }
-}
-module.exports = Promise;
 ```
 
 ## 类的创建和继承
@@ -1445,3 +1556,59 @@ async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇�
 Node 10 之前: 执行完一个阶段所有任务, 执行 nextTick 任务, 然后在执行完微任务队列的所有内容
 
 Node 11 之后: 和浏览器行为统一, 执行一个宏任务就执行完微任务任务队列
+
+## 手写 JSONP
+
+```js
+function jsonp({url,params,cb}){
+  return new Promise((resolve,reject)=>{
+    window[cb] = function(data){
+      resolve(data) 
+      document.body.removeChild(script)
+    }  
+    params = {...params,cb}
+    let arrs = []
+    for(let key in params){
+      arrs.push(`${key}=${params[key]}`) 
+    }
+    let script = document.createElement('script')
+    script.src = `${url}?${arrs.join('&')}`
+    document.body.appendChild(script)
+  })
+}
+```
+
+## 手写 new
+
+```js
+function createNew(Con,...args){
+  let obj = Object.create(Con)
+  let result = Con.apply(obj,args)
+  return result instanceof Object ? result : obj
+}
+```
+
+## 手写 instanceof
+
+```js
+function instanceOf(left,right){
+ let proto = left.__proto__
+ let prototype = right.prototype
+ while(true){
+  if(proto === null) return false
+  if(proto === prototype) return true
+  proto = proto.__proto__
+ }
+}
+```
+
+## 模块加载机制
+
+- ES6之前的模块引入方式和区别
+
+ES6之前模块引入主要是CommonJS和AMD两种。
+
+1. 首先，CommonJS导出值是**浅拷贝**，一旦输出某个值，模块内部的变化就影响不到这个值。而ES6导出是采用实时绑定的方式，是将其内存地址导出，导入是动态加载     模块取值，并且变量总是绑定其所在的模块，不能重新赋值。
+2. ES6模块化导入是异步导入，CommonJS导入是同步导入。这跟ES6模块通常用于web端，而CommonJS用于服务器端有关。
+3. CommonJS导入支持动态导入require(`${path}/xx.js`)，ES6模块化导入不支持，目前已有草案。
+4. ES6模块化会编译成require/exports来执行的。

@@ -290,3 +290,21 @@ event.button === 0 && // ignore everything but left clicks
 3. 再取得跳转 href, 用 history 跳转, 此时只是链接变了, 并没有刷新页面
 
 
+## React 16 更新的生命周期
+
+删除生命周期(17正式删除, 为了向下兼容): 
+
+- componentWillMount
+- componentWillReceiveProps
+- componentWillUpdate
+
+新生命周期: 
+
+- static getDerivedStateFromProps 静态方法, 不能用 this, 两个参数, 新的 props 和旧的 state
+- getSnapshotBeforeUpdate render 后 didUpdate 之前调用, 两个参数, 旧的 props 和 旧的 state, 和 didUpdate 配合使用,
+
+:::tip 注意
+componentDidUpdate 三个参数, 旧的 props 旧的 state, snapshot 是新增方法 getSnapshotBeforeUpdate 返回值, 这里可用 dom 操作, 发送请求 setState等
+:::
+
+

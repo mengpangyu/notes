@@ -477,32 +477,39 @@ function bucketSort(arr, num) {
 3. 对 radix 进行计数排序(利用计数排序适用于小范围的特点)
 
 ```js
-// 基数排序适用于 数据范围小, 妹儿数值都要大于 0
-function radixSort(arr) {
-  let len = arr.length, max = arr[0], location = 1, bucketList = []
-  for(let i=0;i<len;i++){
-    if(arr[i] > max) max = arr[i] 
-  }
-  for(let i=0;i<10;i++){
-    bucketList.push([])
-  } 
-  while(true){
-    let dd = Math.pow(10,location - 1) 
-    if(max < dd) break
-    for(let i=0;i<len;i++){
-      let number = ((arr[i] / dd) % 10) 
-      bucketList[number].push(arr[i])
+/**
+ * 基数排序适用于：
+ *  (1)数据范围较小，建议在小于1000
+ *  (2)每个数值都要大于等于0
+ * @author xiazdong
+ * @param  arr 待排序数组
+ * @param  maxDigit 最大位数
+ */
+//LSD Radix Sort
+
+function radixSort(arr, maxDigit) {
+    let mod = 10;
+    let dev = 1;
+    let counter = [];
+    for (let i = 0; i < maxDigit; i++, dev *= 10, mod *= 10) {
+        for(let j = 0; j < arr.length; j++) {
+            let bucket = Math.floor((arr[j] % mod) / dev);
+            if(counter[bucket]== null) {
+                counter[bucket] = [];
+            }
+            counter[bucket].push(arr[j]);
+        }
+        let pos = 0;
+        for(let j = 0; j < counter.length; j++) {
+            let value = null;
+            if(counter[j]!=null) {
+                while ((value = counter[j].shift()) != null) {
+                      arr[pos++] = value;
+                }
+          }
+        }
     }
-    let nn = 0
-    for(let i=0;i<len;i++){
-      let size = bucketList[i].length
-      for(let j=0;j<size;j++){
-        arr[nn++] = bucketList[i][j] 
-      }
-      bucketList[i] = []
-    }
-    location++
-  }
+    return arr;
 }
 ```
 
