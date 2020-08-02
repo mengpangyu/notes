@@ -68,11 +68,11 @@ class Node {
     return temp
   }
 
-  delNode(val){
-    if(this.left !== null && this.left.val === val) return this.left = null
-    if(this.right !== null && this.rightval === val) return this.right = null
-    if(this.left !== null) this.left.delNode(val)
-    if(this.right !== null) this.right.delNode(val)
+  delNode(val) {
+    if (this.left !== null && this.left.val === val) return this.left = null
+    if (this.right !== null && this.rightval === val) return this.right = null
+    if (this.left !== null) this.left.delNode(val)
+    if (this.right !== null) this.right.delNode(val)
   }
 }
 
@@ -99,31 +99,34 @@ class Tree {
     }
   }
 
-  fpreOrderSearch(val){
-    if(this.root !== null){
+  fpreOrderSearch(val) {
+    if (this.root !== null) {
       return this.root.preOrderSearch(val)
-    }else {
+    } else {
       return null
     }
   }
-  fmidOrderSearch(val){
-    if(this.root !== null){
+
+  fmidOrderSearch(val) {
+    if (this.root !== null) {
       return this.root.midOrderSearch(val)
-    }else {
+    } else {
       return null
     }
   }
-  fbackOrderSearch(val){
-    if(this.root !== null){
+
+  fbackOrderSearch(val) {
+    if (this.root !== null) {
       return this.root.backOrderSearch(val)
-    }else {
+    } else {
       return null
     }
   }
-  fdelNode(val){
-    if(this.root !== null){
+
+  fdelNode(val) {
+    if (this.root !== null) {
       this.root.delNode(val)
-    }else{
+    } else {
       console.log('空树不能删')
     }
   }
@@ -132,33 +135,76 @@ class Tree {
 
 // 顺序存储二叉树
 
-function arrTree(arr){
+function arrTree(arr) {
   this.arr = arr
   this.preOrder = preOrder
 }
+
 function preOrder(index) {
-  if(this.arr.length) return console.log('数组为空')
+  if (this.arr.length) return console.log('数组为空')
   console.log(this.arr[index])
-  if(2 * index + 1 < this.arr.length){
-    this.preOrder(2*index+1)
+  if (2 * index + 1 < this.arr.length) {
+    this.preOrder(2 * index + 1)
   }
-  if(2 * index +2 < this.arr.length){
-    this.preOrder(2*index+2)
+  if (2 * index + 2 < this.arr.length) {
+    this.preOrder(2 * index + 2)
   }
 }
 
-const at = new arrTree([1,2,3,4,5,6,7])
-at.preOrder(0)
 
-// const root = new Node(1)
-// const n1 = new Node(2)
-// const n2 = new Node(3)
-// const n3 = new Node(4)
-// root.left = n1
-// root.right = n2
-// n2.right = n3
-// const tree = new Tree(root)
-//
-// tree.fdelNode(2)
-// tree.fpreOrder()
-//
+// 赫夫曼树实现, 带权路径长最小
+
+const huffTree = arr => {
+  arr.sort((a, b) => a - b)
+  const newArr = arr.map(item => new Node(item))
+  while (newArr.length > 1) {
+    newArr.sort((a, b) => a.val - b.val)
+    let [leftNode, rightNode] = newArr.splice(0, 2)
+    let parentNode = new Node(leftNode.val + rightNode.val)
+    parentNode.left = leftNode
+    parentNode.right = rightNode
+    newArr.push(parentNode)
+  }
+  const tr = new Tree(newArr[0])
+  tr.fpreOrder()
+}
+
+
+// huffTree([13, 7, 8, 3, 29, 6, 1])
+
+// 二叉排序树 BST, 并中序遍历
+
+Node.prototype.add = function (node) {
+  if (node === null) return console.log('请输入正确的值')
+  if (this.val < node.val) {
+    if (this.right !== null) {
+      this.right.add(node)
+    } else {
+      this.right = node
+    }
+  } else {
+    if (this.left !== null) {
+      this.left.add(node)
+    } else {
+      this.left = node
+    }
+  }
+}
+
+Tree.prototype.addNode = function (node) {
+  if (this.root === undefined) this.root = node
+  else this.root.add(node)
+}
+
+let arr = [7, 3, 10, 12, 5, 1, 9]
+
+const tr = new Tree()
+arr.forEach(item => {
+  let node = new Node(item)
+  tr.addNode(node)
+})
+
+console.log(tr.fmidOrder())
+
+
+

@@ -191,3 +191,44 @@ const radixSort = (arr, max) => {
   }
   return arr
 }
+
+
+// 堆排序
+
+const buildHeap = (arr, i, length) => {
+  // 先父节点
+  let temp = arr[i]
+  // 开始调整
+  for(let k = i*2+1;k<length;k=k*2+1){
+    // 如果左孩子比右孩子大, 那么索引就换到右孩子
+    if(k+1 < length && arr[k] < arr[k+1]){
+      k++
+    }
+    // 父节点比孩子节点小, 那么就把孩子节点的值给父节点
+    if(temp < arr[k]){
+      arr[i] = arr[k]
+      // 然后把索引给了右孩子在比较孩子的孩子节点是否大小
+      i = k
+    }
+  }
+  // 把所有的节点都比较完后, 再把最初的父节点赋给现在的 i 索引, 完成建堆
+  arr[i] = temp
+}
+const heapSort = arr => {
+  // 建堆
+  for(let j=Math.floor(arr.length/2-1);j>=0;j--){
+    buildHeap(arr,j,arr.length)
+  }
+  // 排序
+  for(let j=arr.length-1;j>=0;j--){
+    let temp = arr[j]
+    arr[j] = arr[0]
+    arr[0] = temp
+    buildHeap(arr,0,j)
+  }
+  return arr
+}
+
+console.log(heapSort([5,4,3,2,1]))
+
+
