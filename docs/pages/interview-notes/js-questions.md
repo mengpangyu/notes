@@ -1608,7 +1608,44 @@ function instanceOf(left,right){
 
 ES6之前模块引入主要是CommonJS和AMD两种。
 
-1. 首先，CommonJS导出值是**浅拷贝**，一旦输出某个值，模块内部的变化就影响不到这个值。而ES6导出是采用实时绑定的方式，是将其内存地址导出，导入是动态加载     模块取值，并且变量总是绑定其所在的模块，不能重新赋值。
+1. 首先，CommonJS导出值是**浅拷贝**，一旦输出某个值，模块内部的变化就影响不到这个值。而ES6导出是采用实时绑定的方式，是将其内存地址导出，导入是动态加载模块取值，并且变量总是绑定其所在的模块，不能重新赋值。
 2. ES6模块化导入是异步导入，CommonJS导入是同步导入。这跟ES6模块通常用于web端，而CommonJS用于服务器端有关。
 3. CommonJS导入支持动态导入require(`${path}/xx.js`)，ES6模块化导入不支持，目前已有草案。
 4. ES6模块化会编译成require/exports来执行的。
+
+## 如何实现一个倒计时
+
+```js
+// 利用 requestAnimationFrame
+const element = document.getElementById('el'); 
+let start;
+
+function step(timestamp) {
+  if (start === undefined) start = timestamp;
+  const elapsed = timestamp - start;
+   
+	element.innerText = 10 - Math.floor(elapsed/1000)
+  if(parseInt(element.innerText) < 1){
+		element.innerText = '生日快乐'
+	}
+  if (elapsed < 10000) { // Stop the animation after 10 seconds
+    window.requestAnimationFrame(step);
+  }
+}
+window.requestAnimationFrame(step);
+
+// 利用 setTimeout
+
+let timerId
+let time = 10
+function run() {
+  clearTimeout(timerId)
+  if (time <= 0) {
+     countdown.innerHTML = '生日快乐'
+       return
+     } 
+  countdown.innerHTML = time--
+  timerId = setTimeout(run, 1000)
+}
+run()
+```

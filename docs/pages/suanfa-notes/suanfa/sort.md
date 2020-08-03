@@ -324,32 +324,36 @@ arr 数组
 index 索引
 len 长度
 */
-function heapify(arr,index,len) {
-  let leftChild = 2 * index + 1
-  let rightChild = 2 * index + 2
-  let parent = index
-  if(leftChild < len && arr[leftChild] > arr[parent]) parent = leftChild 
-  if(rightChild < len && arr[rightChild] > arr[parent]) parent = rightChild 
-  if(parent !== index){
-    let temp = arr[index] 
-    arr[index] = arr[parent]
-    arr[parent] = temp
-    heapify(arr, parent, len)
+const buildHeap = (arr, i, length) => {
+  // 先父节点
+  let temp = arr[i]
+  // 开始调整
+  for(let k = i*2+1;k<length;k=k*2+1){
+    // 如果左孩子比右孩子大, 那么索引就换到右孩子
+    if(k+1 < length && arr[k] < arr[k+1]){
+      k++
+    }
+    // 父节点比孩子节点小, 那么就把孩子节点的值给父节点
+    if(temp < arr[k]){
+      arr[i] = arr[k]
+      // 然后把索引给了右孩子在比较孩子的孩子节点是否大小
+      i = k
+    }
   }
+  // 把所有的节点都比较完后, 再把最初的父节点赋给现在的 i 索引, 完成建堆
+  arr[i] = temp
 }
-
-function heapSort(arr) {
-  let heapSize  = arr.length
-  for(let i=Math.floor(heapSize/2)-1;i>=0;i--){
-    heapify(arr,i,heapSize) 
-  } 
-  for(let j=heapSize-1;j>=1;j--){
-    // 把排好的堆顶元素和数组最后元素调换
-    let temp = arr[0] 
-    arr[0] = arr[j]
-    arr[j] = temp 
-    // 继续建堆, 最后一个元素就排除在外(已经排序)
-    heapify(arr,0,--heapSize)
+const heapSort = arr => {
+  // 建堆
+  for(let j=Math.floor(arr.length/2-1);j>=0;j--){
+    buildHeap(arr,j,arr.length)
+  }
+  // 排序
+  for(let j=arr.length-1;j>=0;j--){
+    let temp = arr[j]
+    arr[j] = arr[0]
+    arr[0] = temp
+    buildHeap(arr,0,j)
   }
   return arr
 }
