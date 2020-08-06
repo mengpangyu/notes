@@ -1,21 +1,8 @@
-// 怎样做一个计时器
-
-const element = document.getElementById('el');
-let start;
-function step(timestamp) {
-  // timestamp 总共执行时间
-  // start 开始动画时间
-  if (start === undefined) start = timestamp;
-  // elapsed 开始动画时间
-  const elapsed = timestamp - start;
-  element.innerText = 10 - Math.floor(elapsed/1000)
-  if(parseInt(element.innerText) === 0){
-    element.innerText = '生日快乐'
-  }
-  if (elapsed < 10000) { // Stop the animation after 2 seconds
-    window.requestAnimationFrame(step);
-  }
-}
-console.time()
-window.requestAnimationFrame(step);
-console.timeEnd()
+const http = require('http')
+const url = require('url')
+const server = http.createServer((req, res) => {
+  const query = url.parse(req.url, true).query
+  console.log(query)
+  res.write(`${query.callback}('hello')`)
+  res.end()
+}).listen(3000)
