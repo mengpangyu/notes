@@ -134,6 +134,7 @@ v-model 就是双向绑定
 2. Object.definedProperty 只能劫持对象的属性, 从而需要对每个对象, 每个属性进行遍历, 如果属性值是对象, 还需要深度遍历,
  Proxy 可以劫持整个对象, 并返回一个新对象
 3. Proxy 不仅可以代理对象, 还可以代理数组, 还可以代理动态增加的属性
+4. Proxy 作为新标准收到浏览器厂商的重点持续性能优化, 也就是传说中的新标准的性能红利
 
 ## 双向绑定和 Vuex 是否冲突
 
@@ -195,5 +196,197 @@ v-if 会调用addIfCondition 方法, 生成 vnode 的时候会忽略对应节点
 v-show 会生成 vnode, render 的时候也会渲染成真实节点, 只是在 render 过程中在节点的属性修改 show 属性值, 也就是常说的 display
 
 v-html 通过 addProp 添加 innerHtml 属性, 归根结底设置 innerHtml 为 v-html 的值
+
+
+## 对 SPA 的理解, 优缺点
+
+SPA 仅在 Web 页面初始化时加载相应的 HTML, JS 和 CSS, 一旦加载完成, SPA 不会因为用户的操作而进行页面重新加载或跳转
+, 取而代之的利用路由记住实现 HTML 内容的变化, UI 与用户交互
+
+优点:
+
+1. 用户体验好, 快, 内容的改变不需要重新加载整个页面, 避免了不必要跳转和重复渲染
+2. SPA 相对服务器压力较小
+3. 前后端职责分离, 架构清晰, 前端进行交互逻辑, 后端负责数据处理
+
+缺点: 
+
+1. 初次加载耗时过多, 可能出现白屏
+2. 路由管理不能使用浏览器的前进后退管理, 所有页面切换需要自己建立栈管理
+3. SEO 难度较大, 所有内容都在一个页面上显示
+
+## Class 和 Style 如何实现动态绑定
+
+对象语法: 
+
+```vue
+<div :class="{active: isActive, 'text-danger': hasError"></div>
+data:{ isActive: true, hasError: false}
+```
+
+数组语法: 
+
+```vue
+<div :class="[isActive ? activeClass: '', errorClass]"></div>
+data:{ activeClass: 'active', errorClass: 'text-danger'}
+```
+
+## 对 keep-alive 的了解
+
+是 Vue 内置的一个组件, 可以使用被包含的组件保留状态, 避免重新渲染
+
+- 一般结合路由和动态组件一起使用, 用于缓存组件
+- 提供 include 和 exclude 属性, 两者都支持字符串和正则表达式, include 表示只有名称匹配的组件才会被缓存,
+exclude 表示任何名称匹配都不会缓存, 其中 exclude 的优先级比 include 高
+- 对两个钩子函数, activated 和 deactivated, 当组件被激活时, 触发钩子函数 activated, 当组件被移出时, 触发钩子函数
+deactivated
+
+## 为什么 Vue 里的 data 是一个函数
+
+因为组件用来复用的, JS 对象都是引用关系, 如果组件中 data 是一个对象, 那么这样作用域没有隔离, 子组件中的 data 属性
+值会相互影响, 如果组件时一个 data 函数, 那么每个实例可以维护一份呗返回对象的独立拷贝, 组件间的 data 也不会相互影响, 
+而 new Vue 的实例是不会被复用的, 因此不存在引用对象的问题
+
+## v-model 的原理
+
+v-model 主要用在 input, textarea, select等元素上的创建双向数据绑定, 本质上是语法糖
+
+v-model 在内部为不同的输入元素使用不同的属性并抛出不同的事件
+
+- text 和 textarea 元素使用 value 和 input 事件
+- checkbox 和 radio 使用 checked 属性和 change 事件
+- select 字段将 value 作为 prop 并将 change 作为事件
+
+```vue
+<<input type="text" :value="something" @input="something = $event.target.value">
+```
+
+## Vue 组件通讯
+
+1. props / $emit 父子组件通讯
+
+2. ref 与 $parent / $children 父子组件通讯
+
+- ref: 如果普通的 DOM 元素上使用, 引用指向的是 DOM 元素, 如果用在组件上, 引用指向组件实例
+- $parent / $children  访问父/子
+
+3. EventBus($emit/$on), 适用于父子, 隔代, 兄弟之间通讯
+
+通过一个空的 Vue 实例作为事件中心, 用它来触发和监听事件, 从而实现任何组件的通信
+
+4. $attrs / $listeners 使用与隔代组件通讯
+
+- $attrs: 包含了父作用域中不被 prop 所识别的特性绑定(class和style除外), 当一个组件没有声明任何 prop 时, 这里会包含所有
+父作用域绑定, 并可以通过 $attr 传入内部组件, 配合 inheritAttr 使用
+- $listener: 包含了父作用域中的 v-on 事件监听器, 可通过 @$listener 传入内部组件
+
+5. provide / inject 适用于隔代组件通讯
+
+祖先组件中通过 provider 来提供变量, 然后在子孙组件中通过 inject 来注入变量, provide/inject 主要解决了跨级组件间
+的通信问题, 不过他的使用场景, 主要是子组件的状态, 跨级组件间建立了一种主动提供和依赖注入的关系
+
+6. Vuex 适用于全局通信
+
+是一个专为 Vue.js 应用程序开发的状态管理模式, 每一个 Vuex 应用的核心就是 store, Vuex 状态存储是响应式的, 改变 store 中状态
+唯一的途径就是提交 mutation
+
+## 使用过 Vue SSR 么
+
+>Vue.js 是构建客户端应用程序的框架, 默认情况下浏览器输出 Vue 组件, 进行生成 DOM 和操作 DOM, 然而, 也可以将同一个组件渲染为服务端
+>的HTML 字符串, 他们直接发送到浏览器, 最后将服务器渲染的页面为用户服务
+
+优点: 
+
+- 更好的 SEO, SPA 页面通过 AJAX 获取, 而搜索引擎爬取工具并不会等待 AJAX 异步完成后再抓取页面内容, 所以 SPA 总是
+抓取不到 AJAX 获取的内容的, 而 SSR 由服务器直接返回, 所以搜索引擎可以爬取
+- 更快的内容到达: SPA 会等待所有的 Vue 编译后才会显示页面, 而 SSR 会在服务器写好页面后直接返回
+
+缺点: 
+
+- 更多的开发条件限制, 服务端渲染只支持 beforeCreate 和 created 两个钩子函数, 这回导致一些外部扩展库需要特殊处理, 
+才能在服务端渲染程序运行, 而且服务端渲染程序需要 Node.js 的加持
+- 更多的服务器负载
+
+## Vue-router 路由模式有几种 
+
+1. hash: 使用 URL hash 来做路由, 支持所有浏览器
+2. history: HTML5 新增的 history 的 pushstate API
+3. abstract: 支持所有 JS 运行环境, 如 Node.js 服务器, 如果发现没有浏览器的 API, 那么就会强制进入这个模式
+
+## Vue-router 常用的 hash 和 history 原理
+
+>hash 模式
+
+最前的前端路由就是由 location.hash 来实现的, #后面的就表示路径的 hash 值
+
+- URL 中的 hash 值只是客户端的一种状态, 也就是说向服务端发出请求时, hash 部分会被吃掉
+- hash 值的改变, 都会在浏览器的访问记录历史中增加一条记录, 因此我们能通过浏览器的嗯回退, 前进按钮控制 hash 的切换
+- 可以通过 a 标签, 并设置 href 属性, 当用户点击这个标签后, URL 的 hash 值会发生改变, 可以使用 JS 对 location.hash 赋值, 
+改变 URL 的 hash 值
+- 可以通过 hashChange 事件来监听 hash 值的变化, 从而对页面进行跳转
+
+>history 模式
+
+HTML5 提供了 History API 来实现 URL 的变化, 其中主要的有两个
+
+1. history.pushState(): 在 history 里新增一个记录 
+2. history.replaceState(): 替换当前的记录
+
+- pushState 和 replaceState 两个 API 来实现 URL 的变化
+- 可以使用 pushState 来监听 url 的变化, 从而对页面进行跳转
+- 这两个方法不会触发 popstate 事件, 需要手动触发页面跳转
+
+## 什么是 MVVM
+
+Model-View-ViewModel 是一个软件架构的设计模式, 基于 MVC
+
+- View 层:
+
+视图层, HTML 和 CSS 来构建
+
+- Model 层
+
+数据模型, 反之后端进行各种业务逻辑的数据操作
+
+- ViewModel 层
+
+前端来维护的视图数据层, 双向绑定, 当用户操作 DOM 的时候会会直接更新视图, 开发者不需要在维护, 只需要管理数据拿给用户就好
+
+
+## Vue 如何实现双向绑定
+
+1. 实现一个监听器 Observer: 对数据对象进行遍历, 包括子属性对象的属性, 利用 Object.defineProperty() 对属性加上 setter 和 
+getter, 这样的话, 给这个对象的某个赋值, 就会触发 setter, 那么就能监听到数据变化
+
+2. 实现一个解析器 Compile: 解析 Vue 模板指令, 将模板中的变量都替换成数据, 然后初始化渲染页面视图, 并将每个指令对应的 节点
+绑定更新数据, 添加监听数据的订阅者, 一旦数据有变动, 收到通知, 调用更新函数进行数据更新
+
+3. 实现一个 Watcher: Watcher 订阅者是 Observer 和 Compile 之间的桥梁, 主要任务是订阅 Observer 中的属性值变化的消息, 
+当收到属性变化的消息时, 触发解析器 Compile 中对应的更新函数
+
+4. 实现一个订阅器 Dep: 订阅器从用 发布-订阅 设计模式, 用来收集订阅者 Watcher, 对监听器 Observer 和订阅者 Watcher 进行统一管理
+
+
+## Vue3 了解哪些
+
+1. 监测机制的改变
+
+Proxy 来取代 Object.defineProperty()
+
+2. 插槽改为函数的方式, 这样只会影响子组件的重新渲染, 提升了渲染的性能
+
+3. 对象式的组件声明方式
+
+Vue2 中的组件使用过声明的方式传入一系列的 options, 和 TS 的结合需要通过一些装饰器的方式来做, 虽然能实现功能, 但比较麻烦
+
+Vue3 改变了组件的声明方式, 改成了类式的写法, 这样使得和 TS 的结合变的容易
+
+Vue3 的源码也用 TS 来写, 使得对外暴露的 api 更容易结合 TS 
+
+4. 其他改变
+
+- 支持自定义渲染器
+- 支持 Fragment (多个根节点) 和 Protal (在 DOM 其他部分渲染组件内容) 组件
+- 基于 treeShaking 优化, 提供了更多的内置功能
 
 

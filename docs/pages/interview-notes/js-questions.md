@@ -1101,6 +1101,7 @@ RAF 不需要设置时间间隔, 它采用的是系统时间间隔, 不会因为
 - RAF 会把每一帧的所有 DOM 操作集中起来, 再一次重绘或回流中完成
 - 在隐藏或不可见的元素中, RAF 将不会执行重绘或回流, 意味着更少的 CPU 的使用量
 - RAF 是专为浏览器动画提供的 API, 在运行时浏览器会自动优化方法调用
+- RAF 是根据屏幕刷新率来调整动画的帧数, 所以比 setTimeout 和 setInterval 更加流畅
 
 ## 手写 bind
 
@@ -1559,23 +1560,50 @@ Node 11 之后: 和浏览器行为统一, 执行一个宏任务就执行完微�
 
 ## 手写 JSONP
 
+客户端: 
+
 ```js
-function jsonp({url,params,cb}){
-  return new Promise((resolve,reject)=>{
-    window[cb] = function(data){
-      resolve(data) 
-      document.body.removeChild(script)
-    }  
-    params = {...params,cb}
-    let arrs = []
-    for(let key in params){
-      arrs.push(`${key}=${params[key]}`) 
+const jsonp = ({ url, params, callbackName }) => {
+  const generateURL = () => {
+    let dataStr = '';
+    for(let key in params) {
+      dataStr += `${key}=${params[key]}&`;
     }
-    let script = document.createElement('script')
-    script.src = `${url}?${arrs.join('&')}`
-    document.body.appendChild(script)
-  })
+    dataStr += `callback=${callbackName}`;
+    return `${url}?${dataStr}`;
+  };
+  return new Promise((resolve, reject) => {
+    // 初始化回调函数名称
+    callbackName = callbackName || Math.random().toString.replace('.', ''); 
+    // 创建 script 元素并加入到当前文档中
+    let scriptEle = document.createElement('script');
+    scriptEle.src = generateURL();
+    document.body.appendChild(scriptEle);
+    // 绑定到 window 上，为了后面调用
+    window[callbackName] = (data) => {
+      resolve(data);
+      // script 执行完了，成为无用元素，需要清除
+      document.body.removeChild(scriptEle);
+    }
+  });
 }
+const res = jsonp({url:'http://localhost:3000/',params:'',callbackName:'meng'})
+console.log(res)
+res.then(data=>{
+	console.log(data)
+},err=>console.log(err))
+```
+
+服务端:
+
+```js
+const http = require('http')
+const url = require('url')
+http.createServer((req, res) => {
+  const query = url.parse(req.url, true).query
+  res.write(`${query.callback}('hello')`)
+  res.end()
+}).listen(3000)
 ```
 
 ## 手写 new

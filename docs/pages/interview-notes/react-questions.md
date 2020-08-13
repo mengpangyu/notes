@@ -76,9 +76,33 @@ ajax 放在 componentDidMount
 
 ## 什么是高阶组件?
 
-- 高阶组件就是一个函数, 且该函数接收一个组件作为参数, 并返回一个新的组件
-- React Redux 的 connect 就是一个高阶组件, 比如 connect(mapState)(MyComponent) 接收 MyComponent, 
-返回一个具有新状态的 MyComponent 组件
+高阶组件(HOC)是接收一个组件并返回一个新组件的函数, 基本上, 这是一个模式, 是从 React 的组合特性中衍生出来的, 称其为纯组件
+, 因为他们可以接受任何动态提供的组件, 但不会修改或复制输入组件中的任何行为
+```jsx harmony
+const EnhancedComponent = higherOrderComponent(WrapperedComponent)
+```
+::: tip 注意
+HOC 可用于一下许多用例: 
+
+1. 代码重用, 逻辑和引导抽象
+2. 渲染劫持
+3. state 抽象和操作
+4. props 处理
+:::
+
+## 什么是 prop drilling, 如何避免
+
+构建 React 程序时, 多层嵌套组件来使用另一个嵌套组件提供的数据, 最简单的方法是将一个 prop 从每个组件一层一层的传递下去, 从元组件
+传递到深层嵌套组件, 叫做 prop drilling
+
+解决方法可以使用 React Context 通过定义 provider 组件, 并允许通过 Consumer 或 useContext Hook 使用上下文
+
+## 什么是 React Fiber
+
+是 React 16 中新的协调引擎或重新实现核心算法, 主要目标是支出虚拟 DOM 的增量渲染, React Fiber 在于提高在其动画, 布局, 手势,
+暂停, 终止或重用等方面的适用性, 并为不同类型的更新分配优先级, 以及新的并发原语
+
+
 
 ## React diff 的原理是什么?
 
@@ -292,19 +316,59 @@ event.button === 0 && // ignore everything but left clicks
 
 ## React 16 更新的生命周期
 
-删除生命周期(17正式删除, 为了向下兼容): 
+废弃生命周期:
 
 - componentWillMount
 - componentWillReceiveProps
 - componentWillUpdate
 
-新生命周期: 
+虽被废弃但没被删除, 为了向下兼容
 
-- static getDerivedStateFromProps 静态方法, 不能用 this, 两个参数, 新的 props 和旧的 state
-- getSnapshotBeforeUpdate render 后 didUpdate 之前调用, 两个参数, 旧的 props 和 旧的 state, 和 didUpdate 配合使用,
+react 声明周期分三阶段, 挂载阶段, 更新阶段, 卸载阶段
 
-:::tip 注意
-componentDidUpdate 三个参数, 旧的 props 旧的 state, snapshot 是新增方法 getSnapshotBeforeUpdate 返回值, 这里可用 dom 操作, 发送请求 setState等
-:::
+### 挂载阶段
+
+- constructor: 构造函数, 最先被执行, 通常在构造函数里初始化 state 对象和给自定义方法绑定 this
+- static getDerivedStateFromProps: 这个静态方法用于当接收新的属性去修改 state
+- render: 一个纯函数, 只返回需要渲染的东西, 不应该包含其他的业务逻辑
+- componentDidMount: 组件装载之后调用, 可以获取 DOM 节点后操作, canvas, svg 的操作, 服务器请求, 订阅都可写在这里
+
+### 更新阶段
+
+- getDerivedStateFromProps: 此方法在更新挂载阶段都会调用
+- shouldComponentUpdate: 两个参数, nextProps, nextState, 新的属性和变化之后的 state, 返回一个布尔值, true 表示触发渲染, 
+false 表示不会触发渲染, 默认返回 true
+- render: 更新阶段也会触发
+- getSnapshotBeforeUpdate: 在 render 之后, componentDidUpdate 之前调用, 有两个参数 prevProps 和 prevState, 表示之前的
+属性和之前的 state, 这个函数有一个返回值, 会作为第三个参数传给 componentDidUpdate, 必须与 componentDidUpdate 搭配使用
+- componentDidUpdate: 三个参数, prevProps, prevState, snapshot, 表示之前的 props, state 和 snapshot, 如果
+触发某些回调函数需要用到 DOM 元素的状态, 则将对比或计算的过程迁移至 getSnapshotBeforeUpdate, 然后在 componentDidUpdate 中统一触发回调或更新状态
+
+### 卸载阶段
+
+- componentWillUnmount: 组件被卸载了或被销毁了就会调用, 在这里清除定时器, 取消网络请求等操作
+
+
+
+## setState 到底是异步还是同步的
+
+- 有时候表现异步, 有时候表现同步
+
+1. 只能在合成事件和钩子函数中是异步的, 在原生事件和 setTimeout 中是同步的
+2. 异步并不是说内部由异步代码实现, 其实本身执行的过程和代码都是同步的, 只是合成事件和钩子函数调用顺序在更新之前, 
+导致在合成事件和钩子函数没发立马拿到更新后的值, 形成了所谓的异步, 可以通过第二给参数中的回调拿到结果
+3. 批量更新优化也是异步的(合成事件, 钩子函数)之上的, 在原生事件和 setTimeout 中不会批量更新, 在异步中如果对同一个值多次 setState
+, setState 的批量更新策略会对其进行覆盖, 去最后一次执行, 如果是通过 setState 值, 在更新时会对其合并批量更新
+
+## React 中的 refs 干嘛用的
+
+Refs 提供了一种访问在 render 方法中创建的 DOM 节点或者 React 元素的方法, 在典型的数据流中, props 是父子组件交互的
+唯一方式, 想要修改子组件, 需要使用新的 props 来渲染它, 如果想要强制修改子代, 可以用 Refs
+
+## 在 React 中如何处理事件
+
+为了解决兼容性问题, SyntheticEvent 实例会被传递给你的事件处理函数, SyntheticEvent 是 React 跨浏览器的原生事件包装器
+, 他还拥有和浏览器原生事件相同的接口, 包括 stopPropagation 和 preventDefault
+
 
 
