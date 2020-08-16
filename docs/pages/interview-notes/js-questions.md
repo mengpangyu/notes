@@ -586,7 +586,7 @@ function Dog(color, name){
 }
 function temp() {}
 temp.prototype = Animal.prototype
-Dog.prototype = new temp() // 这样做的目的是, 不让 Animal 的属性放在 __proto__ 中
+Dog.prototype = new temp() // 防止原型重复引用
 
 Dog.prototype.constructor = Dog
 Dog.prototype.say = function(){console.log('汪')}
