@@ -17,7 +17,7 @@ module.exports = {
       {text: '项目', link: '/pages/project-notes/cat/wc-money.md'},
       {text: 'Node', link: '/pages/node-notes/node-buffer.md'},
       {text: 'Linux', link: '/pages/linux-notes/linux-start.md'},
-      {text: '算法', link: '/pages/suanfa-notes/structure/suanfa-day01.md'},
+      {text: '算法', link: '/pages/suanfa-notes/suanfa/sort.md'},
       {text: '技巧', link: '/pages/interview-notes/js-questions.md'},
       {text: '工具', link: '/pages/tool-notes/tool-use.md'},
       {text: '关于我', link: '/pages/about-me/about-me.md'},

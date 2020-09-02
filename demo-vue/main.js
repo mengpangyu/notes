@@ -1,3 +1,17 @@
+const foo = {template: `<h1>foo</h1>`}
+const bar = {template: `<h1>bar</h1>`}
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/foo',
+      component: foo
+    },
+    {
+      path: '/bar',
+      component: bar
+    }
+  ]
+})
 Vue.component('Child', {
   template: `
     <input type="text" :value="value" @input="$emit('input',$event.target.value)">
@@ -35,10 +49,15 @@ Vue.component('Father', {
   },
   template: `
     <div>
-      <Child3 v-slot="slotProps">{{slotProps}}</Child3>
-      <Child2 :name.sync="items[0].name"/>
-      <Child :value="items[0].title" @input="input"/>
-      {{items[0].title}}
+      <!--      <Child3 v-slot="slotProps">{{slotProps}}</Child3>-->
+      <!--      <Child2 :name.sync="items[0].name"/>-->
+      <!--      <Child :value="items[0].title" @input="input"/>-->
+      <!--      {{items[0].title}}-->
+      <router-link to="/foo">foo</router-link>
+      <router-link to="/bar">bar</router-link>
+      <div>
+        <router-view></router-view>
+      </div>
     </div>
   `,
   methods: {
