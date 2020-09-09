@@ -415,3 +415,23 @@ src 用于替代这个元素, href 用于建立这个标签与外部资源的联
 1. display: none (不占空间, 不能点击)(场景, 显示出原来这里不存在的结构)
 2. visibility: hidden (占据空间, 不能点击)(场景, 显示不会导致页面结构发生变动, 不会撑开)
 3. opacity: 0 (占据空间, 可以点击)(场景, 可以根据 transition 搭配)
+
+## css 可继承属性
+
+- 所有元素可继承
+
+> visibility cursor
+
+- 内联元素可继承
+
+> letter-spacing word-spacing white-space line-height color font font-family font-szie font-style font-variant font-weight
+>text-decoration text-transform direction
+
+- 块级元素可继承
+
+> text-indent text-align
+
+- 列表元素可继承
+
+> list-style list-style-type list-style-position list-style-image
+
