@@ -381,16 +381,30 @@ https 协议有 http + ssl 协议构成
 
 ## TCP 三次握手
 
-1. 第一次握手: 两端都 closed 关闭状态, Client 将标志位 SYN 置为 1, 随机产生一个值 seq=x, 并将该数据包发给 Server,
+:::tip 注意
+介绍参数分别为什么:
+
+1. SYN(synchronous): 建立联机
+2. ACK(acknowledgement): 确认
+3. PSH(push): 传送
+4. FIN(finish): 结束
+5. RST(reset): 重置
+6. URG(urgent): 紧急
+7. Seq(Sequence Number): 序列号
+8. Ack(Acknowledge Number): 确认好号
+
+:::
+
+9. 第一次握手: 两端都 closed 关闭状态, Client 将标志位 SYN 置为 1, 随机产生一个值 seq=x, 并将该数据包发给 Server,
    Client 进入 SYN-SENT 状态, 等待 Server 确认
 
-2. 第二次握手: Server 收到数据包后由标志位 SYN=1 得知 Client 请求建立连接, Server 将标志位 SYN 和 ACK 都置为 1,
-   ack=x+1, 随机产生一个值 seq=y, 并将数据包发送给 Client 已确认连接请求, Server 进入 SYN-RCVD 状态, 此时操作系统为该
-   TCP 连接分配 TCP 缓存和变量
+10. 第二次握手: Server 收到数据包后由标志位 SYN=1 得知 Client 请求建立连接, Server 将标志位 SYN 和 ACK 都置为 1,
+    ack=x+1, 随机产生一个值 seq=y, 并将数据包发送给 Client 已确认连接请求, Server 进入 SYN-RCVD 状态, 此时操作系统为该
+    TCP 连接分配 TCP 缓存和变量
 
-3. Client 收到确认后, 检查 ACK 是否为 1, 如果正确则将标志位 ACK 置为 1, ack=y+1, 并且此时操作系统为该 TCP 连接分配 TCP 缓存和变量,
-   并将数据包发送给 Server, Server 检查 ack 是否为 y+1, ACK
-   是否为 1, 如果正确则建立成功, Client 和 Server 进入 ESTABLISHED 状态, 完成三次握手, 随后 Client 和 Server 开始传输数据
+11. Client 收到确认后, 检查 ACK 是否为 1, 如果正确则将标志位 ACK 置为 1, ack=y+1, 并且此时操作系统为该 TCP 连接分配 TCP 缓存和变量,
+    并将数据包发送给 Server, Server 检查 ack 是否为 y+1, ACK
+    是否为 1, 如果正确则建立成功, Client 和 Server 进入 ESTABLISHED 状态, 完成三次握手, 随后 Client 和 Server 开始传输数据
 
 :::tip 注意
 依照以下问题展开回答?
