@@ -1328,55 +1328,6 @@ Function.prototype.myBind = function() {
 - URL 后加时间戳: nowtime= new Date().getTime()
 - jQuery 直接: \$.ajaxSetup({cache:false})
 
-## 如何实现 sleep 效果
-
-- Promise 实现
-
-```js
-function sleep(ms) {
-  return new Promise((resolve) => {
-    console.log('start sleep')
-    setTimeout(resolve, ms)
-  })
-}
-sleep(1000).then(() => {
-  console.log('sleep end')
-})
-```
-
-- async 实现封装
-
-```js
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-    console.log('start sleep')
-  })
-}
-async function test() {
-  await sleep(1000)
-  console.log('sleep end')
-}
-test()
-```
-
-- 通过 generate 来实现
-
-generate 函数是一个生成器函数, 他返回一个 Generator 对象, yield 是每个区域, next.value 可以获取它的值
-async await 其实是 generator 的语法糖
-
-```js
-function* sleep(ms) {
-  yield new Promise((resolve) => {
-    console.log('start sleep')
-    setTimeout(resolve, ms)
-  })
-}
-sleep(1000)
-  .next()
-  .value.then(() => console.log('sleep end'))
-```
-
 ## 说一下虚拟 DOM
 
 用 JS 表示 DOM 树的结构, 用这个树建立真正的 DOM 树, 插入到文档中, 当状态变更的时候, 重新构造一棵新的对象树
@@ -1852,6 +1803,152 @@ Function.prototype.myApply = function(content = window) {
   delete content.fn
   return result
 }
+```
+
+## 手写 reduce
+
+```js
+Array.prototype.myReduce = function(fn, base) {
+  if (typeof fn !== 'function') throw new TypeError('arguments[0] must be a function')
+
+  const initArr = this
+  const arr = initArr.concat()
+  let index, result
+
+  if (arguments.length === 2) {
+    arr.unshift(base)
+    index = 0
+  } else {
+    index = 1
+  }
+  if (arr.length === 1) result = arr[0]
+
+  while (arr.length > 1) {
+    result = fn.call(null, arr[0], arr[1], index, initArr)
+    index++
+    arr.splice(0, 2, result)
+  }
+  return result
+}
+```
+
+## 手写 map
+
+```js
+// 利用 reduce, 传入初始值, index 就为 0, 那么就可以从 0 开始遍历数组, Arg 是 map 第二个参数, 表示回调 fn 时候的 this
+Array.prototype.myMap1 = function(fn, Arg) {
+  var res = []
+  this.reduce((prev, curr, index, array) => {
+    res.push(fn.call(Arg, curr, index, array))
+  }, 0)
+  return res
+}
+
+// 利用 for 循环直接实现 map 遍历且返回新的数组
+Array.prototype.myMap2 = function(fn) {
+  var newArr = []
+  for (var i = 0; i < this.length; i++) {
+    newArr.push(fn(this[i], i, this)) //this指向调用newMap方法的数组
+  }
+  return newArr
+}
+```
+
+## 手写 fill
+
+```js
+// value 为填充值, start 开始索引, end 结束索引
+Array.prototype.myFill = function(value, start = 0, end = this.length) {
+  for (let i = start; i < end; i++) {
+    this[i] = value
+  }
+}
+```
+
+## 手写 filter
+
+```js
+Array.prototype.myFilter = function(fn, Arg) {
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`)
+  const arr = this
+  const result = []
+  for (let i = 0; i < arr.length; i++) {
+    const value = fn.call(Arg, arr[i], i, arr)
+    value && result.push(arr[i])
+  }
+  return result
+}
+```
+
+## 手写 find 和 findIndex
+
+```js
+// find
+Array.prototype.myFind = function(fn, start = 0, end = this.length) {
+  for (let i = start; i < end; i++) {
+    if (fn.call(this, arr[i], i, this)) {
+      return arr[i]
+    }
+  }
+}
+
+// findIndex
+Array.prototype.myFindIndex = function(fn, start = 0, end = this.length) {
+  for (let i = start; i < end; i++) {
+    if (fn.call(this, this[i], i, this)) {
+      return i
+    }
+  }
+  return -1
+}
+```
+
+## 手写 sleep
+
+- Promise 实现
+
+```js
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+sleep(1000).then(() => {
+  console.log(' end')
+})
+```
+
+- async 实现封装
+
+```js
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+    console.log('start sleep')
+  })
+}
+async function test() {
+  await sleep(1000)
+  console.log('sleep end')
+}
+test()
+```
+
+- 通过 generate 来实现
+
+generate 函数是一个生成器函数, 他返回一个 Generator 对象, yield 是每个区域, next.value 可以获取它的值
+async await 其实是 generator 的语法糖
+
+```js
+function* sleep(ms) {
+  yield new Promise((resolve) => {
+    console.log('start sleep')
+    setTimeout(resolve, ms)
+  })
+}
+sleep(1000)
+  .next()
+  .value.then(() => console.log('sleep end'))
 ```
 
 ## 函数柯里化

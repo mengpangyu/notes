@@ -364,6 +364,185 @@ BFC 特性及应用
 }
 ```
 
+## CSS 画各种形状
+
+- 等腰三角形
+
+```css
+#div {
+  width: 0;
+  height: 0;
+  border-bottom: 50px solid red;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+}
+```
+
+- 等边三角形: 勾股定理
+
+```css
+#div {
+  width: 0;
+  height: 0;
+  border-bottom: 86.6px solid red;
+  border-right: 50px solid transparent;
+  border-left: 50px solid transparent;
+}
+```
+
+- 等腰梯形
+
+```css
+#div {
+  width: 50px;
+  height: 0;
+  border-bottom: 50px solid red;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+}
+```
+
+- 扇形
+
+```css
+#div {
+  width: 0px;
+  height: 0px;
+  border-bottom: 50px solid red;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-radius: 50%;
+}
+```
+
+- 圆形
+
+```css
+#div {
+  width: 50px;
+  height: 50px;
+  background: red;
+  border-radius: 50%;
+}
+```
+
+- 半圆
+
+```css
+#div {
+  width: 50px;
+  height: 25px;
+  background: red;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+}
+```
+
+## 实现三栏布局
+
+- 流体布局
+
+```css
+.left {
+  float: left;
+  height: 200px;
+  width: 100px;
+  background-color: red;
+}
+.right {
+  width: 200px;
+  height: 200px;
+  background-color: blue;
+  float: right;
+}
+.main {
+  margin-left: 100px;
+  margin-right: 200px;
+  height: 200px;
+  background-color: green;
+}
+```
+
+- BFC 三栏布局
+
+```css
+.left {
+  float: left;
+  height: 200px;
+  width: 100px;
+  margin-right: 20px;
+  background-color: red;
+}
+.right {
+  width: 200px;
+  height: 200px;
+  float: right;
+  margin-left: 20px;
+  background-color: blue;
+}
+.main {
+  height: 200px;
+  overflow: hidden;
+  background-color: green;
+}
+```
+
+- table 布局
+
+```css
+.container {
+  display: table;
+  width: 100%;
+}
+.left,
+.main,
+.right {
+  display: table-cell;
+}
+.left {
+  width: 200px;
+  height: 300px;
+  background-color: red;
+}
+.main {
+  background-color: blue;
+}
+.right {
+  width: 100px;
+  height: 300px;
+  background-color: green;
+}
+```
+
+- 绝对定位布局
+
+```css
+.container {
+  position: relative;
+}
+.main {
+  height: 400px;
+  margin: 0 120px;
+  background-color: green;
+}
+.left {
+  position: absolute;
+  width: 100px;
+  height: 300px;
+  left: 0;
+  top: 0;
+  background-color: red;
+}
+.right {
+  position: absolute;
+  width: 100px;
+  height: 300px;
+  background-color: blue;
+  right: 0;
+  top: 0;
+}
+```
+
 ## link 标签和 import 标签的区别
 
 - link 属于 html 标签, 而 @import 是 css 提供的
