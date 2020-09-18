@@ -799,6 +799,17 @@ function unique(arr) {
 }
 ```
 
+- 利用 reduce 去重
+
+```js
+function unique(arr) {
+  return arr.reduce((all, item, index, arr) => {
+    if (arr.indexOf(item) === index) all.push(item)
+    return all
+  }, [])
+}
+```
+
 - 利用递归去重
 
 ```js
