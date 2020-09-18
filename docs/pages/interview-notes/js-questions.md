@@ -887,6 +887,23 @@ const flatter = (arr) => {
 }
 ```
 
+## 打乱数组
+
+```js
+Array.prototype.shuffle = function() {
+  const arr = this
+  let len = arr.length
+  let index, temp
+  while (len) {
+    index = Math.floor(Math.random() * len--)
+    temp = arr[index]
+    arr[index] = arr[len]
+    arr[len] = temp
+  }
+  return arr
+}
+```
+
 ## 判断数组
 
 - instanceof

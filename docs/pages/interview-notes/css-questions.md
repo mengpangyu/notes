@@ -8,13 +8,24 @@
 
 盒模型有两种:
 
-1. content-box
+1. content-box(标准模型)
 
 设置的宽高都是对于 content 的
 
-2. border-box
+2. border-box(IE 模型)
 
 设置的宽高都是对于 content + padding + border
+
+:::warning 面试
+
+1. JS 如何获取盒模型对应的宽和高
+
+- dom.style.left/height 只能取出内联样式的宽高
+- dom.currentStyle.left/height IE 方法, 兼容不好
+- window.getComputedStyle(dom).width/height 支持所有浏览器, 支持三种 css 引入方法
+- dom.getBoundingClientRect().width/height 获取相对于视窗的相对位置和宽高
+
+:::
 
 **深入问题:** 外边距重叠
 
@@ -314,6 +325,7 @@ BFC 特性及应用
 1. 同一个 BFC 下外边距会发生折叠
 2. BFC 可以包含浮动的元素(清除浮动)
 3. BFC 可以阻止元素被浮动元素覆盖
+4. 独立的容器, 互不相干
 
 ```html
 <!DOCTYPE html>
@@ -442,25 +454,41 @@ BFC 特性及应用
 
 - 流体布局
 
-```css
-.left {
-  float: left;
-  height: 200px;
-  width: 100px;
-  background-color: red;
-}
-.right {
-  width: 200px;
-  height: 200px;
-  background-color: blue;
-  float: right;
-}
-.main {
-  margin-left: 100px;
-  margin-right: 200px;
-  height: 200px;
-  background-color: green;
-}
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JS Bin</title>
+  </head>
+  <style>
+    #div div {
+      min-height: 100px;
+    }
+    .left {
+      float: left;
+      background: red;
+      width: 100px;
+    }
+    .right {
+      float: right;
+      background: red;
+      width: 100px;
+    }
+    .main {
+      margin: 0 100px;
+      background: blue;
+    }
+  </style>
+  <body>
+    <div id="div">
+      <div class="left"></div>
+      <div class="right"></div>
+      <div class="main"></div>
+      // main 的位置必须在第三个, 这样上面两个浮动才能覆盖
+    </div>
+  </body>
+</html>
 ```
 
 - BFC 三栏布局
@@ -542,6 +570,69 @@ BFC 特性及应用
   top: 0;
 }
 ```
+
+- flex 布局
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JS Bin</title>
+  </head>
+  <style>
+    #div {
+      display: flex;
+    }
+    #div div {
+      min-height: 100px;
+    }
+    .left,
+    .right {
+      width: 100px;
+      background: red;
+    }
+    .main {
+      flex: 1;
+      background: blue;
+    }
+  </style>
+  <body>
+    <div id="div">
+      <div class="left"></div>
+      <div class="main"></div>
+      // main 在中间
+      <div class="right"></div>
+    </div>
+  </body>
+</html>
+```
+
+- grid 布局
+
+```css
+#div {
+  display: grid;
+  grid-template-rows: 100px;
+  grid-template-columns: 100px auto 100px;
+}
+.left,
+.right {
+  background: red;
+}
+.main {
+  background: blue;
+}
+```
+
+:::tip 注意
+拓展延伸:
+
+1. 每个方案优缺点
+2. 业务场景用什么
+3. 在改变高度的情况下, flex 和 table 会自动撑开, 其他布局不会
+
+:::
 
 ## link 标签和 import 标签的区别
 
