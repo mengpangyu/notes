@@ -374,110 +374,140 @@ EventLoop 是一个阶段, 分为 Node.js 和 Chrome
 
 ## JS 常用设计模式
 
-- 单例模式: 任意对象都是单例, 无须特别处理
+### 工厂模式
+
+- 简单工厂模式
 
 ```js
-let obj = { name: 'chauncey', age: 30 }
+// 做咖啡, 做出不同的浓度
+function createCoffee(bean, water) {
+  const obj = new Object()
+  obj.bean = bean
+  obj.water = water
+  obj.thickness = Math.floor(bean / water)
+  return obj
+}
+const mocha = createCoffee(1, 10)
+const american = createCoffee(2, 5)
 ```
 
-- 工厂模式: 就是同样形式参数返回不同的实例
+- 复杂工厂模式
 
 ```js
-function Person(name) {
-  this.name = 'chauncey'
-}
-function Animal(name) {
-  this.name = 'cat'
-}
-function Factory() {}
-Factory.prototype.getInstance = function(className) {
-  return eval('new ' + className + '()')
-}
-let factory = new Factory()
-let person = factory.getInstance('Person', 'chauncey')
-let animal = factory.getInstance('Animal', 'cat')
-console.log(person.name)
-console.log(animal.name)
-```
+function Person() {} // 工厂
 
-- 代理: 就是新建一个类调用老类的接口, 包裹一下
-
-```js
-function Person() {}
-Person.prototype.sayName = function() {
-  console.log('chauncey')
-}
-Person.prototype.sayAge = function() {
-  console.log(11)
-}
-function PersonProxy() {
-  this.person = new Person()
-  this.callMethod = (functionName) => {
-    this.person[functionName]()
+Person.prototype.make = function(who, ...args) {
+  // 制作物品
+  if (typeof this[who] === 'function') {
+    const func = this[who]
+    function temp() {}
+    // 把工厂对象的原型换到工厂上, 所有的物品都是出自工厂而不是各自的实例
+    temp.prototype = Person.prototype
+    func.prototype = new temp()
+    return new func(...args)
   }
 }
-let pp = new PersonProxy()
-pp.callMethod('sayName')
-pp.callMethod('sayAge')
+
+Person.prototype.extends = function(obj) {
+  // 扩展生产线
+  for (let key in obj) {
+    this[key] = obj[key]
+  }
+}
+
+Person.prototype.extends({
+  boy: function(name) {
+    console.log(`I am a boy and name is ${name}`)
+  },
+  girl: function(name) {
+    console.log(`I am a girl and name is ${name}`)
+  },
+})
+
+const person = new Person()
+
+person.make('boy', 'bob')
 ```
 
-- 观察者: 就是事件模式, 比如 onclick
+- 单例模式
 
 ```js
-// 发布者
-function Publisher() {
-  this.listeners = []
+function instanceMode() {
+  let instance = null
+  function createInstance() {
+    if (instance) return instance
+    instance = this
+    this.name = 'chauncey'
+    this.age = 11
+  }
+  const p1 = new createInstance()
+  const p2 = new createInstance()
+  console.log(p1 === p2)
 }
-Publisher.prototype = {
-  addListener: function(listener) {
-    this.listeners.push(listener)
-  },
-  removeListener: function(listener) {
-    delete this.listeners[this.listeners.indexOf(listener)]
-  },
-  notify: function(obj) {
-    for (let i = 0; i < this.listeners.length; i++) {
-      let listener = this.listeners[i]
-      if (typeof listener !== 'undefined') {
-        listener.process(obj)
-      }
-    }
-  },
-}
-// 订阅者
-function Subscriber() {}
-Subscriber.prototype = {
-  process: function(obj) {
-    console.log(obj)
-  },
-}
-
-let publisher = new Publisher()
-publisher.addListener(new Subscriber())
-publisher.addListener(new Subscriber())
-// 添加了两个订阅者去监听事件, 如果触发, 那么就获取, 打印
-publisher.notify({ name: 'meng', age: '30' })
 ```
 
-ES6 实现
+- 观察者模式
 
 ```js
 function observerMode() {
-  const eventQueue = new Set() // 事件队列
-  const addEvent = (event) => eventQueue.add(event) // 加入事件
-  const printObj = () => console.log(`name: ${person.name}`) // 打印事件
-  const observer = (obj) =>
-    new Proxy(obj, {
-      set(obj, prop, value, receiver) {
-        const result = Reflect.set(...arguments) // 改变属性
-        eventQueue.forEach((event) => event()) // 执行事件
-        return result // 返回结果 true / false
-      },
-    })
-  const person = observer({ name: 'chauncey', age: 11 }) // 返回被观察后的对象
+  const EventBus = {
+    events: [], // 事件队列
+    addEvent: function(eventName, callback) {
+      // 添加事件
+      if (!this.events[eventName]) {
+        this.events[eventName] = []
+      }
+      const obj = callback
+      this.events[eventName].push(obj)
+    },
+    publishEvent: function(eventName, ...args) {
+      // 触发事件
+      if (!this.events[eventName]) throw Error('没有注册此事件')
+      for (let i = 0; i < this.events[eventName].length; i++) {
+        const callback = this.events[eventName][i]
+        callback.call(eventName, eventName, ...args)
+      }
+    },
+  }
+  EventBus.addEvent('click', (word) => {
+    console.log('hello', word)
+  })
+  EventBus.addEvent('keyup', (word) => {
+    console.log('hello', word)
+  })
+  EventBus.addEvent('keyup', (word) => {
+    console.log('hello', word)
+  })
+  EventBus.publishEvent('click')
+  EventBus.publishEvent('keyup')
+}
+```
 
-  addEvent(printObj) // 加入事件队列
+- 策略模式
 
-  person.age = 12 // 改变属性执行事件
+根据不同的应用场景用不同的策略
+
+```js
+function strategyMode() {
+  const strategy = {
+    slow: function() {
+      console.log('慢速')
+    },
+    quick: function() {
+      console.log('快速')
+    },
+    normal: function() {
+      console.log('常速')
+    },
+  }
+  function Run(to, from) {
+    this.to = to
+    this.from = from
+  }
+  Run.prototype.speed = function() {
+    console.log(`${this.from} to ${this.to}`)
+  }
+  const r = new Run(0, 20)
+  r.speed()
 }
 ```

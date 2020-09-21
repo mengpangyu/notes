@@ -658,15 +658,11 @@ function Dog(color, name) {
   Animal.call(this, color)
   this.name = name
 }
-function temp() {}
-temp.prototype = Animal.prototype
-Dog.prototype = new temp() // 防止原型重复引用
-
+Dog.prototype = new Animal() // 防止原型重复引用
 Dog.prototype.constructor = Dog
 Dog.prototype.say = function() {
   console.log('汪')
 }
-
 let dog = new Dog('黄色', '阿黄')
 ```
 
@@ -1219,11 +1215,25 @@ const once = (callback) => {
 > ES5 利用 defineProperty(Vue2 响应式)
 
 ```js
-Object.defineProperty(user, 'name', {
-  set(key, value) {
-    // todo
+const obj = { name: 'meng', age: 11 }
+const key = 'name'
+let value = obj[key]
+Object.defineProperty(obj, key, {
+  value: 'value', // 属性值设置, 用来新增属性
+  configurable: true, // 控制是否能改和删除 key
+  writable: true, // 控制是否能改 value
+  enumerable: true, // 控制是否在迭代中显示
+  set(newValue) {
+    console.log('set value')
+    value = newValue
+  },
+  get() {
+    console.log('get value')
+    return value
   },
 })
+obj.name = 'chauncey'
+console.log(obj.name)
 ```
 
 如果 id 不在 user 对象中, 则不能监听 id 的变化
@@ -1231,14 +1241,27 @@ Object.defineProperty(user, 'name', {
 > ES6 用 Proxy(Vue3 响应式)
 
 ```js
-let user = new Proxy(
-  {},
-  {
-    set(target, key, value, receiver) {
-      // todo
-    },
-  }
-)
+const person = {
+  firstName: 'meng',
+  lastName: 'xiang',
+}
+const p = new Proxy(person, {
+  get(target, property) {
+    if (property === 'fullName') {
+      return `${target.firstName}-${target.lastName}`
+    }
+    return property in target ? target[property] : `No such property as, ${property}`
+  },
+  set(target, property, value) {
+    if (property === 'age') {
+      if (!Number.isInteger(value)) {
+        throw new TypeError(`${value} is not a Number`)
+      }
+      if (value < 0) throw new TypeError(`${value} must > 0`)
+      target[property] = value
+    }
+  },
+})
 ```
 
 即使有属性在 user 中不存在, 通过 user.id 来定义也可以同样监听这个属性
