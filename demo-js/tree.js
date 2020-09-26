@@ -63,14 +63,14 @@ class Node {
     if (temp !== null) return temp
     if (this.right !== null) temp = this.right.backOrderSearch(val)
     if (temp !== null) return temp
-    console.log('back')  // 位置要在真正比较前面, 否则就包括判空的步骤
+    console.log('back') // 位置要在真正比较前面, 否则就包括判空的步骤
     if (this.val === val) return this
     return temp
   }
 
   delNode(val) {
-    if (this.left !== null && this.left.val === val) return this.left = null
-    if (this.right !== null && this.rightval === val) return this.right = null
+    if (this.left !== null && this.left.val === val) return (this.left = null)
+    if (this.right !== null && this.rightval === val) return (this.right = null)
     if (this.left !== null) this.left.delNode(val)
     if (this.right !== null) this.right.delNode(val)
   }
@@ -132,7 +132,6 @@ class Tree {
   }
 }
 
-
 // 顺序存储二叉树
 
 function arrTree(arr) {
@@ -151,12 +150,11 @@ function preOrder(index) {
   }
 }
 
-
 // 赫夫曼树实现, 带权路径长最小
 
-const huffTree = arr => {
+const huffTree = (arr) => {
   arr.sort((a, b) => a - b)
-  const newArr = arr.map(item => new Node(item))
+  const newArr = arr.map((item) => new Node(item))
   while (newArr.length > 1) {
     newArr.sort((a, b) => a.val - b.val)
     let [leftNode, rightNode] = newArr.splice(0, 2)
@@ -169,12 +167,11 @@ const huffTree = arr => {
   tr.fpreOrder()
 }
 
-
 // huffTree([13, 7, 8, 3, 29, 6, 1])
 
 // 二叉排序树 BST, 并中序遍历
 
-Node.prototype.add = function (node) {
+Node.prototype.add = function(node) {
   if (node === null) return console.log('请输入正确的值')
   if (this.val < node.val) {
     if (this.right !== null) {
@@ -191,7 +188,7 @@ Node.prototype.add = function (node) {
   }
 }
 
-Tree.prototype.addNode = function (node) {
+Tree.prototype.addNode = function(node) {
   if (this.root === undefined) this.root = node
   else this.root.add(node)
 }
@@ -199,12 +196,47 @@ Tree.prototype.addNode = function (node) {
 let arr = [7, 3, 10, 12, 5, 1, 9]
 
 const tr = new Tree()
-arr.forEach(item => {
+arr.forEach((item) => {
   let node = new Node(item)
   tr.addNode(node)
 })
 
 console.log(tr.fmidOrder())
 
+function sleep(timer) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(1)
+    }, timer)
+  })
+}
+sleep(1000).then((data) => console.log(data))
 
+Number.prototype.add = function(n) {
+  return this + n
+}
 
+Number.prototype.mutle = function(n) {
+  return this - n
+}
+
+8.add()
+
+function promiseAll(promises){
+  return new Promise((resolve,reject)=>{
+    let completed = 0
+    const  result = []
+    promises.forEach(item=>{
+      item.then(data=>{
+        result.push(data)
+        completed += 1
+        if(completed === promises.length){
+          resolve(result)
+        }
+      })
+      .catch(err=>reject(err))
+    })
+  })
+}
+
+arr.filter(=>)

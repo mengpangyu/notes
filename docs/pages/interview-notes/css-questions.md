@@ -318,7 +318,7 @@
 2. 浮动元素: float 除 none
 3. 绝对定位: position: absolute/fixed
 4. display: inline-block table-cells flex
-5. overflow 除了 visible 以外的值
+5. overflow 除了 visible 以外的值, [为什么不能是 visible](https://stackoverflow.com/questions/9943503/why-does-css2-1-define-overflow-values-other-than-visible-to-establish-a-new-b?answertab=votes#tab-top)
 
 BFC 特性及应用
 
@@ -363,15 +363,16 @@ BFC 特性及应用
 
 ## 清除浮动说一下?
 
-- 法一: clear 属性的空元素, 在元素最后加一个空 div
+- 法一: clear 属性的空元素, 在元素最后加一个空 div, 加上样式, clear: both: 属性指定一个元素是否必须移动(清除浮动后)到在它之前的浮动元素下面, 在最底层加一个空的有高度的 div, 利用 clear: both 实现浮动
 - 法二: 浮动元素加 overflow 属性
 - 法三: 浮动元素的容器添加浮动
-- 法四: 伪元素 .clearfix 添加到父容器上, 子元素会自动清除浮动
+- 法四: 伪元素 .clearfix 添加到父容器上, 子元素会自动清除浮动, 伪类元素也是和法一同理
 
 ```css
 .clearfix:after {
-  content: '';
-  display: block;
+  content: ''; /* 伪类元素内容为空 */
+  height: 0;
+  display: block; /* 因为block元素才能有高度 */
   clear: both;
 }
 ```

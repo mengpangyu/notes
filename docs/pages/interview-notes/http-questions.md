@@ -164,6 +164,24 @@ GET 会把请求头和数据一起发到服务器, POST 会先发请求头告诉
 
 [比较好的文章](https://zhuanlan.zhihu.com/p/22536382)
 
+## POST 和 PUT 区别
+
+- PUT 幂等(每次相同请求返回的数据都一样), POST 非幂等
+- PUT 用于修改更新旧资源, POST 用于请求新资源
+
+> RFC 是这样解释的:
+
+:::warning 面试
+
+POST 和 PUT 请求之间的根本区别体现在 Request-URI 的不同含义上。
+POST 请求中的 URI 标识将处理封闭实体的资源。
+该资源可能是数据接受过程，某些其他协议的网关，或者是接受注释的单独实体。
+相比之下，PUT 请求中的 URI 标识请求中包含的实体-用户代理知道要使用的 URI，并且服务器不得尝试将请求应用于其他资源。
+如果服务器希望将该请求应用于其他 URI，则它必须发送 301（永久移动）响应；
+然后，用户代理可以自行决定是否重定向请求。
+
+:::
+
 ## Cookie 和 Session 和 LocalStorage 和 SessionStorage 区别?
 
 - Cookie V.S. LocalStorage
@@ -618,6 +636,19 @@ DNS 解析：浏览器首先依次在浏览器缓存->系统缓存->路由器缓
 
 - 对于 defer 加载 js 文件不会阻塞页面(异步)的渲染和资源的加载, 不过 defer 会按原本的 js 顺序执行
 - 对于 async , 这个 html5 新属性, 加载完 js 文件就会执行, 不保证顺序, 异步加载
+
+## DNS 基于哪个协议
+
+HTTP = DNS 域名解析时间 + TCP 连接建立时间 + HTTP 交易时间
+
+想加快 HTTP 请求速度, TCP 三次握手不会缩减, HTTP 基于 Request 和 Response, 同样也不会缩减太多
+
+唯一的方案就是在 DNS 上面下功夫
+
+- 采用 TCP 解析域名 = TCP 连接时间 + DNS 交易时间
+- 采用 UDP 解析域名 = DNS 交易时间
+
+DNS 同样也可用 TCP, UDP 一次一包, 为了追求速度可以用 UDP, 但请求数据量过大的话就得使用 TCP 了
 
 ## OSI 七层模型
 

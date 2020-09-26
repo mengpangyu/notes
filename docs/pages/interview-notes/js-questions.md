@@ -241,6 +241,20 @@ function f1() {
 }
 ```
 
+:::warning 面试
+优点:
+
+- 可以不被垃圾回收
+- 一般不会导致命名冲突
+- 可以一直维护一个变量, 让他做一些事情
+
+缺点:
+
+- 闭包变量不会消失的话内存消耗会很大
+- 会涉及到跨作用域访问, 每次会导致性能上损耗
+
+:::
+
 - 立即执行函数
 
 顾名思义就是立马执行的函数
@@ -1702,6 +1716,8 @@ async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇�
 [node 官网](https://nodejs.org/zh-cn/docs/guides/event-loop-timers-and-nexttick/)
 
 [html#event-loop](https://html.spec.whatwg.org/multipage/webappapis.html#event-loops)
+
+[路西法的文章, 写的不错](https://juejin.im/post/6844903971228745735#comment)
 
 > 浏览器
 
