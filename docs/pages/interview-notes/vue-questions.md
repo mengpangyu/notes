@@ -89,6 +89,13 @@ v-model 就是双向绑定
   - this.\$router.replace: 跟 router.push 很像, 唯一的不同就是, **它不会向 history 添加新记录**, 而是跟它的方法名一样 —— 替换掉当前的 history 记录
   - this.\$route.params: **表示当前的参数**即冒号后面的东西组成的对象
 
+## Hash 和 History 模式的区别?
+
+- History 设置的 URL 可以是与当前的 URL 同源的任意 URL, 而 Hash 只可以设置 # 号后的内容, 只能设置与当前 URL 同文档的 URL
+- History 设置新的 URL 可以和以前一样, 也会加入新的路由栈中, 而 Hash 设置的新值必须与原来的不一样才能出发动作记录到栈中
+- History 可以添加任意类型的数据到记录中, 而 Hash 只能添加短字符串
+- History 可以额外设置 title 属性供后续使用
+
 ## React 和 Vue 为什么要在写列表组件时写 key, 作用是什么
 
 > Vue: key 的作用是为了在数据变化时强制更新组件, 以避免原地复用带来的副作用

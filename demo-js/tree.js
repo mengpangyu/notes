@@ -212,31 +212,11 @@ function sleep(timer) {
 }
 sleep(1000).then((data) => console.log(data))
 
+// (8).add(3).multi(3)
 Number.prototype.add = function(n) {
   return this + n
 }
 
-Number.prototype.mutle = function(n) {
+Number.prototype.multi = function(n) {
   return this - n
 }
-
-8.add()
-
-function promiseAll(promises){
-  return new Promise((resolve,reject)=>{
-    let completed = 0
-    const  result = []
-    promises.forEach(item=>{
-      item.then(data=>{
-        result.push(data)
-        completed += 1
-        if(completed === promises.length){
-          resolve(result)
-        }
-      })
-      .catch(err=>reject(err))
-    })
-  })
-}
-
-arr.filter(=>)
