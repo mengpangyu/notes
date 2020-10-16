@@ -376,6 +376,44 @@ EventLoop 是一个阶段, 分为 Node.js 和 Chrome
 
 ### 工厂模式
 
+- 发布订阅模式
+
+```js
+class MyEvent{
+  constructor(){
+    this.events = {}
+  }
+  on(type,callback){
+    const fns = (this.events[type] = this.events[type] || [])
+    if(fns.indexOf(callback)){
+      fns.push(callback)
+    }
+    return this
+  }
+  emit(type,data){
+    const fns = this.events[type]
+    if(Array.isArray(fns)){
+      fns.forEach(item=>item(data())
+    }
+    return this
+  }
+  off(type,callback){
+    const fns = this.events[type]
+    if(Array.isArray(fns)){
+      if(callback){
+        const index = fns.indexOf(callback)
+        if(index !== -1){
+          fns.splice(index,1)
+        }
+      }else{
+        fns.length = 0
+      }
+    }
+    return thisk
+  }
+}
+```
+
 - 简单工厂模式
 
 ```js
