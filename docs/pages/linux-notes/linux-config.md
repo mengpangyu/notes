@@ -81,6 +81,22 @@ sudo apt-get install charles-proxy
 
 [官网下载](https://linux.wps.com/)
 
+## XMind
+
+[官网下载](https://www.xmind.net/xmind2020/)
+
+## 百度网盘
+
+[官网下载](https://pan.baidu.com/download)
+
+## ibus 拼音(换输入法)
+
+[ubuntu 自带](https://github.com/libpinyin/ibus-libpinyin)
+
+## Chromium
+
+[官网下载](https://www.chromium.org/)
+
 ## Ubuntu 美化
 
 [Linux 玩家必备：Ubuntu 完全配置指南](https://zhuanlan.zhihu.com/p/56253982)
