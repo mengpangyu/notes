@@ -47,7 +47,7 @@ sudo apt autoremove
 
 ## Webstrom
 
-[webstrom 官网](https://www.jetbrains.com/webstorm/)
+[webstrom 官网](https://download.jetbrains.com/webstorm/WebStorm-2019.3.5.tar.gz)
 
 下载解压后运行 bin/webstrom.sh
 
