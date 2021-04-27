@@ -149,6 +149,7 @@ module.exports = {
             ["linux-shell.md", "Shell编程"],
             ["linux-bash.md", "bash命令详解"],
             ["linux-config.md", "我的 Ubuntu"],
+            ["linux-git.md", "git 配置"],
           ],
         },
       ],
