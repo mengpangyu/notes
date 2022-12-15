@@ -1,7 +1,7 @@
 module.exports = {
   base: "/notes/",
   title: "Learning",
-  description: "Chauncey 的的学习记录",
+  description: "PangYu 的的学习记录",
   head: [
     ["link", { rel: "icon", href: "/logo.png" }], //浏览器的标签栏的网页图标
   ],
@@ -21,7 +21,7 @@ module.exports = {
       { text: "技巧", link: "/pages/interview-notes/js-questions.md" },
       { text: "工具", link: "/pages/tool-notes/tool-use.md" },
       { text: "关于我", link: "/pages/about-me/about-me.md" },
-      { text: "Github", link: "https://github.com/chaunceym" },
+      { text: "Github", link: "https://github.com/pangyujs" },
     ],
     sidebar: {
       "/pages/suanfa-notes/": [
