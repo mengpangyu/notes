@@ -2122,3 +2122,7 @@ run()
 - 3xx: 重定向
 - 4xx: 客户端 错误
 - 5xx: 服务端错误
+
+## JS 中 falsy 值
+
+undefined, null, false, NaN, '', 0, -0
