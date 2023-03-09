@@ -1069,7 +1069,7 @@ class myPromise {
         this.rejectCallbacks.push((reason) => {
           setTimeout(() => {
             try {
-              const x = onRejected(this.reason)
+              const x = onRejected(reason)
               resolve(x)
             } catch (e) {
               reject(e)
