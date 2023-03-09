@@ -1055,6 +1055,7 @@ class myPromise {
         })
       }
       // 当异步中还有异步状态可能就来不及更新为 padding 所以把所有的方法存到数组内, 下次调用在执行
+      // 比如在Promise加入setTimeout, 在setTimeout中在执行resolve, 这样如果在resolve之前执行then, 那么状态就是padding, 会拿不到想要的结果, 存储调用方法会避免这种情况发生
       if (this.state === 'padding') {
         this.resolveCallbacks.push((value) => {
           setTimeout(() => {
