@@ -1267,6 +1267,7 @@ Promise.resolve = function(param) {
 };
 
 // Promise.reject
+// Promise.reject方法和Promise.resolve不同，Promise.reject()方法的参数，会原封不动地作为reject的理由，变成后续方法的参数。
 Promise.reject = function(reason) {
   return new Promise((resolve, reject) => {
     reject(reason);
@@ -1274,11 +1275,13 @@ Promise.reject = function(reason) {
 };
 
 // Promise.catch
+// Promise.prototype.catch 用于指定出错时的回调，是特殊的then方法，catch之后，可以继续 .then
 Promise.prototype.catch = function(onRejected) {
   return this.then(null, onRejected);
 };
 
 // Promise.finally
+// 不管成功还是失败，都会走到finally中,并且finally之后，还可以继续then。并且会将值原封不动的传递给后面的then.
 Promise.prototype.finally = function(callback) {
   return this.then(
     (value) => {
@@ -1294,7 +1297,8 @@ Promise.prototype.finally = function(callback) {
   );
 };
 
-// Promise.all
+// Promise.all 
+// Promise.all(promises) 返回一个promise对象
 // 1. 如果传入的参数是一个空的可迭代对象，那么此promise对象回调完成(resolve),只有此情况，是同步执行的，其它都是异步返回的。
 // 2. 如果传入的参数不包含任何 promise，则返回一个异步完成.
 // 3. promises 中所有的promise都promise都“完成”时或参数中不包含 promise 时回调完成。
@@ -1331,6 +1335,7 @@ Promise.all = function(promises) {
 };
 
 // Promise.race
+// Promise.race函数返回一个 Promise，它将与第一个传递的 promise 相同的完成方式被完成。它可以是完成（ resolves），也可以是失败（rejects），这要取决于第一个完成的方式是两个中的哪个。
 // 1. 如果传的参数数组是空，则返回的 promise 将永远等待。
 // 2. 如果迭代包含一个或多个非承诺值和/或已解决/拒绝的承诺，则 Promise.race 将解析为迭代中找到的第一个值。
 Promise.race = function(promises) {
