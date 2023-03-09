@@ -20,19 +20,19 @@
 ```js
 function fn() {
   return new Promise((resolve, reject) => {
-    resolve(success) //成功时调用
-    reject(error) //失败时调用
-  })
+    resolve(success); //成功时调用
+    reject(error); //失败时调用
+  });
 }
 fn()
   .then(success, fail)
-  .then(success2, fail2)
+  .then(success2, fail2);
 ```
 
 - Promise.all 用法
 
 ```js
-Promise.all([promise1, promise2]).then(success1, fail1)
+Promise.all([promise1, promise2]).then(success1, fail1);
 ```
 
 promise1 和 promise2 都成功才会调用 success1
@@ -42,27 +42,27 @@ promise1 和 promise2 都成功才会调用 success1
 ```js
 const all = (promiseArr) => {
   return new Promise((resolve, reject) => {
-    let result = []
-    let completed = 0
+    let result = [];
+    let completed = 0;
     promiseArr.forEach((promise, index) => {
       promise
         .then((data) => {
-          result[index] = data
-          completed += 1
+          result[index] = data;
+          completed += 1;
           if (completed === promiseArr.length) {
-            resolve(result)
+            resolve(result);
           }
         })
-        .catch((err) => reject(err))
-    })
-  })
-}
+        .catch((err) => reject(err));
+    });
+  });
+};
 ```
 
 - Promise.race 用法
 
 ```js
-Promise.race([promise1, promise2]).then(success1, fail1)
+Promise.race([promise1, promise2]).then(success1, fail1);
 ```
 
 promise1 和 promise2 只有一个成功就会调用 success1
@@ -72,8 +72,8 @@ promise1 和 promise2 只有一个成功就会调用 success1
 ```js
 function race(promises) {
   return new Promise((resolve, reject) => {
-    promises.forEach((promise) => promise.then(resolve, reject))
-  })
+    promises.forEach((promise) => promise.then(resolve, reject));
+  });
 }
 ```
 
@@ -83,25 +83,25 @@ function race(promises) {
 
 ```js
 const 接外卖 = (fn, delay) => {
-  let timer
+  let timer;
   return (...args) => {
-    if (timer) clearTimeout(timer)
-    console.log('接单')
+    if (timer) clearTimeout(timer);
+    console.log("接单");
     timer = setTimeout(() => {
-      fn.apply(this, args)
-    }, delay)
-  }
-}
+      fn.apply(this, args);
+    }, delay);
+  };
+};
 
 const 送外卖 = () => {
-  console.log('没单了，可以送了')
-}
+  console.log("没单了，可以送了");
+};
 
-const 我是接外卖返回的函数 = 接外卖(送外卖, 5000)
+const 我是接外卖返回的函数 = 接外卖(送外卖, 5000);
 
 div.onclick = () => {
-  我是接外卖返回的函数()
-}
+  我是接外卖返回的函数();
+};
 ```
 
 :::tip
@@ -112,26 +112,26 @@ div.onclick = () => {
 
 ```js
 const 技能CD = (fn, delay) => {
-  let timer = true
+  let timer = true;
   return (...args) => {
-    if (!timer) return console.log('CD还没好')
-    timer = false
+    if (!timer) return console.log("CD还没好");
+    timer = false;
     setTimeout(() => {
-      timer = true
-      fn.apply(this, args)
-    }, delay)
-  }
-}
+      timer = true;
+      fn.apply(this, args);
+    }, delay);
+  };
+};
 
 const 放技能 = () => {
-  console.log('技能可以放了')
-}
+  console.log("技能可以放了");
+};
 
-const 我是技能CD返回的函数 = 技能CD(放技能, 5000)
+const 我是技能CD返回的函数 = 技能CD(放技能, 5000);
 
 div.onclick = () => {
-  我是技能CD返回的函数()
-}
+  我是技能CD返回的函数();
+};
 ```
 
 ## 手写 AJAX
@@ -141,83 +141,85 @@ div.onclick = () => {
 ```js
 function ajax(options) {
   return new Promise((resolve, reject) => {
-    let method = options.method || 'GET'
-    let params = options.params
-    let data = options.data
+    let method = options.method || "GET";
+    let params = options.params;
+    let data = options.data;
     let url =
       options.url +
       (params
         ? `?${Object.keys(params)
-            .map((key) => key + '=' + params[key])
-            .join('&')}`
-        : '')
-    let async = options.async === false ? false : true
-    let success = options.success
-    let fail = options.fail
-    let headers = options.headers
-    let xhr
+            .map((key) => key + "=" + params[key])
+            .join("&")}`
+        : "");
+    let async = options.async === false ? false : true;
+    let success = options.success;
+    let fail = options.fail;
+    let headers = options.headers;
+    let xhr;
     if (window.XMLHttpRequest) {
-      xhr = new XMLHttpRequest()
+      xhr = new XMLHttpRequest();
     } else {
-      xhr = new ActiveXObject('Microsoft.XMLHTTP')
+      xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4 && xhr.status === 200) {
-        success && success(xhr.responseText)
-        resolve(xhr.responseText)
+        success && success(xhr.responseText);
+        resolve(xhr.responseText);
       }
-    }
+    };
     xhr.onerror = (err) => {
-      fail && fail(err)
-      reject(err)
-    }
-    xhr.open(method, url, async)
+      fail && fail(err);
+      reject(err);
+    };
+    xhr.open(method, url, async);
     if (headers) {
-      Object.keys(headers).forEach((key) => xhr.setRequestHeader(key, headers[key]))
+      Object.keys(headers).forEach((key) =>
+        xhr.setRequestHeader(key, headers[key])
+      );
     }
-    method === 'GET' ? xhr.send() : xhr.send(data)
-  })
+    method === "GET" ? xhr.send() : xhr.send(data);
+  });
 }
 ```
 
 - 完整版
 
 ```js
-const request = new XMLHttpRequest()
-request.open('GET', '/a/b/c?name=ff', true)
+const request = new XMLHttpRequest();
+request.open("GET", "/a/b/c?name=ff", true);
 request.onreadystatechange = function() {
   if (request.readyState === 4 && request.status === 200) {
-    console.log(request.responseText)
+    console.log(request.responseText);
   }
-}
-request.send()
+};
+request.send();
 ```
 
 - 简化版
 
 ```js
-const request = new XMLHttpRequest()
-request.open('GET', '/a/b/c?name=ff', true)
-request.onload = () => console.log(request.responseText)
-request.send()
+const request = new XMLHttpRequest();
+request.open("GET", "/a/b/c?name=ff", true);
+request.onload = () => console.log(request.responseText);
+request.send();
 ```
 
 ## 这段代码的 this 是什么?
 
 ```js
-fn()
+fn();
 //this => window/global
-obj.fn()
+obj.fn();
 //this => obj
-fn.call(xx)
+fn.call(xx);
 //this => xx
-fn.apply(xx)
+fn.apply(xx);
 //this => xx
-fn.bind(xx)
+fn.bind(xx);
 //this => xx
-new Fn()
+new Fn();
 //this => 新的对象
-fn = () => {}
+fn = () => {};
 //this => 外面的 this
 ```
 
@@ -233,10 +235,10 @@ jQuery 的设计思想就是把\$出的元素一直用闭包的功能返回下�
 
 ```js
 function f1() {
-  let local = 0
+  let local = 0;
   function f2() {
-    local++
-    return local
+    local++;
+    return local;
   }
 }
 ```
@@ -266,24 +268,24 @@ function f1() {
 > 举个著名的面试题
 
 ```js
-var liList = ul.getElementsByTagName('li')
+var liList = ul.getElementsByTagName("li");
 for (var i = 0; i < 6; i++) {
   liList[i].onclick = function() {
-    alert(i) //总是6
-  }
+    alert(i); //总是6
+  };
 }
 ```
 
 > 下面用立即执行函数解决这个问题
 
 ```js
-var liList = ul.getElementsByTagName('li')
+var liList = ul.getElementsByTagName("li");
 for (var i = 0; i < 6; i++) {
   !(function(ii) {
     liList[ii].onclick = function() {
-      alert(ii) // 0、1、2、3、4、5
-    }
-  })(i)
+      alert(ii); // 0、1、2、3、4、5
+    };
+  })(i);
 }
 ```
 
@@ -326,16 +328,16 @@ async 与 await 组合使用, 用于说明一个函数是处理异步函数
 function resolveAfter2Seconds(x) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(x)
-    }, 2000)
-  })
+      resolve(x);
+    }, 2000);
+  });
 }
 
 async function f1() {
-  var x = await resolveAfter2Seconds(10)
-  console.log(x) // 10
+  var x = await resolveAfter2Seconds(10);
+  console.log(x); // 10
 }
-f1()
+f1();
 ```
 
 捕获异常
@@ -343,12 +345,12 @@ f1()
 ```js
 async function f3() {
   try {
-    var z = await Promise.reject(30)
+    var z = await Promise.reject(30);
   } catch (e) {
-    console.log(e) // 30
+    console.log(e); // 30
   }
 }
-f3()
+f3();
 ```
 
 ## 如何实现浅拷贝
@@ -356,34 +358,34 @@ f3()
 1. ES6: object.assign()
 
 ```js
-let a = { name: 'hello' }
-let b = Object.assign({}, a)
-b.name = 'hi'
-console.log(a)
+let a = { name: "hello" };
+let b = Object.assign({}, a);
+b.name = "hi";
+console.log(a);
 ```
 
 2. 展开运算符
 
 ```js
-let a = { name: 'hello' }
-let b = { ...a }
-b.name = 'he'
-console.log(a)
+let a = { name: "hello" };
+let b = { ...a };
+b.name = "he";
+console.log(a);
 ```
 
 3. 自己实现 for in
 
 ```js
 function shallowCopy(obj) {
-  let newObj = {}
+  let newObj = {};
   for (let key in obj) {
-    newObj[key] = obj[key]
+    newObj[key] = obj[key];
   }
-  return newObj
+  return newObj;
 }
-let a = { name: 'hello' }
-let b = shallowCopy(a)
-console.log(b)
+let a = { name: "hello" };
+let b = shallowCopy(a);
+console.log(b);
 ```
 
 concat() slice() 方法也可实现数组浅拷贝
@@ -398,9 +400,9 @@ concat() slice() 方法也可实现数组浅拷贝
 1. 用 JSON
 
 ```js
-let a = { name: 'hello' }
-let b = JSON.parse(JSOn.stringify(a))
-console.log(b)
+let a = { name: "hello" };
+let b = JSON.parse(JSOn.stringify(a));
+console.log(b);
 ```
 
 :::tip 注意
@@ -413,14 +415,14 @@ JSON 深拷贝只可以拷贝 JSON 对应的类型, 函数就不可以拷贝
 
 ```js
 function deepClone(target) {
-  if (typeof target === 'object') {
-    let cloneTarget = Array.isArray(target) ? [] : {}
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
     for (const key in target) {
-      cloneTarget[key] = deepClone(target[key])
+      cloneTarget[key] = deepClone(target[key]);
     }
-    return cloneTarget
+    return cloneTarget;
   } else {
-    return target
+    return target;
   }
 }
 ```
@@ -429,16 +431,16 @@ function deepClone(target) {
 
 ```js
 function deepClone(target, map = new WeakMap()) {
-  if (typeof target === 'object') {
-    let cloneTarget = Array.isArray(target) ? [] : {}
-    if (map.get(target)) return map.get(target)
-    map.set(target, cloneTarget)
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) return map.get(target);
+    map.set(target, cloneTarget);
     for (const key in target) {
-      cloneTarget[key] = deepClone(target[key], map)
+      cloneTarget[key] = deepClone(target[key], map);
     }
-    return cloneTarget
+    return cloneTarget;
   } else {
-    return target
+    return target;
   }
 }
 ```
@@ -456,12 +458,12 @@ WeakMap 对象是一组键/值对的集合, 其中的键是弱引用的, 其键�
 
 ```js
 function forEach(array, iteratee) {
-  let index = -1
-  const length = array.length
+  let index = -1;
+  const length = array.length;
   while (++index < length) {
-    iteratee(array[index], index)
+    iteratee(array[index], index);
   }
-  return array
+  return array;
 }
 ```
 
@@ -469,23 +471,23 @@ function forEach(array, iteratee) {
 
 ```js
 function clone(target, hash = new WeakMap()) {
-  if (typeof target === 'object') {
-    const isArray = Array.isArray(target)
-    let cloneTarget = isArray ? [] : {}
+  if (typeof target === "object") {
+    const isArray = Array.isArray(target);
+    let cloneTarget = isArray ? [] : {};
     if (hash.get(target)) {
-      return hash.get(target)
+      return hash.get(target);
     }
-    hash.set(target, cloneTarget)
-    const keys = isArray ? undefined : Object.keys(target)
+    hash.set(target, cloneTarget);
+    const keys = isArray ? undefined : Object.keys(target);
     forEach(keys || target, (value, key) => {
       if (keys) {
-        key = value
+        key = value;
       }
-      cloneTarget[key] = clone(target[key], hash)
-    })
-    return cloneTarget
+      cloneTarget[key] = clone(target[key], hash);
+    });
+    return cloneTarget;
   } else {
-    return target
+    return target;
   }
 }
 ```
@@ -497,11 +499,11 @@ function clone(target, hash = new WeakMap()) {
 
 ```js
 function isObject(target) {
-  const type = typeof target
-  return target !== null && (type === 'object' || type === 'function')
+  const type = typeof target;
+  return target !== null && (type === "object" || type === "function");
 }
 if (!isObject(target)) {
-  return target
+  return target;
 }
 ```
 
@@ -511,7 +513,7 @@ if (!isObject(target)) {
 
 ```js
 function getType(target) {
-  return Object.prototype.toString.call(target)
+  return Object.prototype.toString.call(target);
 }
 ```
 
@@ -521,96 +523,96 @@ function getType(target) {
 在声明克隆的引用类型时, 其实上面的声明方法是一个语法糖, 真正的声明方法是
 
 ```js
-const cloneTarget = new Object() // 这种方法不会原型丢失
+const cloneTarget = new Object(); // 这种方法不会原型丢失
 ```
 
 所以我们就可以用 Constructor 来创建一个通用声明的函数
 
 ```js
 function getInit(target) {
-  const Ctor = target.constructor
-  return new Ctor()
+  const Ctor = target.constructor;
+  return new Ctor();
 }
 ```
 
 接下来是四种引用类型的完整深拷贝代码
 
 ```js
-const mapTag = '[object Map]'
-const setTag = '[object Set]'
-const arrayTag = '[object Array]'
-const objectTag = '[object Object]'
-const boolTag = '[object Boolean]'
-const dateTag = '[object Date]'
-const errorTag = '[object Error]'
-const numberTag = '[object Number]'
-const regexpTag = '[object RegExp]'
-const stringTag = '[object String]'
-const symbolTag = '[object Symbol]'
+const mapTag = "[object Map]";
+const setTag = "[object Set]";
+const arrayTag = "[object Array]";
+const objectTag = "[object Object]";
+const boolTag = "[object Boolean]";
+const dateTag = "[object Date]";
+const errorTag = "[object Error]";
+const numberTag = "[object Number]";
+const regexpTag = "[object RegExp]";
+const stringTag = "[object String]";
+const symbolTag = "[object Symbol]";
 
 function getInit(target) {
-  const Ctor = target.constructor
-  return new Ctor()
+  const Ctor = target.constructor;
+  return new Ctor();
 }
 
 function getType(target) {
-  return Object.prototype.toString.call(target)
+  return Object.prototype.toString.call(target);
 }
 
 function isObject(target) {
-  const type = typeof target
-  return target !== null && (type === 'object' || type === 'function')
+  const type = typeof target;
+  return target !== null && (type === "object" || type === "function");
 }
 
 function forEach(array, iteratee) {
-  let index = -1
-  const length = array.length
+  let index = -1;
+  const length = array.length;
   while (++index < length) {
-    iteratee(array[index], index)
+    iteratee(array[index], index);
   }
-  return array
+  return array;
 }
 
 function clone(target, hash = new WeakMap()) {
   // 克隆原始类型
-  const deepTag = [mapTag, setTag, arrayTag, objectTag]
+  const deepTag = [mapTag, setTag, arrayTag, objectTag];
 
   if (!isObject(target)) {
-    return target
+    return target;
   }
   // 初始化
-  const type = getType(target)
-  let cloneTarget
+  const type = getType(target);
+  let cloneTarget;
   if (deepTag.includes(type)) {
-    cloneTarget = getInit(target)
+    cloneTarget = getInit(target);
   }
   // 防止循环引
   if (hash.get(target)) {
-    return hash.get(target)
+    return hash.get(target);
   }
-  hash.set(target, cloneTarget) // 克隆set
+  hash.set(target, cloneTarget); // 克隆set
   if (type === setTag) {
     target.forEach((value) => {
-      cloneTarget.add(clone(value, hash))
-    })
-    return cloneTarget
+      cloneTarget.add(clone(value, hash));
+    });
+    return cloneTarget;
   }
   // 克隆map
   if (type === mapTag) {
     target.forEach((value, key) => {
-      cloneTarget.set(key, clone(value, hash))
-    })
-    return cloneTarget
+      cloneTarget.set(key, clone(value, hash));
+    });
+    return cloneTarget;
   }
   // 克隆对象和数组
-  const keys = type === arrayTag ? undefined : Object.keys(target)
+  const keys = type === arrayTag ? undefined : Object.keys(target);
   forEach(keys || target, (value, key) => {
     if (keys) {
-      key = value
+      key = value;
     }
-    cloneTarget[key] = clone(target[key], hash)
-  })
-  return cloneTarget
+    cloneTarget[key] = clone(target[key], hash);
+  });
+  return cloneTarget;
 }
 ```
 
@@ -618,32 +620,32 @@ function clone(target, hash = new WeakMap()) {
 
 ```js
 function cloneOtherType(target, type) {
-  const Ctor = target.constructor
+  const Ctor = target.constructor;
   switch (type) {
     case boolTag:
     case numberTag:
     case stringTag:
     case errorTag:
     case dateTag:
-      return new Ctor(target)
+      return new Ctor(target);
     case regexpTag:
-      return cloneReg(target)
+      return cloneReg(target);
     case symbolTag:
-      return cloneSymbol(target)
+      return cloneSymbol(target);
     default:
-      return null
+      return null;
   }
 }
 
 function cloneSymbol(target) {
-  return Object(Symbol.prototype.valueOf.call(target))
+  return Object(Symbol.prototype.valueOf.call(target));
 }
 
 function cloneReg(target) {
-  const reFlags = /\w*$/
-  const result = new target.constructor(target.source, reFlags.exec(target))
-  result.lastIndex = target.lastIndex
-  return result
+  const reFlags = /\w*$/;
+  const result = new target.constructor(target.source, reFlags.exec(target));
+  result.lastIndex = target.lastIndex;
+  return result;
 }
 ```
 
@@ -651,11 +653,11 @@ function cloneReg(target) {
 
 ```js
 String.prototype.trim = function() {
-  return this.replace(/^\s+|\s+$/, '')
-}
+  return this.replace(/^\s+|\s+$/, "");
+};
 
 function trim(string) {
-  return string.replace(/^\s+|\s+$/g, '')
+  return string.replace(/^\s+|\s+$/g, "");
 }
 ```
 
@@ -665,19 +667,19 @@ function trim(string) {
 
 ```js
 function Animal(color) {
-  this.color = color
+  this.color = color;
 }
-Animal.prototype.move = function() {}
+Animal.prototype.move = function() {};
 function Dog(color, name) {
-  Animal.call(this, color)
-  this.name = name
+  Animal.call(this, color);
+  this.name = name;
 }
-Dog.prototype = new Animal() // 防止原型重复引用
-Dog.prototype.constructor = Dog
+Dog.prototype = new Animal(); // 防止原型重复引用
+Dog.prototype.constructor = Dog;
 Dog.prototype.say = function() {
-  console.log('汪')
-}
-let dog = new Dog('黄色', '阿黄')
+  console.log("汪");
+};
+let dog = new Dog("黄色", "阿黄");
 ```
 
 - 用 class 实现
@@ -685,14 +687,14 @@ let dog = new Dog('黄色', '阿黄')
 ```js
 class Animal {
   constructor(color) {
-    this.color = color
+    this.color = color;
   }
   move() {}
 }
 class Dog extends Animal {
   constructor(color, name) {
-    super(color)
-    this.name = name
+    super(color);
+    this.name = name;
   }
   say() {}
 }
@@ -703,7 +705,7 @@ class Dog extends Animal {
 - 使用 Set
 
 ```js
-new Set([1, 1, 2, 2, 3, 3, 4, 5])
+new Set([1, 1, 2, 2, 3, 3, 4, 5]);
 ```
 
 :::tip 注意
@@ -717,12 +719,12 @@ function unique(arr) {
   for (let i = 0; i < arr.length; i++) {
     for (let j = i + 1; j < arr.length; j++) {
       if (arr[i] === arr[j]) {
-        arr.splice(j, 1)
-        j-- //元素去除所以索引也要变化, j-- 为了紧跟继续遍历
+        arr.splice(j, 1);
+        j--; //元素去除所以索引也要变化, j-- 为了紧跟继续遍历
       }
     }
   }
-  return arr
+  return arr;
 }
 ```
 
@@ -731,15 +733,15 @@ function unique(arr) {
 ```js
 function unique(arr) {
   if (!Array.isArray(arr)) {
-    return console.log('type error')
+    return console.log("type error");
   }
-  let array = []
+  let array = [];
   for (let i = 0; i < arr.length; i++) {
     if (array.indexOf(arr[i]) === -1) {
-      array.push(arr[i])
+      array.push(arr[i]);
     }
   }
-  return array
+  return array;
 }
 ```
 
@@ -748,16 +750,16 @@ function unique(arr) {
 ```js
 function unique(arr) {
   if (!Array.isArray(arr)) {
-    return console.log('type error')
+    return console.log("type error");
   }
-  arr = arr.sort()
-  let array = [arr[0]]
+  arr = arr.sort();
+  let array = [arr[0]];
   for (let i = 1; i < arr.length; i++) {
     if (arr[i] !== arr[i - 1]) {
-      array.push(arr[i])
+      array.push(arr[i]);
     }
   }
-  return array
+  return array;
 }
 ```
 
@@ -772,15 +774,15 @@ function unique(arr) {
 ```js
 function unique(arr) {
   if (!Array.isArray(arr)) {
-    return console.log('type error')
+    return console.log("type error");
   }
-  let array = []
+  let array = [];
   for (let i = 0; i < arr.length; i++) {
     if (!array.includes(arr[i])) {
-      array.push(arr[i])
+      array.push(arr[i]);
     }
   }
-  return array
+  return array;
 }
 ```
 
@@ -790,11 +792,13 @@ function unique(arr) {
 
 ```js
 function unique(arr) {
-  let obj = {}
+  let obj = {};
   return arr.filter(function(item) {
-    return obj.hasOwnProperty(typeof item + item) ? false : (obj[typeof item + item] = true)
+    return obj.hasOwnProperty(typeof item + item)
+      ? false
+      : (obj[typeof item + item] = true);
     // filter 返回的就是数组, 带上类型是防止转换
-  })
+  });
 }
 ```
 
@@ -803,9 +807,9 @@ function unique(arr) {
 ```js
 function unique(arr) {
   return arr.filter(function(item, index, arr) {
-    return arr.indexOf(item) === index
+    return arr.indexOf(item) === index;
     // arr.indexOf 只会匹配第一次相同的索引, 所以可以实现去重
-  })
+  });
 }
 ```
 
@@ -814,9 +818,9 @@ function unique(arr) {
 ```js
 function unique(arr) {
   return arr.reduce((all, item, index, arr) => {
-    if (arr.indexOf(item) === index) all.push(item)
-    return all
-  }, [])
+    if (arr.indexOf(item) === index) all.push(item);
+    return all;
+  }, []);
 }
 ```
 
@@ -824,24 +828,24 @@ function unique(arr) {
 
 ```js
 function unique(arr) {
-  var array = arr
-  var len = array.length
+  var array = arr;
+  var len = array.length;
 
   array.sort(function(a, b) {
     //排序后更加方便去重
-    return a - b
-  })
+    return a - b;
+  });
 
   function loop(index) {
     if (index >= 1) {
       if (array[index] === array[index - 1]) {
-        array.splice(index, 1)
+        array.splice(index, 1);
       }
-      loop(index - 1) //递归loop，然后数组去重
+      loop(index - 1); //递归loop，然后数组去重
     }
   }
-  loop(len - 1)
-  return array
+  loop(len - 1);
+  return array;
 }
 ```
 
@@ -849,18 +853,18 @@ function unique(arr) {
 
 ```js
 function unique(arr) {
-  let map = new Map()
-  let array = new Array() // 数组用于返回结果
+  let map = new Map();
+  let array = new Array(); // 数组用于返回结果
   for (let i = 0; i < arr.length; i++) {
     if (map.has(arr[i])) {
       // 如果有该key值
-      map.set(arr[i], true)
+      map.set(arr[i], true);
     } else {
-      map.set(arr[i], false) // 如果没有该key值
-      array.push(arr[i])
+      map.set(arr[i], false); // 如果没有该key值
+      array.push(arr[i]);
     }
   }
-  return array
+  return array;
 }
 ```
 
@@ -869,8 +873,8 @@ function unique(arr) {
 - flat
 
 ```js
-let arr = [1, 2, [3, 4], [5, 6, [7, 8, 9]]]
-let newArr = arr.flat(Infinity)
+let arr = [1, 2, [3, 4], [5, 6, [7, 8, 9]]];
+let newArr = arr.flat(Infinity);
 ```
 
 - join, split
@@ -879,8 +883,8 @@ let newArr = arr.flat(Infinity)
 // join 没有参数的话默认是保留逗号来结合数组元素
 let newArr = arr
   .join()
-  .split(',')
-  .map(Number)
+  .split(",")
+  .map(Number);
 ```
 
 - toString()
@@ -888,41 +892,41 @@ let newArr = arr
 ```js
 let newArr = arr
   .toString()
-  .split(',')
-  .map(Number)
+  .split(",")
+  .map(Number);
 ```
 
 - for 循环
 
 ```js
 const flatter = (arr) => {
-  const result = []
+  const result = [];
   arr.forEach((element) => {
     if (Array.isArray(element)) {
-      result.push(...flatter(element))
+      result.push(...flatter(element));
     } else {
-      result.push(element)
+      result.push(element);
     }
-  })
-  return result
-}
+  });
+  return result;
+};
 ```
 
 ## 打乱数组
 
 ```js
 Array.prototype.shuffle = function() {
-  const arr = this
-  let len = arr.length
-  let index, temp
+  const arr = this;
+  let len = arr.length;
+  let index, temp;
   while (len) {
-    index = Math.floor(Math.random() * len--)
-    temp = arr[index]
-    arr[index] = arr[len]
-    arr[len] = temp
+    index = Math.floor(Math.random() * len--);
+    temp = arr[index];
+    arr[index] = arr[len];
+    arr[len] = temp;
   }
-  return arr
-}
+  return arr;
+};
 ```
 
 ## 判断数组
@@ -930,19 +934,19 @@ Array.prototype.shuffle = function() {
 - instanceof
 
 ```js
-arr instanceof Array
+arr instanceof Array;
 ```
 
 - constructor
 
 ```js
-arr.constructor === Array
+arr.constructor === Array;
 ```
 
 - 判断是否有数组的方法
 
 ```js
-!!arr.push && !!arr.concat
+!!arr.push && !!arr.concat;
 ```
 
 - toString
@@ -954,7 +958,7 @@ Object.prototype.toString.call(arr) === '[object Array]
 - Array.isArray
 
 ```js
-Array.isArray(arr)
+Array.isArray(arr);
 ```
 
 ## 看到可以放弃的题目
@@ -976,111 +980,381 @@ Array.isArray(arr)
 class myPromise {
   constructor(fn) {
     // 判断参数类型
-    if (typeof fn !== 'function') {
-      throw new Error('我需要一个函数')
+    if (typeof fn !== "function") {
+      throw new Error("我需要一个函数");
     }
     // 初始化需要用到的值
-    this.initValue()
+    this.initValue();
     // 修改 this 绑定
-    this.initBind()
+    this.initBind();
     // 给 fn 处理回调
     try {
-      fn(this.resolve, this.reject)
+      fn(this.resolve, this.reject);
     } catch (e) {
-      this.reject(e)
+      this.reject(e);
     }
   }
 
   initValue() {
-    this.value = null
-    this.reason = null
-    this.state = 'padding'
+    this.value = null;
+    this.reason = null;
+    this.state = "padding";
     // 下面两个变量是为了异步中套异步使得状态为 padding, 将异步方法存起来等下次在调用
-    this.resolveCallbacks = []
-    this.rejectCallbacks = []
+    this.resolveCallbacks = [];
+    this.rejectCallbacks = [];
   }
 
   initBind() {
-    this.resolve = this.resolve.bind(this)
-    this.reject = this.reject.bind(this)
+    this.resolve = this.resolve.bind(this);
+    this.reject = this.reject.bind(this);
   }
 
   resolve(value) {
-    if (this.state === 'padding') {
-      this.state = 'fulfilled'
-      this.value = value
-      this.resolveCallbacks.forEach((fn) => fn(this.value))
+    if (this.state === "padding") {
+      this.state = "fulfilled";
+      this.value = value;
+      this.resolveCallbacks.forEach((fn) => fn(this.value));
     }
   }
 
   reject(reason) {
-    if (this.state === 'padding') {
-      this.state = 'rejected'
-      this.reason = reason
-      this.rejectCallbacks.forEach((fn) => fn(this.reason))
+    if (this.state === "padding") {
+      this.state = "rejected";
+      this.reason = reason;
+      this.rejectCallbacks.forEach((fn) => fn(this.reason));
     }
   }
 
   then(onFulfilled, onRejected) {
-    if (typeof onFulfilled !== 'function') {
+    if (typeof onFulfilled !== "function") {
       onFulfilled = function(value) {
-        return value
-      }
+        return value;
+      };
     }
-    if (typeof onRejected !== 'function') {
+    if (typeof onRejected !== "function") {
       onRejected = function(reason) {
-        throw reason
-      }
+        throw reason;
+      };
     }
     // 实现链式调用
     return new myPromise((resolve, reject) => {
-      if (this.state === 'fulfilled') {
+      if (this.state === "fulfilled") {
         setTimeout(() => {
           try {
-            const x = onFulfilled(this.value)
-            resolve(x)
+            const x = onFulfilled(this.value);
+            resolve(x);
           } catch (e) {
-            reject(e)
+            reject(e);
           }
-        })
+        });
       }
-      if (this.state === 'rejected') {
+      if (this.state === "rejected") {
         setTimeout(() => {
           try {
-            const x = onRejected(this.reason)
-            resolve(x)
+            const x = onRejected(this.reason);
+            resolve(x);
           } catch (e) {
-            reject(e)
+            reject(e);
           }
-        })
+        });
       }
       // 当异步中还有异步状态可能就来不及更新为 padding 所以把所有的方法存到数组内, 下次调用在执行
       // 比如在Promise加入setTimeout, 在setTimeout中在执行resolve, 这样如果在resolve之前执行then, 那么状态就是padding, 会拿不到想要的结果, 存储调用方法会避免这种情况发生
-      if (this.state === 'padding') {
+      if (this.state === "padding") {
         this.resolveCallbacks.push((value) => {
           setTimeout(() => {
             try {
-              const x = onFulfilled(value)
-              resolve(x)
+              const x = onFulfilled(value);
+              resolve(x);
             } catch (e) {
-              reject(e)
+              reject(e);
             }
-          })
-        })
+          });
+        });
         this.rejectCallbacks.push((reason) => {
           setTimeout(() => {
             try {
-              const x = onRejected(reason)
-              resolve(x)
+              const x = onRejected(reason);
+              resolve(x);
             } catch (e) {
-              reject(e)
+              reject(e);
             }
-          })
-        })
+          });
+        });
       }
-    })
+    });
   }
 }
+```
+
+### 符合 PromiseA+规范的 Promise
+
+```js
+/**
+ * 1. new Promise时，需要传递一个 executor 执行器，执行器立刻执行
+ * 2. executor 接受两个参数，分别是 resolve 和 reject
+ * 3. promise 只能从 pending 到 rejected, 或者从 pending 到 fulfilled
+ * 4. promise 的状态一旦确认，就不会再改变
+ * 5. promise 都有 then 方法，then 接收两个参数，分别是 promise 成功的回调 onFulfilled,
+ *      和 promise 失败的回调 onRejected
+ * 6. 如果调用 then 时，promise已经成功，则执行 onFulfilled，并将promise的值作为参数传递进去。
+ *      如果promise已经失败，那么执行 onRejected, 并将 promise 失败的原因作为参数传递进去。
+ *      如果promise的状态是pending，需要将onFulfilled和onRejected函数存放起来，等待状态确定后，再依次将对应的函数执行(发布订阅)
+ * 7. then 的参数 onFulfilled 和 onRejected 可以缺省
+ * 8. promise 可以then多次，promise 的then 方法返回一个 promise
+ * 9. 如果 then 返回的是一个结果，那么就会把这个结果作为参数，传递给下一个then的成功的回调(onFulfilled)
+ * 10. 如果 then 中抛出了异常，那么就会把这个异常作为参数，传递给下一个then的失败的回调(onRejected)
+ * 11.如果 then 返回的是一个promise,那么需要等这个promise，那么会等这个promise执行完，promise如果成功，
+ *   就走下一个then的成功，如果失败，就走下一个then的失败
+ */
+
+const PENDING = "pending";
+const FULFILLED = "fulfilled";
+const REJECTED = "rejected";
+function Promise(executor) {
+  let self = this;
+  self.status = PENDING;
+  self.onFulfilled = []; //成功的回调
+  self.onRejected = []; //失败的回调
+  //PromiseA+ 2.1
+  function resolve(value) {
+    if (self.status === PENDING) {
+      self.status = FULFILLED;
+      self.value = value;
+      self.onFulfilled.forEach((fn) => fn()); //PromiseA+ 2.2.6.1
+    }
+  }
+
+  function reject(reason) {
+    if (self.status === PENDING) {
+      self.status = REJECTED;
+      self.reason = reason;
+      self.onRejected.forEach((fn) => fn()); //PromiseA+ 2.2.6.2
+    }
+  }
+
+  try {
+    executor(resolve, reject);
+  } catch (e) {
+    reject(e);
+  }
+}
+
+Promise.prototype.then = function(onFulfilled, onRejected) {
+  //PromiseA+ 2.2.1 / PromiseA+ 2.2.5 / PromiseA+ 2.2.7.3 / PromiseA+ 2.2.7.4
+  onFulfilled =
+    typeof onFulfilled === "function" ? onFulfilled : (value) => value;
+  onRejected =
+    typeof onRejected === "function"
+      ? onRejected
+      : (reason) => {
+          throw reason;
+        };
+  let self = this;
+  //PromiseA+ 2.2.7
+  let promise2 = new Promise((resolve, reject) => {
+    if (self.status === FULFILLED) {
+      //PromiseA+ 2.2.2
+      //PromiseA+ 2.2.4 --- setTimeout
+      setTimeout(() => {
+        try {
+          //PromiseA+ 2.2.7.1
+          let x = onFulfilled(self.value);
+          resolvePromise(promise2, x, resolve, reject);
+        } catch (e) {
+          //PromiseA+ 2.2.7.2
+          reject(e);
+        }
+      });
+    } else if (self.status === REJECTED) {
+      //PromiseA+ 2.2.3
+      setTimeout(() => {
+        try {
+          let x = onRejected(self.reason);
+          resolvePromise(promise2, x, resolve, reject);
+        } catch (e) {
+          reject(e);
+        }
+      });
+    } else if (self.status === PENDING) {
+      self.onFulfilled.push(() => {
+        setTimeout(() => {
+          try {
+            let x = onFulfilled(self.value);
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+      self.onRejected.push(() => {
+        setTimeout(() => {
+          try {
+            let x = onRejected(self.reason);
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    }
+  });
+  return promise2;
+};
+
+function resolvePromise(promise2, x, resolve, reject) {
+  let self = this;
+  //PromiseA+ 2.3.1
+  if (promise2 === x) {
+    reject(new TypeError("Chaining cycle"));
+  }
+  if ((x && typeof x === "object") || typeof x === "function") {
+    let used; //PromiseA+2.3.3.3.3 只能调用一次
+    try {
+      let then = x.then;
+      if (typeof then === "function") {
+        //PromiseA+2.3.3
+        then.call(
+          x,
+          (y) => {
+            //PromiseA+2.3.3.1
+            if (used) return;
+            used = true;
+            resolvePromise(promise2, y, resolve, reject);
+          },
+          (r) => {
+            //PromiseA+2.3.3.2
+            if (used) return;
+            used = true;
+            reject(r);
+          }
+        );
+      } else {
+        //PromiseA+2.3.3.4
+        if (used) return;
+        used = true;
+        resolve(x);
+      }
+    } catch (e) {
+      //PromiseA+ 2.3.3.2
+      if (used) return;
+      used = true;
+      reject(e);
+    }
+  } else {
+    //PromiseA+ 2.3.3.4
+    resolve(x);
+  }
+}
+
+// Promise.resolve
+// 1. 如果 value 是个 thenable 对象，返回的promise会“跟随”这个thenable的对象，采用它的最终状态
+// 2. 如果传入的value本身就是promise对象，那么Promise.resolve将不做任何修改、原封不动地返回这个promise对象。
+// 3. 其他情况，直接返回以该值为成功状态的promise对象。
+Promise.resolve = function(param) {
+  if (param instanceof Promise) {
+    return param;
+  }
+  return new Promise((resolve, reject) => {
+    if (param && param.then && typeof param.then === "function") {
+      setTimeout(() => {
+        param.then(resolve, reject);
+      });
+    } else {
+      resolve(param);
+    }
+  });
+};
+
+// Promise.reject
+Promise.reject = function(reason) {
+  return new Promise((resolve, reject) => {
+    reject(reason);
+  });
+};
+
+// Promise.catch
+Promise.prototype.catch = function(onRejected) {
+  return this.then(null, onRejected);
+};
+
+// Promise.finally
+Promise.prototype.finally = function(callback) {
+  return this.then(
+    (value) => {
+      return Promise.resolve(callback()).then(() => {
+        return value;
+      });
+    },
+    (err) => {
+      return Promise.resolve(callback()).then(() => {
+        throw err;
+      });
+    }
+  );
+};
+
+// Promise.all
+// 1. 如果传入的参数是一个空的可迭代对象，那么此promise对象回调完成(resolve),只有此情况，是同步执行的，其它都是异步返回的。
+// 2. 如果传入的参数不包含任何 promise，则返回一个异步完成.
+// 3. promises 中所有的promise都promise都“完成”时或参数中不包含 promise 时回调完成。
+// 4. 如果参数中有一个promise失败，那么Promise.all返回的promise对象失败
+// 5. 在任何情况下，Promise.all 返回的 promise 的完成状态的结果都是一个数组
+
+Promise.all = function(promises) {
+  return new Promise((resolve, reject) => {
+    let index = 0;
+    let result = [];
+    if (promises.length === 0) {
+      resolve(result);
+    } else {
+      function processValue(i, data) {
+        result[i] = data;
+        if (++index === promises.length) {
+          resolve(result);
+        }
+      }
+      for (let i = 0; i < promises.length; i++) {
+        //promises[i] 可能是普通值
+        Promise.resolve(promises[i]).then(
+          (data) => {
+            processValue(i, data);
+          },
+          (err) => {
+            reject(err);
+            return;
+          }
+        );
+      }
+    }
+  });
+};
+
+// Promise.race
+// 1. 如果传的参数数组是空，则返回的 promise 将永远等待。
+// 2. 如果迭代包含一个或多个非承诺值和/或已解决/拒绝的承诺，则 Promise.race 将解析为迭代中找到的第一个值。
+Promise.race = function(promises) {
+  return new Promise((resolve, reject) => {
+    if (promises.length === 0) {
+      return;
+    } else {
+      for (let i = 0; i < promises.length; i++) {
+        Promise.resolve(promises[i]).then(
+          (data) => {
+            resolve(data);
+            return;
+          },
+          (err) => {
+            reject(err);
+            return;
+          }
+        );
+      }
+    }
+  });
+};
+
+module.exports = Promise;
 ```
 
 ## 类的创建和继承
@@ -1090,19 +1364,19 @@ class myPromise {
 ```js
 // Animal 自身的方法
 function Animal(name) {
-  this.name = name || 'Animal'
+  this.name = name || "Animal";
   this.sleep = function() {
-    console.log(`${this.name} is sleeping`)
-  }
+    console.log(`${this.name} is sleeping`);
+  };
 }
 
 // Animal 上的方法
 Animal.prototype.eat = function(food) {
-  console.log(`${this.name} is eat ${food}`)
-}
+  console.log(`${this.name} is eat ${food}`);
+};
 function Cat() {}
-Cat.prototype = new Animal()
-Cat.prototype.name = 'cat'
+Cat.prototype = new Animal();
+Cat.prototype.name = "cat";
 ```
 
 利用 new 继承, 基于原型链, 既是父类的实例, 也是子类的实例, 无法实现多继承
@@ -1112,18 +1386,18 @@ Cat.prototype.name = 'cat'
 ```js
 // Animal 自身的方法
 function Animal(name) {
-  this.name = name || 'Animal'
+  this.name = name || "Animal";
   this.sleep = function() {
-    console.log(`${this.name} is sleeping`)
-  }
+    console.log(`${this.name} is sleeping`);
+  };
 }
 // Animal 上的方法
 Animal.prototype.eat = function(food) {
-  console.log(`${this.name} is eat ${food}`)
-}
+  console.log(`${this.name} is eat ${food}`);
+};
 function Cat() {
-  Animal.call(this)
-  this.name = name || 'cat'
+  Animal.call(this);
+  this.name = name || "cat";
 }
 ```
 
@@ -1134,22 +1408,22 @@ function Cat() {
 ```js
 // Animal 自身的方法
 function Animal(name) {
-  this.name = name || 'Animal'
+  this.name = name || "Animal";
   this.sleep = function() {
-    console.log(`${this.name} is sleeping`)
-  }
+    console.log(`${this.name} is sleeping`);
+  };
 }
 // Animal 上的方法
 Animal.prototype.eat = function(food) {
-  console.log(`${this.name} is eat ${food}`)
-}
+  console.log(`${this.name} is eat ${food}`);
+};
 
 function Cat() {
-  Animal.call(this)
-  this.name = name || 'cat'
+  Animal.call(this);
+  this.name = name || "cat";
 }
-Cat.prototype = new Animal()
-Cat.prototype.constructor = Cat
+Cat.prototype = new Animal();
+Cat.prototype.constructor = Cat;
 ```
 
 可以继承实例属性方法, 也可以继承原型属性/方法, 但是调用两次父类构造函数, 生成两份实例
@@ -1161,25 +1435,25 @@ Cat.prototype.constructor = Cat
 ```js
 // Animal 自身的方法
 function Animal(name) {
-  this.name = name || 'Animal'
+  this.name = name || "Animal";
   this.sleep = function() {
-    console.log(`${this.name} is sleeping`)
-  }
+    console.log(`${this.name} is sleeping`);
+  };
 }
 // Animal 上的方法
 Animal.prototype.eat = function(food) {
-  console.log(`${this.name} is eat ${food}`)
-}
+  console.log(`${this.name} is eat ${food}`);
+};
 
 function Cat() {
-  Animal.call(this)
-  this.name = name || 'cat'
+  Animal.call(this);
+  this.name = name || "cat";
 }
-;(function() {
-  let Super = function() {}
-  Super.prototype = Animal.prototype
-  Cat.prototype = new Super()
-})()
+(function() {
+  let Super = function() {};
+  Super.prototype = Animal.prototype;
+  Cat.prototype = new Super();
+})();
 ```
 
 这种方法较为推荐
@@ -1215,14 +1489,14 @@ function Cat() {
 
 ```js
 const once = (callback) => {
-  let tag = true
+  let tag = true;
   return () => {
     if (tag) {
-      callback()
-      tag = false
+      callback();
+      tag = false;
     }
-  }
-}
+  };
+};
 ```
 
 ## JS 监听对象属性的改变
@@ -1230,25 +1504,25 @@ const once = (callback) => {
 > ES5 利用 defineProperty(Vue2 响应式)
 
 ```js
-const obj = { name: 'meng', age: 11 }
-const key = 'name'
-let value = obj[key]
+const obj = { name: "meng", age: 11 };
+const key = "name";
+let value = obj[key];
 Object.defineProperty(obj, key, {
-  value: 'value', // 属性值设置, 用来新增属性
+  value: "value", // 属性值设置, 用来新增属性
   configurable: true, // 控制是否能改和删除 key
   writable: true, // 控制是否能改 value
   enumerable: true, // 控制是否在迭代中显示
   set(newValue) {
-    console.log('set value')
-    value = newValue
+    console.log("set value");
+    value = newValue;
   },
   get() {
-    console.log('get value')
-    return value
+    console.log("get value");
+    return value;
   },
-})
-obj.name = 'chauncey'
-console.log(obj.name)
+});
+obj.name = "chauncey";
+console.log(obj.name);
 ```
 
 如果 id 不在 user 对象中, 则不能监听 id 的变化
@@ -1257,26 +1531,28 @@ console.log(obj.name)
 
 ```js
 const person = {
-  firstName: 'meng',
-  lastName: 'xiang',
-}
+  firstName: "meng",
+  lastName: "xiang",
+};
 const p = new Proxy(person, {
   get(target, property) {
-    if (property === 'fullName') {
-      return `${target.firstName}-${target.lastName}`
+    if (property === "fullName") {
+      return `${target.firstName}-${target.lastName}`;
     }
-    return property in target ? target[property] : `No such property as, ${property}`
+    return property in target
+      ? target[property]
+      : `No such property as, ${property}`;
   },
   set(target, property, value) {
-    if (property === 'age') {
+    if (property === "age") {
       if (!Number.isInteger(value)) {
-        throw new TypeError(`${value} is not a Number`)
+        throw new TypeError(`${value} is not a Number`);
       }
-      if (value < 0) throw new TypeError(`${value} must > 0`)
-      target[property] = value
+      if (value < 0) throw new TypeError(`${value} must > 0`);
+      target[property] = value;
     }
   },
-})
+});
 ```
 
 即使有属性在 user 中不存在, 通过 user.id 来定义也可以同样监听这个属性
@@ -1287,38 +1563,38 @@ const p = new Proxy(person, {
 
 ```js
 obj = {
-  name: 'chauncey',
+  name: "chauncey",
   getName() {
-    return this.name
+    return this.name;
   },
-}
-Object.defineProperty(obj, 'name', {
+};
+Object.defineProperty(obj, "name", {
   // 不可枚举, 不可配置, 默认就是
   get() {
-    return undefined
+    return undefined;
   },
-})
+});
 ```
 
 > 通过函数
 
 ```js
 function product() {
-  let name = 'chauncey'
+  let name = "chauncey";
   this.getName = function() {
-    return name
-  }
+    return name;
+  };
 }
-const obj = new product()
+const obj = new product();
 ```
 
 > 通过 class
 
 ```js
 class Person {
-  #name = 'chauncey'
+  #name = "chauncey";
   getName() {
-    return this.#name
+    return this.#name;
   }
 }
 ```
@@ -1340,27 +1616,27 @@ bind 函数可以指定 this 的指向, 可以手写一个 bind 函数
 
 ```js
 Function.prototype.myBind = function(context, ...args) {
-  if (typeof this !== 'function') return
-  let fn = this
+  if (typeof this !== "function") return;
+  let fn = this;
   return function(...rest) {
-    return fn.apply(context, [...args, ...rest])
-  }
-}
+    return fn.apply(context, [...args, ...rest]);
+  };
+};
 ```
 
 > ES5 写法
 
 ```js
 Function.prototype.myBind = function() {
-  if (typeof this !== 'function') return
-  let args = Array.prototype.slice.call(arguments) // slice 方法的应用就是实现深拷贝
-  const context = args.splice(0, 1)[0] // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
-  const fn = this // bind 把 this 保存
+  if (typeof this !== "function") return;
+  let args = Array.prototype.slice.call(arguments); // slice 方法的应用就是实现深拷贝
+  const context = args.splice(0, 1)[0]; // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
+  const fn = this; // bind 把 this 保存
   return function() {
-    let rest = Array.prototype.slice.call(arguments)
-    return fn.apply(context, args.concat(rest)) // 利用 bind 函数的 this 调用 apply 实现委托给上下文
-  }
-}
+    let rest = Array.prototype.slice.call(arguments);
+    return fn.apply(context, args.concat(rest)); // 利用 bind 函数的 this 调用 apply 实现委托给上下文
+  };
+};
 ```
 
 这样写有错误, 需要把原型留下, 因为在 new 的时候会直接走 bind 的 this, 而忽略 new 的 this
@@ -1369,21 +1645,24 @@ Function.prototype.myBind = function() {
 
 ```js
 Function.prototype.myBind = function() {
-  if (typeof this !== 'function') return
-  let args = Array.prototype.slice.call(arguments) // slice 方法的应用就是实现深拷贝
-  const context = args.splice(0, 1)[0] // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
-  const fn = this // bind 把 this 保存
-  const middleFun = function() {} // 定义一个空函数来当做中间人, 可以实现继承原型链
+  if (typeof this !== "function") return;
+  let args = Array.prototype.slice.call(arguments); // slice 方法的应用就是实现深拷贝
+  const context = args.splice(0, 1)[0]; // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
+  const fn = this; // bind 把 this 保存
+  const middleFun = function() {}; // 定义一个空函数来当做中间人, 可以实现继承原型链
   const callback = function() {
-    let rest = Array.prototype.slice.call(arguments)
-    return fn.apply(this instanceof context ? this : context, args.concat(rest)) // 利用 bind 函数的 this 调用 apply 实现委托给上下文
-  }
+    let rest = Array.prototype.slice.call(arguments);
+    return fn.apply(
+      this instanceof context ? this : context,
+      args.concat(rest)
+    ); // 利用 bind 函数的 this 调用 apply 实现委托给上下文
+  };
   if (this.prototype) {
-    middleFun.prototype = this.prototype
+    middleFun.prototype = this.prototype;
   }
-  callback.prototype = new middleFun()
-  return callback
-}
+  callback.prototype = new middleFun();
+  return callback;
+};
 ```
 
 ## Ajax 解决浏览器缓存问题
@@ -1402,15 +1681,15 @@ Function.prototype.myBind = function() {
 ## Set 实现并集, 交集, 差集
 
 ```js
-let set1 = new Set([1, 2, 3])
-let set2 = new Set([4, 3, 2])
+let set1 = new Set([1, 2, 3]);
+let set2 = new Set([4, 3, 2]);
 
-let intersect = new Set([...set1].filter((value) => set2.has(value)))
-let union = new Set([...set1, ...set2])
-let difference = new Set([...set1].filter((value) => !set2.has(value)))
-console.log(intersect)
-console.log(union)
-console.log(difference)
+let intersect = new Set([...set1].filter((value) => set2.has(value)));
+let union = new Set([...set1, ...set2]);
+let difference = new Set([...set1].filter((value) => !set2.has(value)));
+console.log(intersect);
+console.log(union);
+console.log(difference);
 ```
 
 ### WeakSet
@@ -1450,8 +1729,8 @@ WeakSet 对象允许你将弱引用对象储存在一个集合中
 toString 的上下文
 
 ```js
-const arr = [1, 2]
-Object.prototype.toString.call(arr) // [object Array]
+const arr = [1, 2];
+Object.prototype.toString.call(arr); // [object Array]
 ```
 
 `Ojbect.prototype.toString.call()` 常用判断浏览器内置对象
@@ -1476,22 +1755,22 @@ ES6 新语法, 用来判断是否为数组
 ## 全局作用域中, const let 声明不在 window 上到底在哪里?
 
 ```js
-let a = 2
-const b = 3
-console.log(new Function()) // script 中
+let a = 2;
+const b = 3;
+console.log(new Function()); // script 中
 ```
 
 ## 下面代码打印结果
 
 ```js
-var a = 10
-;(function() {
-  console.log(a)
-  a = 5
-  console.log(window.a)
-  var a = 20
-  console.log(a)
-})()
+var a = 10;
+(function() {
+  console.log(a);
+  a = 5;
+  console.log(window.a);
+  var a = 20;
+  console.log(a);
+})();
 // undefined 10 20
 ```
 
@@ -1510,27 +1789,27 @@ var a = 10
 ```js
 // example 1
 var a = {},
-  b = '123',
-  c = 123
-a[b] = 'b'
-a[c] = 'c'
-console.log(a[b]) // c, b 默认为 123, c 会覆盖 b
+  b = "123",
+  c = 123;
+a[b] = "b";
+a[c] = "c";
+console.log(a[b]); // c, b 默认为 123, c 会覆盖 b
 
 // example 2
 var a = {},
-  b = Symbol('123'),
-  c = Symbol('123')
-a[b] = 'b'
-a[c] = 'c'
-console.log(a[b]) // b, symbol 是唯一的
+  b = Symbol("123"),
+  c = Symbol("123");
+a[b] = "b";
+a[c] = "c";
+console.log(a[b]); // b, symbol 是唯一的
 
 // example 3
 var a = {},
-  b = { key: '123' },
-  c = { key: '456' }
-a[b] = 'b'
-a[c] = 'c'
-console.log(a[b]) // c, 对象做为键, 会调用 toString, 所以 c 会覆盖 b
+  b = { key: "123" },
+  c = { key: "456" };
+a[b] = "b";
+a[c] = "c";
+console.log(a[b]); // c, 对象做为键, 会调用 toString, 所以 c 会覆盖 b
 ```
 
 本题考查的是对象键名的转换
@@ -1561,83 +1840,83 @@ console.log(a[b]) // c, 对象做为键, 会调用 toString, 所以 c 会覆盖 
 // 定义一个构造函数 Foo
 function Foo() {
   Foo.a = function() {
-    console.log(1)
-  }
+    console.log(1);
+  };
   this.a = function() {
-    console.log(2)
-  }
+    console.log(2);
+  };
 }
 
 // 给 Foo 的原型上挂载一个方法
 Foo.prototype.a = function() {
-  console.log(3)
-}
+  console.log(3);
+};
 
 // 给 window 对象上挂在一个函数 Foo
 Foo.a = function() {
-  console.log(4)
-}
+  console.log(4);
+};
 
 //  调用 window 上的函数
-Foo.a() // 4
+Foo.a(); // 4
 
 // 创建了 Foo 构造函数的实例, 这时候给 window 的 Foo 改变了方法, obj 成了 this
-let obj = new Foo()
+let obj = new Foo();
 
 // 调用 obj 实例的函数 a
-obj.a() // 2
+obj.a(); // 2
 
 // 再次调用 window 上的方法, 就为 1
-Foo.a() // 1
+Foo.a(); // 1
 ```
 
 ## 判断以下代码结果
 
 ```js
-String('11') == new String('11') // == 会隐式转换 new String('11').toString() true
-String('11') === new String('11') // === 是全等, 类型不同 false
+String("11") == new String("11"); // == 会隐式转换 new String('11').toString() true
+String("11") === new String("11"); // === 是全等, 类型不同 false
 // true false
 ```
 
 ```js
-var name = 'Tom'
-;(function() {
-  console.info('name', name)
-  console.info('typeof name', typeof name)
-  if (typeof name == 'undefined') {
-    var name = 'Jack'
-    console.log('Goodbye ' + name)
+var name = "Tom";
+(function() {
+  console.info("name", name);
+  console.info("typeof name", typeof name);
+  if (typeof name == "undefined") {
+    var name = "Jack";
+    console.log("Goodbye " + name);
   } else {
-    console.log('Hello ' + name)
+    console.log("Hello " + name);
   }
-})()
+})();
 
 // var 穿透了块作用域, name 提升至 if() 之前, 为 undefined
 ```
 
 ```js
 function wait() {
-  return new Promise((resolve) => setTimeout(resolve, 10 * 1000))
+  return new Promise((resolve) => setTimeout(resolve, 10 * 1000));
 }
 
 async function main() {
-  console.time()
-  const x = wait()
-  const y = wait()
-  const z = wait()
-  await x
-  await y
-  await z
-  console.timeEnd()
+  console.time();
+  const x = wait();
+  const y = wait();
+  const z = wait();
+  await x;
+  await y;
+  await z;
+  console.timeEnd();
 }
-main()
+main();
 // 三个方法都是异步执行, 所以加起来最大的时间为 10 * 1000 ms,
 async function two() {
-  console.time()
-  const x = await wait()
-  const y = await wait()
-  const z = await wait()
-  console.timeEnd()
+  console.time();
+  const x = await wait();
+  const y = await wait();
+  const z = await wait();
+  console.timeEnd();
 }
 // 改成下面这样就是为同步执行, 执行时间从上到下, 一个 10 * 1000ms, 所以结果为 30 * 1000ms
 ```
@@ -1647,11 +1926,11 @@ async function two() {
 1. setTimeout
 
 ```js
-console.log('script start')
+console.log("script start");
 setTimeout(function() {
-  console.log('setTimeout')
-})
-console.log('script end')
+  console.log("setTimeout");
+});
+console.log("script end");
 // script start => script end => setTimeout
 ```
 
@@ -1661,18 +1940,18 @@ Promise 本身是同步的立即执行函数, 当在 executor 中执行 resolve 
 then / catch 等, 当主栈完成后, 才会执行 resolve / reject 中存放的方法
 
 ```js
-console.log('script start')
+console.log("script start");
 let promise1 = new Promise(function(resolve) {
-  console.log('promise1')
-  resolve()
-  console.log('promise1 end')
+  console.log("promise1");
+  resolve();
+  console.log("promise1 end");
 }).then(function() {
-  console.log('promise2')
-})
+  console.log("promise2");
+});
 setTimeout(function() {
-  console.log('settimeout')
-})
-console.log('script end')
+  console.log("settimeout");
+});
+console.log("script end");
 // 输出顺序: script start->promise1->promise1 end->script end->promise2->settimeout
 ```
 
@@ -1680,17 +1959,17 @@ console.log('script end')
 
 ```js
 async function async1() {
-  console.log('async1 start')
-  await async2()
-  console.log('async1 end')
+  console.log("async1 start");
+  await async2();
+  console.log("async1 end");
 }
 async function async2() {
-  console.log('async2')
+  console.log("async2");
 }
 
-console.log('script start')
-async1()
-console.log('script end')
+console.log("script start");
+async1();
+console.log("script end");
 
 // 输出顺序：script start->async1 start->async2->script end->async1 end
 ```
@@ -1748,54 +2027,54 @@ Node 11 之后: 和浏览器行为统一, 执行一个宏任务就执行完微�
 ```js
 const jsonp = ({ url, params, callbackName }) => {
   const generateURL = () => {
-    let dataStr = ''
+    let dataStr = "";
     for (let key in params) {
-      dataStr += `${key}=${params[key]}&`
+      dataStr += `${key}=${params[key]}&`;
     }
-    dataStr += `callback=${callbackName}`
-    return `${url}?${dataStr}`
-  }
+    dataStr += `callback=${callbackName}`;
+    return `${url}?${dataStr}`;
+  };
   return new Promise((resolve, reject) => {
     // 初始化回调函数名称
-    callbackName = callbackName || Math.random().toString.replace('.', '')
+    callbackName = callbackName || Math.random().toString.replace(".", "");
     // 创建 script 元素并加入到当前文档中
-    let scriptEle = document.createElement('script')
-    scriptEle.src = generateURL()
-    document.body.appendChild(scriptEle)
+    let scriptEle = document.createElement("script");
+    scriptEle.src = generateURL();
+    document.body.appendChild(scriptEle);
     // 绑定到 window 上，为了后面调用
     window[callbackName] = (data) => {
-      resolve(data)
+      resolve(data);
       // script 执行完了，成为无用元素，需要清除
-      document.body.removeChild(scriptEle)
-    }
-  })
-}
+      document.body.removeChild(scriptEle);
+    };
+  });
+};
 const res = jsonp({
-  url: 'http://localhost:3000/',
-  params: '',
-  callbackName: 'meng',
-})
-console.log(res)
+  url: "http://localhost:3000/",
+  params: "",
+  callbackName: "meng",
+});
+console.log(res);
 res.then(
   (data) => {
-    console.log(data)
+    console.log(data);
   },
   (err) => console.log(err)
-)
+);
 ```
 
 服务端:
 
 ```js
-const http = require('http')
-const url = require('url')
+const http = require("http");
+const url = require("url");
 http
   .createServer((req, res) => {
-    const query = url.parse(req.url, true).query
-    res.write(`${query.callback}('hello')`)
-    res.end()
+    const query = url.parse(req.url, true).query;
+    res.write(`${query.callback}('hello')`);
+    res.end();
   })
-  .listen(3000)
+  .listen(3000);
 ```
 
 ## 手写 new
@@ -1807,9 +2086,9 @@ http
 
 ```js
 function createNew(Con, ...args) {
-  let obj = Object.create(Con) // obj.__proto__ = Con.prototype
-  let result = Con.apply(obj, args) // 将 obj 绑定到 Con 上
-  return result instanceof Object ? result : obj // 判断返回值是否为对象
+  let obj = Object.create(Con); // obj.__proto__ = Con.prototype
+  let result = Con.apply(obj, args); // 将 obj 绑定到 Con 上
+  return result instanceof Object ? result : obj; // 判断返回值是否为对象
 }
 ```
 
@@ -1826,12 +2105,12 @@ function createNew(Con, ...args) {
 
 ```js
 function instanceOf(left, right) {
-  let proto = left.__proto__
-  let prototype = right.prototype
+  let proto = left.__proto__;
+  let prototype = right.prototype;
   while (true) {
-    if (proto === null) return false
-    if (proto === prototype) return true
-    proto = proto.__proto__
+    if (proto === null) return false;
+    if (proto === prototype) return true;
+    proto = proto.__proto__;
   }
 }
 ```
@@ -1847,12 +2126,12 @@ function instanceOf(left, right) {
 
 ```js
 Function.prototype.myCall = function(content = window) {
-  content.fn = this
-  let args = [...arguments].slice(1)
-  let result = content.fn(...args)
-  delete content.fn
-  return result
-}
+  content.fn = this;
+  let args = [...arguments].slice(1);
+  let result = content.fn(...args);
+  delete content.fn;
+  return result;
+};
 ```
 
 ## 手写 apply
@@ -1861,43 +2140,44 @@ Function.prototype.myCall = function(content = window) {
 
 ```js
 Function.prototype.myApply = function(content = window) {
-  content.fn = this
-  let result
+  content.fn = this;
+  let result;
   if (arguments[1]) {
-    result = content.fn(...arguments[1])
+    result = content.fn(...arguments[1]);
   } else {
-    result = content.fn()
+    result = content.fn();
   }
-  delete content.fn
-  return result
-}
+  delete content.fn;
+  return result;
+};
 ```
 
 ## 手写 reduce
 
 ```js
 Array.prototype.myReduce = function(fn, base) {
-  if (typeof fn !== 'function') throw new TypeError('arguments[0] must be a function')
+  if (typeof fn !== "function")
+    throw new TypeError("arguments[0] must be a function");
 
-  const initArr = this
-  const arr = initArr.concat()
-  let index, result
+  const initArr = this;
+  const arr = initArr.concat();
+  let index, result;
 
   if (arguments.length === 2) {
-    arr.unshift(base)
-    index = 0
+    arr.unshift(base);
+    index = 0;
   } else {
-    index = 1
+    index = 1;
   }
-  if (arr.length === 1) result = arr[0]
+  if (arr.length === 1) result = arr[0];
 
   while (arr.length > 1) {
-    result = fn.call(null, arr[0], arr[1], index, initArr)
-    index++
-    arr.splice(0, 2, result)
+    result = fn.call(null, arr[0], arr[1], index, initArr);
+    index++;
+    arr.splice(0, 2, result);
   }
-  return result
-}
+  return result;
+};
 ```
 
 ## 手写 map
@@ -1905,21 +2185,21 @@ Array.prototype.myReduce = function(fn, base) {
 ```js
 // 利用 reduce, 传入初始值, index 就为 0, 那么就可以从 0 开始遍历数组, Arg 是 map 第二个参数, 表示回调 fn 时候的 this
 Array.prototype.myMap1 = function(fn, Arg) {
-  var res = []
+  var res = [];
   this.reduce((prev, curr, index, array) => {
-    res.push(fn.call(Arg, curr, index, array))
-  }, 0)
-  return res
-}
+    res.push(fn.call(Arg, curr, index, array));
+  }, 0);
+  return res;
+};
 
 // 利用 for 循环直接实现 map 遍历且返回新的数组
 Array.prototype.myMap2 = function(fn) {
-  var newArr = []
+  var newArr = [];
   for (var i = 0; i < this.length; i++) {
-    newArr.push(fn(this[i], i, this)) //this指向调用newMap方法的数组
+    newArr.push(fn(this[i], i, this)); //this指向调用newMap方法的数组
   }
-  return newArr
-}
+  return newArr;
+};
 ```
 
 ## 手写 fill
@@ -1928,24 +2208,24 @@ Array.prototype.myMap2 = function(fn) {
 // value 为填充值, start 开始索引, end 结束索引
 Array.prototype.myFill = function(value, start = 0, end = this.length) {
   for (let i = start; i < end; i++) {
-    this[i] = value
+    this[i] = value;
   }
-}
+};
 ```
 
 ## 手写 filter
 
 ```js
 Array.prototype.myFilter = function(fn, Arg) {
-  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`)
-  const arr = this
-  const result = []
+  if (typeof fn !== "function") throw new TypeError(`${fn} is not a function`);
+  const arr = this;
+  const result = [];
   for (let i = 0; i < arr.length; i++) {
-    const value = fn.call(Arg, arr[i], i, arr)
-    value && result.push(arr[i])
+    const value = fn.call(Arg, arr[i], i, arr);
+    value && result.push(arr[i]);
   }
-  return result
-}
+  return result;
+};
 ```
 
 ## 手写 find 和 findIndex
@@ -1955,20 +2235,20 @@ Array.prototype.myFilter = function(fn, Arg) {
 Array.prototype.myFind = function(fn, start = 0, end = this.length) {
   for (let i = start; i < end; i++) {
     if (fn.call(this, arr[i], i, this)) {
-      return arr[i]
+      return arr[i];
     }
   }
-}
+};
 
 // findIndex
 Array.prototype.myFindIndex = function(fn, start = 0, end = this.length) {
   for (let i = start; i < end; i++) {
     if (fn.call(this, this[i], i, this)) {
-      return i
+      return i;
     }
   }
-  return -1
-}
+  return -1;
+};
 ```
 
 ## 手写 sleep
@@ -1978,12 +2258,12 @@ Array.prototype.myFindIndex = function(fn, start = 0, end = this.length) {
 ```js
 function sleep(ms) {
   return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
+    setTimeout(resolve, ms);
+  });
 }
 sleep(1000).then(() => {
-  console.log(' end')
-})
+  console.log(" end");
+});
 ```
 
 - async 实现封装
@@ -1991,15 +2271,15 @@ sleep(1000).then(() => {
 ```js
 function sleep(ms) {
   return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-    console.log('start sleep')
-  })
+    setTimeout(resolve, ms);
+    console.log("start sleep");
+  });
 }
 async function test() {
-  await sleep(1000)
-  console.log('sleep end')
+  await sleep(1000);
+  console.log("sleep end");
 }
-test()
+test();
 ```
 
 - 通过 generate 来实现
@@ -2010,13 +2290,13 @@ async await 其实是 generator 的语法糖
 ```js
 function* sleep(ms) {
   yield new Promise((resolve) => {
-    console.log('start sleep')
-    setTimeout(resolve, ms)
-  })
+    console.log("start sleep");
+    setTimeout(resolve, ms);
+  });
 }
 sleep(1000)
   .next()
-  .value.then(() => console.log('sleep end'))
+  .value.then(() => console.log("sleep end"));
 ```
 
 ## 函数柯里化
@@ -2025,27 +2305,27 @@ sleep(1000)
 
 ```js
 function curry(fn, args) {
-  const length = fn.length
-  const args = args || []
+  const length = fn.length;
+  const args = args || [];
   return function() {
-    let newArgs = args.concat(Array.prototype.slice.call(arguments))
+    let newArgs = args.concat(Array.prototype.slice.call(arguments));
     if (newArgs.length < length) {
       // 参数个数不够, 在递归去加参数
-      return curry.call(this, fn, newArgs)
+      return curry.call(this, fn, newArgs);
     } else {
       // 参数个数够了, 就调用这个函数
-      return fn.apply(this, newArgs)
+      return fn.apply(this, newArgs);
     }
-  }
+  };
 }
 
 function multiFn(a, b, c) {
-  console.log(a * b * c)
-  return a * b * c
+  console.log(a * b * c);
+  return a * b * c;
 }
 
-const multi = curry(multiFn)
-multi(2)(3)(4)
+const multi = curry(multiFn);
+multi(2)(3)(4);
 // multi(2, 3, 4)
 // multi(2)(3, 4)
 // multi(2, 3)(4)
@@ -2066,38 +2346,38 @@ ES6 之前模块引入主要是 CommonJS 和 AMD 两种。
 
 ```js
 // 利用 requestAnimationFrame
-const element = document.getElementById('el')
-let start
+const element = document.getElementById("el");
+let start;
 
 function step(timestamp) {
-  if (start === undefined) start = timestamp
-  const elapsed = timestamp - start
+  if (start === undefined) start = timestamp;
+  const elapsed = timestamp - start;
 
-  element.innerText = 10 - Math.floor(elapsed / 1000)
+  element.innerText = 10 - Math.floor(elapsed / 1000);
   if (parseInt(element.innerText) < 1) {
-    element.innerText = '生日快乐'
+    element.innerText = "生日快乐";
   }
   if (elapsed < 10000) {
     // Stop the animation after 10 seconds
-    window.requestAnimationFrame(step)
+    window.requestAnimationFrame(step);
   }
 }
-window.requestAnimationFrame(step)
+window.requestAnimationFrame(step);
 
 // 利用 setTimeout
 
-let timerId
-let time = 10
+let timerId;
+let time = 10;
 function run() {
-  clearTimeout(timerId)
+  clearTimeout(timerId);
   if (time <= 0) {
-    countdown.innerHTML = '生日快乐'
-    return
+    countdown.innerHTML = "生日快乐";
+    return;
   }
-  countdown.innerHTML = time--
-  timerId = setTimeout(run, 1000)
+  countdown.innerHTML = time--;
+  timerId = setTimeout(run, 1000);
 }
-run()
+run();
 ```
 
 ## XMLHttpRequest 和 JSONP 应用场景和错误处理
