@@ -967,6 +967,8 @@ Array.isArray(arr);
 
 ## 手写一个 Promise(高级前端)
 
+### 符合 PromiseA+规范的 Promise(ES6 实现)
+
 - 解决 fulfill: 指一个 promise 成功时进行的一系列操作, 状态的改变, 回调的执行
 - 拒绝 reject: 指一个 promise 失败时进行的一系列操作
 - 终值 eventual value: 指的是 promise 被解决时传递给解决回调的值
@@ -977,12 +979,15 @@ Array.isArray(arr);
 - 异常: 适用 throw 语句抛出的一个值
 
 ```js
-class myPromise {
+class Promise {
+  PENDING = "pending";
+  FULFILLED = "fulfilled";
+  REJECTED = "rejected";
+
   constructor(fn) {
-    // 判断参数类型
-    if (typeof fn !== "function") {
-      throw new Error("我需要一个函数");
-    }
+    // if (typeof fn !== 'function') {
+    //   throw new TypeError('except a function params');
+    // }
     // 初始化需要用到的值
     this.initValue();
     // 修改 this 绑定
@@ -998,8 +1003,8 @@ class myPromise {
   initValue() {
     this.value = null;
     this.reason = null;
-    this.state = "padding";
-    // 下面两个变量是为了异步中套异步使得状态为 padding, 将异步方法存起来等下次在调用
+    this.state = this.PENDING;
+    // 下面两个变量是为了异步中套异步使得状态为 pending, 将异步方法存起来等下次在调用
     this.resolveCallbacks = [];
     this.rejectCallbacks = [];
   }
@@ -1010,72 +1015,105 @@ class myPromise {
   }
 
   resolve(value) {
-    if (this.state === "padding") {
-      this.state = "fulfilled";
+    if (this.state === this.PENDING) {
+      this.state = this.FULFILLED;
       this.value = value;
-      this.resolveCallbacks.forEach((fn) => fn(this.value));
+      this.resolveCallbacks.forEach((fn) => fn());
     }
   }
 
   reject(reason) {
-    if (this.state === "padding") {
-      this.state = "rejected";
+    if (this.state === this.PENDING) {
+      this.state = this.REJECTED;
       this.reason = reason;
-      this.rejectCallbacks.forEach((fn) => fn(this.reason));
+      this.rejectCallbacks.forEach((fn) => fn());
+    }
+  }
+
+  resolvePromise(promise2, x, resolve, reject) {
+    if (promise2 === x) {
+      reject(new TypeError("Chaining cycle"));
+    }
+    if ((x && typeof x === "object") || typeof x === "function") {
+      let used;
+      try {
+        const then = x.then;
+        if (typeof then === "function") {
+          then.call(
+            x,
+            (y) => {
+              if (used) return;
+              used = true;
+              this.resolvePromise(promise2, y, resolve, reject);
+            },
+            (r) => {
+              if (used) return;
+              used = true;
+              reject(r);
+            }
+          );
+        } else {
+          if (used) return;
+          used = true;
+          resolve(x);
+        }
+      } catch (e) {
+        if (used) return;
+        used = true;
+        reject(e);
+      }
+    } else {
+      resolve(x);
     }
   }
 
   then(onFulfilled, onRejected) {
-    if (typeof onFulfilled !== "function") {
-      onFulfilled = function(value) {
-        return value;
-      };
-    }
-    if (typeof onRejected !== "function") {
-      onRejected = function(reason) {
-        throw reason;
-      };
-    }
+    onFulfilled =
+      typeof onFulfilled === "function" ? onFulfilled : (value) => value;
+    onRejected =
+      typeof onRejected === "function"
+        ? onRejected
+        : (reason) => {
+            throw reason;
+          };
     // 实现链式调用
-    return new myPromise((resolve, reject) => {
-      if (this.state === "fulfilled") {
+    const promise2 = new Promise((resolve, reject) => {
+      if (this.state === this.FULFILLED) {
         setTimeout(() => {
           try {
             const x = onFulfilled(this.value);
-            resolve(x);
+            this.resolvePromise(promise2, x, resolve, reject);
           } catch (e) {
             reject(e);
           }
         });
-      }
-      if (this.state === "rejected") {
+      } else if (this.state === this.REJECTED) {
         setTimeout(() => {
           try {
             const x = onRejected(this.reason);
-            resolve(x);
+            this.resolvePromise(promise2, x, resolve, reject);
           } catch (e) {
             reject(e);
           }
         });
-      }
-      // 当异步中还有异步状态可能就来不及更新为 padding 所以把所有的方法存到数组内, 下次调用在执行
-      // 比如在Promise加入setTimeout, 在setTimeout中在执行resolve, 这样如果在resolve之前执行then, 那么状态就是padding, 会拿不到想要的结果, 存储调用方法会避免这种情况发生
-      if (this.state === "padding") {
-        this.resolveCallbacks.push((value) => {
+      } else if (this.state === this.PENDING) {
+        // 当异步中还有异步状态可能就来不及更新为 padding 所以把所有的方法存到数组内, 下次调用在执行
+        // 比如在Promise加入setTimeout, 在setTimeout中在执行resolve, 这样如果在resolve之前执行then, 那么状态就是padding, 会拿不到想要的结果, 存储调用方法会避免这种情况发生
+        this.resolveCallbacks.push(() => {
           setTimeout(() => {
             try {
-              const x = onFulfilled(value);
-              resolve(x);
+              const x = onFulfilled(this.value);
+              this.resolvePromise(promise2, x, resolve, reject);
             } catch (e) {
               reject(e);
             }
           });
         });
-        this.rejectCallbacks.push((reason) => {
+        this.rejectCallbacks.push(() => {
           setTimeout(() => {
             try {
-              const x = onRejected(reason);
-              resolve(x);
+              const x = onRejected(this.reason);
+              this.resolvePromise(promise2, x, resolve, reject);
             } catch (e) {
               reject(e);
             }
@@ -1083,11 +1121,12 @@ class myPromise {
         });
       }
     });
+    return promise2;
   }
 }
 ```
 
-### 符合 PromiseA+规范的 Promise
+### 符合 PromiseA+规范的 Promise(ES5 实现)
 
 ```js
 /**
@@ -1297,7 +1336,7 @@ Promise.prototype.finally = function(callback) {
   );
 };
 
-// Promise.all 
+// Promise.all
 // Promise.all(promises) 返回一个promise对象
 // 1. 如果传入的参数是一个空的可迭代对象，那么此promise对象回调完成(resolve),只有此情况，是同步执行的，其它都是异步返回的。
 // 2. 如果传入的参数不包含任何 promise，则返回一个异步完成.
