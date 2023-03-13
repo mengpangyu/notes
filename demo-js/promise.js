@@ -1,7 +1,8 @@
+// ES6实现
 class Promise {
-  PENDING = 'pending';
-  FULFILLED = 'fulfilled';
-  REJECTED = 'rejected';
+  PENDING = "pending";
+  FULFILLED = "fulfilled";
+  REJECTED = "rejected";
 
   constructor(fn) {
     // if (typeof fn !== 'function') {
@@ -50,45 +51,36 @@ class Promise {
   }
 
   resolvePromise(promise2, x, resolve, reject) {
-    let self = this;
     if (promise2 === x) {
-      reject(new TypeError('Chaining cycle'));
+      reject(new TypeError("Chaining cycle"));
     }
-    if ((x && typeof x === 'object') || typeof x === 'function') {
+    if ((x && typeof x === "object") || typeof x === "function") {
       let used;
       try {
         const then = x.then;
-        if (typeof then === 'function') {
+        if (typeof then === "function") {
           then.call(
             x,
             (y) => {
-              if (used) {
-                return;
-              }
+              if (used) return;
               used = true;
               this.resolvePromise(promise2, y, resolve, reject);
             },
             (r) => {
-              if (used) {
-                return;
-              }
+              if (used) return;
               used = true;
               reject(r);
             }
           );
         } else {
-          if (used) {
-            return;
-          }
+          if (used) return;
           used = true;
           resolve(x);
         }
       } catch (e) {
-        if (used) {
-          return;
-        }
+        if (used) return;
         used = true;
-        resolve(e);
+        reject(e);
       }
     } else {
       resolve(x);
@@ -96,9 +88,10 @@ class Promise {
   }
 
   then(onFulfilled, onRejected) {
-    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : (value) => value;
+    onFulfilled =
+      typeof onFulfilled === "function" ? onFulfilled : (value) => value;
     onRejected =
-      typeof onRejected === 'function'
+      typeof onRejected === "function"
         ? onRejected
         : (reason) => {
             throw reason;
@@ -152,6 +145,52 @@ class Promise {
   }
 }
 
+
+
+
+// 有专门的测试脚本可以测试所编写的代码是否符合PromiseA+的规范。
+
+// 首先，在promise实现的代码中，增加以下代码:
+
+// Promise.defer = Promise.deferred = function () {
+//     let dfd = {};
+//     dfd.promise = new Promise((resolve, reject) => {
+//         dfd.resolve = resolve;
+//         dfd.reject = reject;
+//     });
+//     return dfd;
+// }
+// 安装测试脚本:
+
+// npm install -g promises-aplus-tests
+// 如果当前的promise源码的文件名为promise.js
+
+// 那么在对应的目录执行以下命令:
+
+// promises-aplus-tests promise.js
+// promises-aplus-tests中共有872条测试用例。以上代码，可以完美通过所有用例。
+
+// 对上面的代码实现做一点简要说明(其它一些内容注释中已经写得很清楚):
+
+// onFulfilled 和 onFulfilled的调用需要放在setTimeout，因为规范中表示: onFulfilled or onRejected must not be called until the execution context stack contains only platform code。使用setTimeout只是模拟异步，原生Promise并非是这样实现的。
+
+// 在 resolvePromise 的函数中，为何需要usedd这个flag,同样是因为规范中明确表示: If both resolvePromise and rejectPromise are called, or multiple calls to the same argument are made, the first call takes precedence, and any further calls are ignored. 因此我们需要这样的flag来确保只会执行一次。
+
+// self.onFulfilled 和 self.onRejected 中存储了成功的回调和失败的回调，根据规范2.6显示，当promise从pending态改变的时候，需要按照顺序去指定then对应的回调。
+
+Promise.defer = Promise.deferred = function() {
+  let dfd = {};
+  dfd.promise = new Promise((resolve, reject) => {
+    dfd.resolve = resolve;
+    dfd.reject = reject;
+  });
+  return dfd;
+};
+
+module.exports = Promise;
+
+
+// ES5实现
 // /**
 //  * 1. new Promise时，需要传递一个 executor 执行器，执行器立刻执行
 //  * 2. executor 接受两个参数，分别是 resolve 和 reject
@@ -308,15 +347,3 @@ class Promise {
 //     resolve(x);
 //   }
 // }
-
-Promise.defer = Promise.deferred = function () {
-  let dfd = {};
-  dfd.promise = new Promise((resolve, reject) => {
-      dfd.resolve = resolve;
-      dfd.reject = reject;
-  });
-  return dfd;
-}
-
-module.exports = Promise;
-
