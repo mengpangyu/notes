@@ -2357,8 +2357,8 @@ sleep(1000)
 
 ```js
 function curry(fn, args) {
-  const length = fn.length;
-  const args = args || [];
+  const length = fn.length; // 函数的length表示参数个数
+  args = args || [];
   return function() {
     let newArgs = args.concat(Array.prototype.slice.call(arguments));
     if (newArgs.length < length) {
