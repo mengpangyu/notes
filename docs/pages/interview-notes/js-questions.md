@@ -2070,7 +2070,7 @@ Node 11 之后: 和浏览器行为统一, 执行一个宏任务就执行完微�
 
 ```js
 const jsonp = ({ url, params, callbackName }) => {
-  const generateURL = (url, callback) => {
+  const generateURL = (url, params, callback) => {
     let dataStr = "";
     for (let key in params) {
       dataStr += `${key}=${params[key]}&`;
@@ -2099,7 +2099,7 @@ const jsonp = ({ url, params, callbackName }) => {
 };
 const res = jsonp({
   url: "http://localhost:3000/",
-  params: "",
+  params: {},
   callbackName: "meng",
 });
 console.log(res);
