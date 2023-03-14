@@ -2232,19 +2232,19 @@ Array.prototype.myReduce = function(fn, base) {
 
 ```js
 // 利用 reduce, 传入初始值, index 就为 0, 那么就可以从 0 开始遍历数组, Arg 是 map 第二个参数, 表示回调 fn 时候的 this
-Array.prototype.myMap1 = function(fn, Arg) {
+Array.prototype.myMap1 = function(fn, context) {
   var res = [];
   this.reduce((prev, curr, index, array) => {
-    res.push(fn.call(Arg, curr, index, array));
+    res.push(fn.call(context, curr, index, array));
   }, 0);
   return res;
 };
 
 // 利用 for 循环直接实现 map 遍历且返回新的数组
-Array.prototype.myMap2 = function(fn) {
+Array.prototype.myMap2 = function(fn, context) {
   var newArr = [];
   for (var i = 0; i < this.length; i++) {
-    newArr.push(fn(this[i], i, this)); //this指向调用newMap方法的数组
+    newArr.push(fn.call(context, this[i], i, this)); //this指向调用newMap方法的数组
   }
   return newArr;
 };
