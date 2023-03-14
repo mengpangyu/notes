@@ -2366,7 +2366,7 @@ function curry(fn, args) {
       return curry.call(this, fn, newArgs);
     } else {
       // 参数个数够了, 就调用这个函数
-      return fn.apply(this, newArgs);
+      return fn.apply(this, newArgs); // apply会把数组转为单个得参数传给函数, 类似扩展运算符 ...newArgs
     }
   };
 }
