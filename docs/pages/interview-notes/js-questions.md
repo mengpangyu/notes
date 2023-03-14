@@ -2255,9 +2255,11 @@ Array.prototype.myMap2 = function(fn, context) {
 ```js
 // value 为填充值, start 开始索引, end 结束索引
 Array.prototype.myFill = function(value, start = 0, end = this.length) {
+  if (value === undefined) return this;
   for (let i = start; i < end; i++) {
     this[i] = value;
   }
+  return this;
 };
 ```
 
