@@ -2282,18 +2282,20 @@ Array.prototype.myFilter = function(fn, Arg) {
 
 ```js
 // find
-Array.prototype.myFind = function(fn, start = 0, end = this.length) {
-  for (let i = start; i < end; i++) {
-    if (fn.call(this, arr[i], i, this)) {
+Array.prototype.myFind = function(fn, context) {
+  const arr = this
+  for (let i = 0; i < arr.length; i++) {
+    if (fn.call(context, arr[i], i, arr)) {
       return arr[i];
     }
   }
 };
 
 // findIndex
-Array.prototype.myFindIndex = function(fn, start = 0, end = this.length) {
-  for (let i = start; i < end; i++) {
-    if (fn.call(this, this[i], i, this)) {
+Array.prototype.myFindIndex = function(fn, context) {
+  const arr = this
+  for (let i = 0; i < arr.length; i++) {
+    if (fn.call(context, arr[i], i, arr)) {
       return i;
     }
   }
