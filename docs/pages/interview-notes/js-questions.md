@@ -2070,17 +2070,21 @@ Node 11 之后: 和浏览器行为统一, 执行一个宏任务就执行完微�
 
 ```js
 const jsonp = ({ url, params, callbackName }) => {
-  const generateURL = () => {
+  const generateURL = (url, callback) => {
     let dataStr = "";
     for (let key in params) {
       dataStr += `${key}=${params[key]}&`;
     }
-    dataStr += `callback=${callbackName}`;
+    dataStr += `callback=${callback}`;
     return `${url}?${dataStr}`;
   };
   return new Promise((resolve, reject) => {
     // 初始化回调函数名称
-    callbackName = callbackName || Math.random().toString().replace(".", "");
+    callbackName =
+      callbackName ||
+      Math.random()
+        .toString()
+        .replace(".", "");
     // 创建 script 元素并加入到当前文档中
     let scriptEle = document.createElement("script");
     scriptEle.src = generateURL();
