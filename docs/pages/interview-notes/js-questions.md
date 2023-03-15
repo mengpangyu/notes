@@ -2403,14 +2403,13 @@ let start;
 
 function step(timestamp) {
   if (start === undefined) start = timestamp;
-  const elapsed = timestamp - start;
+  const pastTime = timestamp - start;
 
-  element.innerText = 10 - Math.floor(elapsed / 1000);
-  if (parseInt(element.innerText) < 1) {
-    element.innerText = "生日快乐";
-  }
-  if (elapsed < 10000) {
-    // Stop the animation after 10 seconds
+  const showValue = 10 - Math.floor(pastTime / 1000);
+  element.innerText = showValue < 1 ? "生日快乐" : showValue;
+
+  // 10秒后停止
+  if (pastTime < 10000) {
     window.requestAnimationFrame(step);
   }
 }
