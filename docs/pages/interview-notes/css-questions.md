@@ -295,7 +295,7 @@
 </html>
 ```
 
-**深入问题:** 为什么 CSS 水平居中容易实现, 二垂直居中不容易实现
+**深入问题:** 为什么 CSS 水平居中容易实现, 垂直居中不容易实现
 
 **解决方案:** CSS 回溯机制
 
@@ -310,7 +310,7 @@
 
 ## BFC 是什么?
 
-- 块级格式化上下文, 普通流, 就是一个封闭的盒子, 里面的元素无论怎么动就不会影响外面的元素
+- 块级格式化上下文, 普通流, 就是一个封闭的盒子, 里面的元素无论怎么动就不会影响外面的元素, 是页面盒模型布局中的一种 CSS 渲染模式
 
 触发 BFC:
 
@@ -318,7 +318,7 @@
 2. 浮动元素: float 除 none
 3. 绝对定位: position: absolute/fixed
 4. display: inline-block table-cells flex
-5. overflow 除了 visible 以外的值, [为什么不能是 visible](https://stackoverflow.com/questions/9943503/why-does-css2-1-define-overflow-values-other-than-visible-to-establish-a-new-b?answertab=votes#tab-top)
+5. overflow 除了 visible 以外的值(hidden、auto、scroll) [为什么不能是 visible](https://stackoverflow.com/questions/9943503/why-does-css2-1-define-overflow-values-other-than-visible-to-establish-a-new-b?answertab=votes#tab-top)
 
 BFC 特性及应用
 
@@ -355,6 +355,12 @@ BFC 特性及应用
 </html>
 ```
 
+> 扩展
+>
+> - IFC（Inline formatting contexts）：内联格式上下文
+> - GFC（GrideLayout formatting contexts）：网格布局格式化上下文
+> - FFC（Flex formatting contexts）:自适应格式上下文
+
 ## CSS 选择器优先级?
 
 1. 越具体优先级越高
@@ -366,11 +372,11 @@ BFC 特性及应用
 - 法一: clear 属性的空元素, 在元素最后加一个空 div, 加上样式, clear: both: 属性指定一个元素是否必须移动(清除浮动后)到在它之前的浮动元素下面, 在最底层加一个空的有高度的 div, 利用 clear: both 实现浮动
 - 法二: 浮动元素加 overflow 属性
 - 法三: 浮动元素的容器添加浮动
-- 法四: 伪元素 .clearfix 添加到父容器上, 子元素会自动清除浮动, 伪类元素也是和法一同理
+- 法四: 伪元素 添加到父容器上,.clearfix 子元素会自动清除浮动, 伪类元素也是和法一同理
 
 ```css
 .clearfix:after {
-  content: ''; /* 伪类元素内容为空 */
+  content: ""; /* 伪类元素内容为空 */
   height: 0;
   display: block; /* 因为block元素才能有高度 */
   clear: both;
@@ -673,9 +679,9 @@ DOM 的变化影响到了宽高, 浏览器重新计算元素的几何属性, 其
 > 减少重绘重排的方法有
 
 - 不在布局信息改变时做 DOM 查询
-- 使用 csstext, className 一次性改变属性
-- 使用 fragment
-- 对于多次重排的元素, 比如说使用动画, 使用决定定位, 使其不受其他元素影响
+- 使用 [cssText 行内样式](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration/cssText), className 一次性改变属性
+- 使用 [fragment](https://developer.mozilla.org/zh-CN/docs/Web/API/DocumentFragment), 可以理解为虚拟 dom, 等元素操作完成后, 再 append 到真实 dom 中
+- 对于多次重排的元素, 比如说使用动画, 使用绝对定位, 使其不受其他元素影响
 
 ## src 和 href 的区别
 
@@ -690,6 +696,9 @@ src 用于替代这个元素, href 用于建立这个标签与外部资源的联
 1. display: none (不占空间, 不能点击)(场景, 显示出原来这里不存在的结构)
 2. visibility: hidden (占据空间, 不能点击)(场景, 显示不会导致页面结构发生变动, 不会撑开)
 3. opacity: 0 (占据空间, 可以点击)(场景, 可以根据 transition 搭配)
+
+opacity:0 和 display:none，若父节点元素应用了 opacity:0 和 display:none，无论其子孙元素如何挣扎都不会再出现在大众视野；
+而若父节点元素应用 visibility:hidden，子孙元素应用 visibility:visible，那么其就会毫无意外的显现出来。
 
 ## css 可继承属性
 
