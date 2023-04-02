@@ -1,5 +1,234 @@
 # JavaScript 技巧
 
+## JS 异步解决方案的发展历程以及优缺点
+
+1. 回调函数（callback）
+
+```js
+ajax("XXX1", () => {
+  // callback 函数体
+  ajax("XXX2", () => {
+    // callback 函数体
+    ajax("XXX3", () => {
+      // callback 函数体
+    });
+  });
+});
+```
+
+- 优点：解决了同步的问题（只要有一个任务耗时很长，后面的任务都必须排队等着，会拖延整个程序的执行。）
+- 缺点：回调地狱，不能用 try catch 捕获错误，不能 return
+
+1. Promise
+
+```js
+ajax("XXX1")
+  .then((res) => {
+    // 操作逻辑
+    return ajax("XXX2");
+  })
+  .then((res) => {
+    // 操作逻辑
+    return ajax("XXX3");
+  })
+  .then((res) => {
+    // 操作逻辑
+  });
+```
+
+- 优点：解决了回调地狱的问题
+- 缺点：无法取消 Promise ，错误需要通过回调函数来捕获
+
+3. Generator
+
+```js
+function* fetch() {
+  yield ajax("XXX1", () => {});
+  yield ajax("XXX2", () => {});
+  yield ajax("XXX3", () => {});
+}
+let it = fetch();
+let result1 = it.next();
+let result2 = it.next();
+let result3 = it.next();
+```
+
+- 特点：可以控制函数的执行，可以配合 co 函数库使用
+
+4. Async/await
+
+```js
+async function test() {
+  // 以下代码没有依赖性的话，完全可以使用 Promise.all 的方式
+  // 如果有依赖性的话，其实就是解决回调地狱的例子了
+  await fetch("XXX1");
+  await fetch("XXX2");
+  await fetch("XXX3");
+}
+```
+
+- 优点是：代码清晰，不用像 Promise 写一大堆 then 链，处理了回调地狱的问题
+- 缺点：await 将异步代码改造成同步代码，如果多个异步操作没有依赖性而使用 await 会导致性能上的降低。
+
+## 请写出代码的运行结果
+
+```js
+//请写出输出内容
+async function async1() {
+  console.log("async1 start");
+  await async2();
+  console.log("async1 end");
+}
+async function async2() {
+  console.log("async2");
+}
+
+console.log("script start");
+
+setTimeout(function() {
+  console.log("setTimeout");
+}, 0);
+
+async1();
+
+new Promise(function(resolve) {
+  console.log("promise1");
+  resolve();
+}).then(function() {
+  console.log("promise2");
+});
+console.log("script end");
+
+/*
+script start
+async1 start
+async2
+promise1
+script end
+async1 end
+promise2
+setTimeout
+*/
+```
+
+- JS 分为同步任务和异步任务
+- 同步任务都在主线程上执行，形成一个执行栈
+- 主线程之外，事件触发线程管理着一个任务队列，只要异步任务有了运行结果，就在任务队列之中放置一个事件。
+- 一旦执行栈中的所有同步任务执行完毕（此时 JS 引擎空闲），系统就会读取任务队列，将可运行的异步任务添加到可执行栈中，开始执行。
+
+:::tip
+await 是一个让出线程的标志。await 后面的表达式会先执行一遍，将 await 后面的代码加入到 microtask 中，然后就会跳出整个 async 函数来执行后面的代码。
+
+```js
+async function async1() {
+  console.log("async1 start");
+  await async2();
+  console.log("async1 end");
+}
+
+// 等价于
+
+async function async1() {
+  console.log("async1 start");
+  Promise.resolve(async2()).then(() => {
+    console.log("async1 end");
+  });
+}
+```
+
+:::
+
+## var、let 和 const 区别的实现原理是什么?
+
+- var 的话会直接在栈内存里预分配内存空间，然后等到实际语句执行的时候，再存储对应的变量，如果传的是引用类型，那么会在堆内存里开辟一个内存空间存储实际内容，栈内存会存储一个指向堆内存的指针
+- let 的话，是不会在栈内存里预分配内存空间，而且在栈内存分配变量时，做一个检查，如果已经有相同变量名存在就会报错
+- const 的话，也不会预分配内存空间，在栈内存分配变量时也会做同样的检查。不过 const 存储的变量是不可修改的，对于基本类型来说你无法修改定义的值，对于引用类型来说你无法修改栈内存里分配的指针，但是你可以修改指针指向的对象里面的属性
+
+## 箭头函数与普通函数（function）的区别是什么？构造函数（function）可以使用 new 生成实例，那么箭头函数可以吗？为什么？
+
+引入箭头函数有两个方面的作用：更简短的函数并且不绑定 this。箭头函数与普通函数不同之处有：
+
+- 箭头函数没有 this，它会从自己的作用域链的上一层继承 this（因此无法使用 apply / call / bind 进行绑定 this 值）；
+- 不绑定 arguments，当在箭头函数中调用 aruguments 时同样会向作用域链中查询结果；
+- 不绑定 super 和 new.target；
+- 没有 prototype 属性，即指向 undefined；
+- 无法使用 new 实例化对象，因为普通构造函数通过 new 实例化对象时 this 指向实例对象，而箭头函数没有 this 值，同时 箭头函数也没有 prototype。
+
+## 介绍模块化发展历程
+
+模块化主要是用来抽离公共代码，隔离作用域，避免变量冲突等。
+
+- IIFE： 使用自执行函数来编写模块化，特点：在一个单独的函数作用域中执行代码，避免变量冲突。
+
+```js
+(function() {
+  return {
+    data: [],
+  };
+})();
+```
+
+- AMD： 使用 requireJS 来编写模块化，特点：依赖必须提前声明好。
+
+```js
+define("./index.js", function(code) {
+  // code 就是index.js 返回的内容
+});
+```
+
+- CMD： 使用 seaJS 来编写模块化，特点：支持动态引入依赖文件。
+
+```js
+define(function(require, exports, module) {
+  var indexCode = require("./index.js");
+});
+```
+
+- CommonJS： nodejs 中自带的模块化。
+
+```js
+var fs = require("fs");
+```
+
+- UMD：兼容 AMD，CommonJS 模块化语法。
+
+webpack(require.ensure)：webpack 2.x 版本中的代码分割。
+
+- ES Modules： ES6 引入的模块化，支持 import 来引入另一个 js 。
+
+```js
+import a from "a";
+```
+
+## ['1', '2', '3'].map(parseInt) what & why ?
+
+答案: [1, NaN, NaN]
+
+parseInt() 函数解析一个字符串参数，并返回一个指定基数的整数 (数学系统的基础)。
+
+```js
+const intValue = parseInt(string[, radix]);
+```
+
+string 要被解析的值。如果参数不是一个字符串，则将其转换为字符串(使用 ToString 抽象操作)。字符串开头的空白符将会被忽略。
+
+radix 一个介于 2 和 36 之间的整数(数学系统的基础)，表示上述字符串的基数。默认为 10。
+返回值 返回一个整数或 NaN
+
+```js
+parseInt(100); // 100
+parseInt(100, 10); // 100
+parseInt(100, 2); // 4 -> converts 100 in base 2 to base 10
+```
+
+:::tip
+在 radix 为 undefined，或者 radix 为 0 或者没有指定的情况下，JavaScript 作如下处理：
+
+- 如果字符串 string 以"0x"或者"0X"开头, 则基数是 16 (16 进制).
+- 如果字符串 string 以"0"开头, 基数是 8（八进制）或者 10（十进制），那么具体是哪个基数由实现环境决定。ECMAScript 5 规定使用 10，但是并不是所有的浏览器都遵循这个规定。因此，永远都要明确给出 radix 参数的值。
+- 如果字符串 string 以其它任何值开头，则基数是 10 (十进制)。
+  :::
+
 ## ES 6 语法知道哪些?
 
 举例法
@@ -1423,7 +1652,7 @@ Cat.prototype = new Animal();
 Cat.prototype.name = "cat";
 ```
 
-利用 new 继承, 基于原型链, 既是父类的实例, 也是子类的实例, 无法实现多继承
+利用 new 继承, 基于原型链, 既是父类的实例, 也是子类的实例
 
 ### 构造继承
 
@@ -1501,6 +1730,40 @@ function Cat() {
 ```
 
 这种方法较为推荐
+
+## ES5/ES6 的继承除了写法以外还有什么区别？
+
+1. class 声明会提升，但不会初始化赋值。Foo 进入暂时性死区，类似于 let、const 声明变量。
+2. class 声明内部会启用严格模式。
+3. class 的所有方法（包括静态方法和实例方法）都是不可枚举的。
+4. class 的所有方法（包括静态方法和实例方法）都没有原型对象 prototype，所以也没有[[construct]]，不能使用 new 来调用。
+5. 必须使用 new 调用 class。
+6. class 内部无法重写类名。
+
+```js
+class Super {}
+class Sub extends Super {}
+
+const sub = new Sub();
+
+Sub.__proto__ === Super;
+```
+
+子类可以直接通过 **proto** 寻址到父类。
+
+```js
+function Super() {}
+function Sub() {}
+
+Sub.prototype = new Super();
+Sub.prototype.constructor = Sub;
+
+var sub = new Sub();
+
+Sub.__proto__ === Function.prototype;
+```
+
+而通过 ES5 的方式，Sub.**proto** === Function.prototype
 
 ## 说说前端事件流
 
@@ -2283,7 +2546,7 @@ Array.prototype.myFilter = function(fn, Arg) {
 ```js
 // find
 Array.prototype.myFind = function(fn, context) {
-  const arr = this
+  const arr = this;
   for (let i = 0; i < arr.length; i++) {
     if (fn.call(context, arr[i], i, arr)) {
       return arr[i];
@@ -2293,7 +2556,7 @@ Array.prototype.myFind = function(fn, context) {
 
 // findIndex
 Array.prototype.myFindIndex = function(fn, context) {
-  const arr = this
+  const arr = this;
   for (let i = 0; i < arr.length; i++) {
     if (fn.call(context, arr[i], i, arr)) {
       return i;
