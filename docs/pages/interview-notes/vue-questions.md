@@ -4,10 +4,21 @@
 
 - 思路: 先翻译单词, 在阐述作用, 最后强行找不同
 - 要点:
+
   - computed 和 methods 相比
     - **computed 有缓存**, 如果 computed 属性依赖没有变化, 那么 computed 属性就不会重新计算, methods 则是看到一次计算一次
   - watch 和 computed 相比
+
     - computed 是计算出一个属性, 而 watch 则可能是做**别的事情(如上报数据)**
+
+:::tip
+计算属性是由 data 中的已知值，得到的一个新值。 这个新值只会根据已知值的变化而变化，其他不相关的数据的变化不会影响该新值。 计算属性不在 data 中，计算属性新值的相关已知值在 data 中。 别人变化影响我自己。 watch：监听数据的变化
+
+监听 data 中数据的变化 监听的数据就是 data 中的已知值 我的变化影响别人
+
+1.watch 擅长处理的场景：一个数据影响多个数据
+2.computed 擅长处理的场景：一个数据受多个数据影响
+:::
 
 ## Vue 有哪些生命周期钩子函数? 分别有什么用?
 
@@ -140,9 +151,9 @@ v-model 就是双向绑定
 
 1. Object.definedProperty 无法监控到数组下标变化, 导致通过数组下标添加元素, 不能实现响应
 2. Object.definedProperty 只能劫持对象的属性, 从而需要对每个对象, 每个属性进行遍历, 如果属性值是对象, 还需要深度遍历,
-   Proxy 可以劫持整个对象, 并返回一个新对象
-3. Proxy 不仅可以代理对象, 还可以代理数组, 还可以代理动态增加的属性
-4. Proxy 作为新标准收到浏览器厂商的重点持续性能优化, 也就是传说中的新标准的性能红利
+3. Proxy 可以劫持整个对象, 并返回一个新对象
+4. Proxy 不仅可以代理对象, 还可以代理数组, 还可以代理动态增加的属性
+5. Proxy 作为新标准收到浏览器厂商的重点持续性能优化, 也就是传说中的新标准的性能红利
 
 ## 双向绑定和 Vuex 是否冲突
 
@@ -195,15 +206,13 @@ v-model 就是双向绑定
 ## nextTick 原理
 
 在改变 state 的时候不会立即改变, 而是进入一个队列里, 然后把重复的操作去掉, 然后把最后的结果 push 进去
-nextTick 后就可以看到改变的新 state
+nextTick 后就可以看到改变的新 state, 内部使用 setImmediate, channelMessage, promise, setTimeout 实现
 
 ## v-if, v-show, v-html 的原理是什么, 它是如何封装的?
 
-v-if 会调用 addIfCondition 方法, 生成 vnode 的时候会忽略对应节点, render 就不会渲染
-
-v-show 会生成 vnode, render 的时候也会渲染成真实节点, 只是在 render 过程中在节点的属性修改 show 属性值, 也就是常说的 display
-
-v-html 通过 addProp 添加 innerHtml 属性, 归根结底设置 innerHtml 为 v-html 的值
+- v-if 会调用 addIfCondition 方法, 生成 vnode 的时候会忽略对应节点, render 就不会渲染
+- v-show 会生成 vnode, render 的时候也会渲染成真实节点, 只是在 render 过程中在节点的属性修改 show 属性值, 也就是常说的 display
+- v-html 通过 addProp 添加 innerHtml 属性, 归根结底设置 innerHtml 为 v-html 的值
 
 ## 对 SPA 的理解, 优缺点
 

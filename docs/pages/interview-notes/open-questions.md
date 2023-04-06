@@ -73,7 +73,7 @@ secure 这个属性告诉浏览器尽在请求为 https 的时候发送 Cookie
 ### 代码
 
 ```js
-;[1, 2, 3].map(parseInt) // 1 NaN NaN
+[1, 2, 3].map(parseInt); // 1 NaN NaN
 ```
 
 :::danger 危险
@@ -89,8 +89,8 @@ parInt('3',2)
 ### 代码
 
 ```js
-var a = { name: 'a' }
-a.x = a = {}
+var a = { name: "a" };
+a.x = a = {};
 // a.x = undefined
 ```
 
@@ -104,24 +104,24 @@ a.x = a = {}
 let a = {
   value: 1,
   valueOf() {
-    return this.value++
+    return this.value++;
   },
-}
-a == 1 && a == 2 && a == 3 // true
+};
+a == 1 && a == 2 && a == 3; // true
 ```
 
 - 利用 a 会读取 window.a 的特性
 
 ```js
-var value = 1
-Object.defineProperty(window, 'a', {
+var value = 1;
+Object.defineProperty(window, "a", {
   get() {
-    return value++
+    return value++;
   },
-})
-a == 1 && a == 2 && a == 3 // true
+});
+a == 1 && a == 2 && a == 3; // true
 // 或者
-a === 1 && a === 2 && a === 3 // true
+a === 1 && a === 2 && a === 3; // true
 ```
 
 ## 超纲题
@@ -140,8 +140,8 @@ a === 1 && a === 2 && a === 3 // true
 
 ```js
 let user = {
-  name: 'John',
-}
+  name: "John",
+};
 ```
 
 ![单个对象引用](./image/open-questions-3.png)
@@ -149,7 +149,7 @@ let user = {
 当把 user 重写
 
 ```js
-user = null
+user = null;
 ```
 
 ![单个对象引用改变](./image/open-questions-4.png)
@@ -158,10 +158,10 @@ user = null
 
 ```js
 let user = {
-  name: 'John',
-}
+  name: "John",
+};
 
-let admin = user
+let admin = user;
 ```
 
 ![多个对象引用](./image/open-questions-5.png)
@@ -169,7 +169,7 @@ let admin = user
 当把 user 重写
 
 ```js
-user = null
+user = null;
 ```
 
 这样的话, 对象还是存在的, 它还被 admin 引用的, 所以不会被垃圾回收
@@ -178,23 +178,23 @@ user = null
 
 ```js
 function marry(man, woman) {
-  woman.husband = man
-  man.wife = woman
+  woman.husband = man;
+  man.wife = woman;
 
   return {
     father: man,
     mother: woman,
-  }
+  };
 }
 
 let family = marry(
   {
-    name: 'John',
+    name: "John",
   },
   {
-    name: 'Ann',
+    name: "Ann",
   }
-)
+);
 ```
 
 ![引用环](./image/open-questions-6.png)
@@ -202,8 +202,8 @@ let family = marry(
 去除两个引用
 
 ```js
-delete family.father
-delete family.mother.husband
+delete family.father;
+delete family.mother.husband;
 ```
 
 ![引用环去除](./image/open-questions-7.png)
@@ -217,7 +217,7 @@ delete family.mother.husband
 继续引用环的代码
 
 ```js
-family = null
+family = null;
 ```
 
 ![引用环的孤岛](./image/open-questions-9.png)
@@ -251,9 +251,9 @@ family = null
 > 前端的特性: 有 DOM 进程和 JS 进程, 如果把 DOM 元素指为 null, 那么也应该删除 DOM 元素
 
 ```js
-div.remove()
-div.onclick = null // 这句兼容 IE
-div = null
+div.remove();
+div.onclick = null; // 这句兼容 IE
+div = null;
 ```
 
 2. 标记压缩算法
@@ -419,14 +419,14 @@ class MyEvent{
 ```js
 // 做咖啡, 做出不同的浓度
 function createCoffee(bean, water) {
-  const obj = new Object()
-  obj.bean = bean
-  obj.water = water
-  obj.thickness = Math.floor(bean / water)
-  return obj
+  const obj = new Object();
+  obj.bean = bean;
+  obj.water = water;
+  obj.thickness = Math.floor(bean / water);
+  return obj;
 }
-const mocha = createCoffee(1, 10)
-const american = createCoffee(2, 5)
+const mocha = createCoffee(1, 10);
+const american = createCoffee(2, 5);
 ```
 
 - 复杂工厂模式
@@ -436,51 +436,51 @@ function Person() {} // 工厂
 
 Person.prototype.make = function(who, ...args) {
   // 制作物品
-  if (typeof this[who] === 'function') {
-    const func = this[who]
+  if (typeof this[who] === "function") {
+    const func = this[who];
     function temp() {}
     // 把工厂对象的原型换到工厂上, 所有的物品都是出自工厂而不是各自的实例
-    temp.prototype = Person.prototype
-    func.prototype = new temp()
-    return new func(...args)
+    temp.prototype = Person.prototype;
+    func.prototype = new temp();
+    return new func(...args);
   }
-}
+};
 
 Person.prototype.extends = function(obj) {
   // 扩展生产线
   for (let key in obj) {
-    this[key] = obj[key]
+    this[key] = obj[key];
   }
-}
+};
 
 Person.prototype.extends({
   boy: function(name) {
-    console.log(`I am a boy and name is ${name}`)
+    console.log(`I am a boy and name is ${name}`);
   },
   girl: function(name) {
-    console.log(`I am a girl and name is ${name}`)
+    console.log(`I am a girl and name is ${name}`);
   },
-})
+});
 
-const person = new Person()
+const person = new Person();
 
-person.make('boy', 'bob')
+person.make("boy", "bob");
 ```
 
 - 单例模式
 
 ```js
 function instanceMode() {
-  let instance = null
+  let instance = null;
   function createInstance() {
-    if (instance) return instance
-    instance = this
-    this.name = 'chauncey'
-    this.age = 11
+    if (instance) return instance;
+    instance = this;
+    this.name = "chauncey";
+    this.age = 11;
   }
-  const p1 = new createInstance()
-  const p2 = new createInstance()
-  console.log(p1 === p2)
+  const p1 = new createInstance();
+  const p2 = new createInstance();
+  console.log(p1 === p2);
 }
 ```
 
@@ -493,31 +493,31 @@ function observerMode() {
     addEvent: function(eventName, callback) {
       // 添加事件
       if (!this.events[eventName]) {
-        this.events[eventName] = []
+        this.events[eventName] = [];
       }
-      const obj = callback
-      this.events[eventName].push(obj)
+      const obj = callback;
+      this.events[eventName].push(obj);
     },
     publishEvent: function(eventName, ...args) {
       // 触发事件
-      if (!this.events[eventName]) throw Error('没有注册此事件')
+      if (!this.events[eventName]) throw Error("没有注册此事件");
       for (let i = 0; i < this.events[eventName].length; i++) {
-        const callback = this.events[eventName][i]
-        callback.call(eventName, eventName, ...args)
+        const callback = this.events[eventName][i];
+        callback.call(eventName, eventName, ...args);
       }
     },
-  }
-  EventBus.addEvent('click', (word) => {
-    console.log('hello', word)
-  })
-  EventBus.addEvent('keyup', (word) => {
-    console.log('hello', word)
-  })
-  EventBus.addEvent('keyup', (word) => {
-    console.log('hello', word)
-  })
-  EventBus.publishEvent('click')
-  EventBus.publishEvent('keyup')
+  };
+  EventBus.addEvent("click", (word) => {
+    console.log("hello", word);
+  });
+  EventBus.addEvent("keyup", (word) => {
+    console.log("hello", word);
+  });
+  EventBus.addEvent("keyup", (word) => {
+    console.log("hello", word);
+  });
+  EventBus.publishEvent("click");
+  EventBus.publishEvent("keyup");
 }
 ```
 
@@ -529,23 +529,23 @@ function observerMode() {
 function strategyMode() {
   const strategy = {
     slow: function() {
-      console.log('慢速')
+      console.log("慢速");
     },
     quick: function() {
-      console.log('快速')
+      console.log("快速");
     },
     normal: function() {
-      console.log('常速')
+      console.log("常速");
     },
-  }
+  };
   function Run(to, from) {
-    this.to = to
-    this.from = from
+    this.to = to;
+    this.from = from;
   }
   Run.prototype.speed = function() {
-    console.log(`${this.from} to ${this.to}`)
-  }
-  const r = new Run(0, 20)
-  r.speed()
+    console.log(`${this.from} to ${this.to}`);
+  };
+  const r = new Run(0, 20);
+  r.speed();
 }
 ```

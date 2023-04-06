@@ -1,12 +1,23 @@
 # React 技巧
 
+## 为什么 Vuex 的 mutation 和 Redux 的 reducer 中不能做异步操作
+
+因为异步操作是成功还是失败不可预测，什么时候进行异步操作也不可预测；当异步操作成功或失败时，如果不 commit(mutation) 或者 dispatch(action)，Vuex 和 Redux 就不能捕获到异步的结果从而进行相应的操作
+
+## 聊聊 Redux 和 Vuex 的设计思想
+
+共同点: 首先两者都是处理全局状态的工具库，大致实现思想都是：全局 state 保存状态---->dispatch(action)
+------>reducer(Vuex 里的 mutation)----> 生成 newState(Vuex 会改变旧 state); 整个状态为同步操作；
+V
+区别: 最大的区别在于处理异步的不同，Vuex 里面多了一步 commit 操作，在 action 之后 commit(mutation)之前处理异步，而 redux 里面则是通过中间件处理
+
 ## 写 React / Vue 项目时为什么要在列表组件中写 key，其作用是什么？
 
-Vue和React采用了diff算法, 但react本身的设计和vue的设计是截然不同的, vue采用了更细粒度的更新组件的方式, 即给每一个属性绑定监听, 而react采用的是自顶向下的更新策略, 每次小的改动都会生成一个新的vdom, 从而进行diff, 如果不写key, 可能就会发生本来应该更新却没有更新的bug
+Vue 和 React 采用了 diff 算法, 但 react 本身的设计和 vue 的设计是截然不同的, vue 采用了更细粒度的更新组件的方式, 即给每一个属性绑定监听, 而 react 采用的是自顶向下的更新策略, 每次小的改动都会生成一个新的 vdom, 从而进行 diff, 如果不写 key, 可能就会发生本来应该更新却没有更新的 bug
 
-这个bug其实与diff算法有关, react团队完全可以写一个没有bug的版本, 但这是一种权衡, 一种性能和方便使用的权衡, 写不写key能够提高性能的根本在于一方面diff算法会优先判断key是否相同, 如果相同则不进行后面的运算, 不需要创建新节点
+这个 bug 其实与 diff 算法有关, react 团队完全可以写一个没有 bug 的版本, 但这是一种权衡, 一种性能和方便使用的权衡, 写不写 key 能够提高性能的根本在于一方面 diff 算法会优先判断 key 是否相同, 如果相同则不进行后面的运算, 不需要创建新节点
 
-> 总结: diff算法在复杂的列表稳定的时候明显提高性能, 因为节点可以复用, 但是对于列表频繁更新的场景, 节点不能重用, 但是diff可以省略一部分逻辑, 因此性能也会变得更好, 两者的性能优化不在同一个维度, 一个是创建和更新节点(渲染器)的优化, 一个是DOM diff算法(核心引擎)的优化
+> 总结: diff 算法在复杂的列表稳定的时候明显提高性能, 因为节点可以复用, 但是对于列表频繁更新的场景, 节点不能重用, 但是 diff 可以省略一部分逻辑, 因此性能也会变得更好, 两者的性能优化不在同一个维度, 一个是创建和更新节点(渲染器)的优化, 一个是 DOM diff 算法(核心引擎)的优化
 
 ## 受控组件与非受控组件
 
@@ -18,20 +29,20 @@ Vue和React采用了diff算法, 但react本身的设计和vue的设计是截然�
 > 受控组件: 输入的值始终都由 React 的 state 驱动
 
 ```jsx harmony
-import { useState } from 'react'
+import { useState } from "react";
 const controlComponent = () => {
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState("");
   const handleChange = (e) => {
-    setInputValue(e.target.value)
-  }
+    setInputValue(e.target.value);
+  };
   return (
     <div>
       <label>
-        <input type='text' value={inputValue} onChange={handleChange} />
+        <input type="text" value={inputValue} onChange={handleChange} />
       </label>
     </div>
-  )
-}
+  );
+};
 ```
 
 input 的值始终都是通过 inputValue 来控制
@@ -39,21 +50,21 @@ input 的值始终都是通过 inputValue 来控制
 > 非受控组件: 表单数据将由 DOM 节点来处理
 
 ```jsx harmony
-import React, { useState } from 'react'
+import React, { useState } from "react";
 const uncontrolComponent = () => {
-  const [inputValue, setInputValue] = useState(React.createRef())
+  const [inputValue, setInputValue] = useState(React.createRef());
   const handleSubmit = (e) => {
-    console.log(inputValue.current.value)
-    e.preventDefault()
-  }
+    console.log(inputValue.current.value);
+    e.preventDefault();
+  };
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        <input type='text' value={inputValue} ref={inputValue} />
+        <input type="text" value={inputValue} ref={inputValue} />
       </label>
     </form>
-  )
-}
+  );
+};
 ```
 
 因为非受控组件将真实数据存在 DOM 节点中, 所以使用非受控组件时, 有时候反而容易同时集成 React 和非 React 代码, 如果
@@ -89,7 +100,7 @@ ajax 放在 componentDidMount
 , 因为他们可以接受任何动态提供的组件, 但不会修改或复制输入组件中的任何行为
 
 ```jsx harmony
-const EnhancedComponent = higherOrderComponent(WrapperedComponent)
+const EnhancedComponent = higherOrderComponent(WrapperedComponent);
 ```
 
 ::: tip 注意
@@ -202,7 +213,7 @@ function makeInsertMarkup(markup, afterNode, toIndex) {
     fromNode: null,
     toIndex: toIndex,
     afterNode: afterNode,
-  }
+  };
 }
 // MOVE_EXISTING
 function makeMove(child, afterNode, toIndex) {
@@ -213,7 +224,7 @@ function makeMove(child, afterNode, toIndex) {
     fromNode: ReactReconciler.getNativeNode(child),
     toIndex: toIndex,
     afterNode: afterNode,
-  }
+  };
 }
 // REMOVE_NODE
 function makeRemove(child, node) {
@@ -224,7 +235,7 @@ function makeRemove(child, node) {
     fromNode: node,
     toIndex: null,
     afterNode: null,
-  }
+  };
 }
 ```
 
@@ -288,12 +299,12 @@ redux 三大原则:
 3. 使用纯函数来执行修改, 为了描述 action 如何修改 state tree, 你需要编写 reducers, 把 reducer 设计成纯函数,
    可以实现时间旅行, 记录/回放或热加载
 
-## React-router 里的 <link> 标签和 <a> 标签有什么区别
+## React-router 里的 link 标签和 a 标签有什么区别
 
 link 源码
 
 ```jsx harmony
-if (_this.props.onClick) _this.props.onClick(event)
+if (_this.props.onClick) _this.props.onClick(event);
 
 if (
   !event.defaultPrevented && // onClick prevented default
@@ -301,17 +312,17 @@ if (
   !_this.props.target && // let browser handle "target=_blank" etc.
   !isModifiedEvent(event) // ignore clicks with modifier keys
 ) {
-  event.preventDefault()
+  event.preventDefault();
 
-  var history = _this.context.router.history
+  var history = _this.context.router.history;
   var _this$props = _this.props,
     replace = _this$props.replace,
-    to = _this$props.to
+    to = _this$props.to;
 
   if (replace) {
-    history.replace(to)
+    history.replace(to);
   } else {
-    history.push(to)
+    history.push(to);
   }
 }
 ```
