@@ -1,6 +1,5 @@
 # CSS 技巧
 
-
 ## 两种盒模型说一下?
 
 每个 HTML 元素都可以看做一个盒子, 盒模型是在设计和布局时使用
@@ -309,11 +308,11 @@
   - justify-content 项目在主轴的对齐方式
   - align-content 项目在交叉轴的对齐方式
 
-## BFC 是什么?
+## 介绍下 BFC?
 
-- 块级格式化上下文, 普通流, 就是一个封闭的盒子, 里面的元素无论怎么动就不会影响外面的元素, 是页面盒模型布局中的一种 CSS 渲染模式
+是什么: 块级格式化上下文, 普通流, 就是一个封闭的盒子, 里面的元素无论怎么动就不会影响外面的元素, 是页面盒模型布局中的一种 CSS 渲染模式
 
-触发 BFC:
+怎么做: 触发 BFC
 
 1. body 根元素
 2. 浮动元素: float 除 none
@@ -321,10 +320,10 @@
 4. display: inline-block table-cells flex
 5. overflow 除了 visible 以外的值(hidden、auto、scroll) [为什么不能是 visible](https://stackoverflow.com/questions/9943503/why-does-css2-1-define-overflow-values-other-than-visible-to-establish-a-new-b?answertab=votes#tab-top)
 
-BFC 特性及应用
+解决了什么问题: BFC 特性及应用
 
-1. 同一个 BFC 下外边距会发生折叠
-2. BFC 可以包含浮动的元素(清除浮动)
+1. 同一个 BFC 下外边距会发生折叠, 防止 margin 合并
+2. BFC 可以包含浮动的元素, 清除浮动
 3. BFC 可以阻止元素被浮动元素覆盖
 4. 独立的容器, 互不相干
 
