@@ -1959,10 +1959,7 @@ Function.prototype.myBind = function() {
   const middleFun = function() {}; // 定义一个空函数来当做中间人, 可以实现继承原型链
   const callback = function() {
     let rest = Array.prototype.slice.call(arguments);
-    return fn.apply(
-      this instanceof context ? this : context,
-      args.concat(rest)
-    ); // 利用 bind 函数的 this 调用 apply 实现委托给上下文
+    return fn.apply(this instanceof fn ? this : context, args.concat(rest)); // 利用 bind 函数的 this 调用 apply 实现委托给上下文
   };
   if (this.prototype) {
     middleFun.prototype = this.prototype;
