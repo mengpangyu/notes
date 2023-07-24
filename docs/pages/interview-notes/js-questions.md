@@ -1922,50 +1922,44 @@ bind 函数可以指定 this 的指向, 可以手写一个 bind 函数
 > ES6 写法
 
 ```js
-Function.prototype.myBind = function(context, ...args) {
-  if (typeof this !== "function") return;
-  let fn = this;
-  return function(...rest) {
-    return fn.apply(context, [...args, ...rest]);
+Function.prototype.es6Bind = function(context, ...args) {
+  if (typeof this !== "function") {
+    throw new TypeError(
+      "Function.prototype.myBind - what is trying to be bound is not callable"
+    );
+  }
+  const fn = this;
+  const midFunc = function() {};
+  const boundFunc = function(...rest) {
+    return fn.apply(this instanceof fn ? this : context, [...args, ...rest]);
   };
+  if (this.prototype) {
+    midFunc.prototype = this.prototype;
+  }
+  boundFunc.prototype = new midFunc();
+  return boundFunc;
 };
 ```
 
 > ES5 写法
 
 ```js
-Function.prototype.myBind = function() {
+Function.prototype.es5Bind = function() {
   if (typeof this !== "function") return;
   let args = Array.prototype.slice.call(arguments); // slice 方法的应用就是实现深拷贝
-  const context = args.splice(0, 1)[0]; // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
+  const context = args.shift(); // 把第一个参数也就是 this 的指向上下文留下
   const fn = this; // bind 把 this 保存
-  return function() {
+  const midFunc = function() {}; // 定义一个空函数来当做中间人, 可以实现继承原型链
+  const boundFunc = function() {
     let rest = Array.prototype.slice.call(arguments);
-    return fn.apply(context, args.concat(rest)); // 利用 bind 函数的 this 调用 apply 实现委托给上下文
-  };
-};
-```
-
-这样写有错误, 需要把原型留下, 因为在 new 的时候会直接走 bind 的 this, 而忽略 new 的 this
-
-修改:
-
-```js
-Function.prototype.myBind = function() {
-  if (typeof this !== "function") return;
-  let args = Array.prototype.slice.call(arguments); // slice 方法的应用就是实现深拷贝
-  const context = args.splice(0, 1)[0]; // 把第一个参数也就是 this 的指向上下文留下, splice 会改变原数组
-  const fn = this; // bind 把 this 保存
-  const middleFun = function() {}; // 定义一个空函数来当做中间人, 可以实现继承原型链
-  const callback = function() {
-    let rest = Array.prototype.slice.call(arguments);
+    // this instanceof fn ? this : context 判断是否构造函数,也就是使用了new
     return fn.apply(this instanceof fn ? this : context, args.concat(rest)); // 利用 bind 函数的 this 调用 apply 实现委托给上下文
   };
   if (this.prototype) {
-    middleFun.prototype = this.prototype;
+    midFunc.prototype = this.prototype;
   }
-  callback.prototype = new middleFun();
-  return callback;
+  boundFunc.prototype = new midFunc();
+  return boundFunc;
 };
 ```
 
