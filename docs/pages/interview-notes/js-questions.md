@@ -2424,15 +2424,17 @@ function instanceOf(left, right) {
 1. 将函数设为对象的属性
 2. 执行并删除这个函数
 3. 指定 this 到这个函数并传入给定参数执行函数
-4. 如果不传参数, 默认为 window
+4. 上下文不存在自动取globalThis
 
 ```js
-Function.prototype.myCall = function(content = window) {
-  content.fn = this;
-  let args = [...arguments].slice(1);
-  let result = content.fn(...args);
-  delete content.fn;
-  return result;
+Function.prototype.myCall = function(context) {
+  context = context ?? globalThis; // globalThis: node为global, web为window
+  const uniqueId = Symbol("uniqueId"); // 创建临时属性, 防止属性覆盖
+  context[uniqueId] = this; // 改变指向
+  const args = Array.from(arguments).slice(1); // 得出剩余的参数
+  const result = context[uniqueId](...args); // 调用得出结果
+  delete context[uniqueId]; // 删除临时属性
+  return result; // 返回结果
 };
 ```
 
