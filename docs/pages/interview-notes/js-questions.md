@@ -2424,7 +2424,7 @@ function instanceOf(left, right) {
 1. 将函数设为对象的属性
 2. 执行并删除这个函数
 3. 指定 this 到这个函数并传入给定参数执行函数
-4. 上下文不存在自动取globalThis
+4. 上下文不存在自动取 globalThis
 
 ```js
 Function.prototype.myCall = function(context) {
@@ -2443,15 +2443,12 @@ Function.prototype.myCall = function(context) {
 与 call 同理, 只不过参数为数组
 
 ```js
-Function.prototype.myApply = function(content = window) {
-  content.fn = this;
-  let result;
-  if (arguments[1]) {
-    result = content.fn(...arguments[1]);
-  } else {
-    result = content.fn();
-  }
-  delete content.fn;
+Function.prototype.myApply = function(context, args = []) {
+  context = context ?? globalThis;
+  const uniqueId = Symbol("uniqueId");
+  context[uniqueId] = this;
+  const result = context[uniqueId](...args);
+  delete context[uniqueId];
   return result;
 };
 ```
