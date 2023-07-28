@@ -2456,26 +2456,19 @@ Function.prototype.myApply = function(context, args = []) {
 ## 手写 reduce
 
 ```js
-Array.prototype.myReduce = function(fn, base) {
-  if (typeof fn !== "function")
-    throw new TypeError("arguments[0] must be a function");
-
-  const initArr = this;
-  const arr = initArr.concat();
-  let index, result;
-
-  if (arguments.length === 2) {
-    arr.unshift(base);
+Array.prototype.myReduce = function(fn, initValue) {
+  const arr = this;
+  let result, index;
+  if (initValue !== undefined) {
     index = 0;
+    result = initValue;
   } else {
     index = 1;
+    result = arr[0];
   }
-  if (arr.length === 1) result = arr[0];
-
-  while (arr.length > 1) {
-    result = fn.call(null, arr[0], arr[1], index, initArr);
+  while (index < arr.length) {
+    result = fn.call(null, result, arr[index], index, arr);
     index++;
-    arr.splice(0, 2, result);
   }
   return result;
 };
