@@ -2602,17 +2602,14 @@ sleep(1000)
 柯里化 (Currying) 把接收多个参数的函数变成接收一个单一参数 (最初函数的第一个函数参数) 的函数, 并且返回接收余下的参数且返回结果的新函数的技术
 
 ```js
-function curry(fn, args) {
-  const length = fn.length; // 函数的length表示参数个数
-  args = args || [];
-  return function() {
-    let newArgs = args.concat(Array.prototype.slice.call(arguments));
-    if (newArgs.length < length) {
-      // 参数个数不够, 在递归去加参数
-      return curry.call(this, fn, newArgs);
+function curry(fn) {
+  return function curried(...args) {
+    if (args.length >= fn.length) {
+      return fn.apply(this, args);
     } else {
-      // 参数个数够了, 就调用这个函数
-      return fn.apply(this, newArgs); // apply会把数组转为单个得参数传给函数, 类似扩展运算符 ...newArgs
+      return function (...args2) {
+        return curried.apply(this, args.concat(args2));
+      }
     }
   };
 }
