@@ -1,0 +1,16 @@
+{
+    "name": "Chauncey的学习笔记",
+    "short_name": "Chauncey的学习笔记",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "description": "Chauncey的学习笔记",
+    "theme_color": "blue",
+    "icons": [
+      {
+        "src": "./logo.png",
+        "sizes": "144x144",
+        "type": "image/png"
+      }
+    ]
+}
