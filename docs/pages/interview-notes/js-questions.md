@@ -1214,9 +1214,9 @@ class Promise {
   REJECTED = "rejected";
 
   constructor(fn) {
-    // if (typeof fn !== 'function') {
-    //   throw new TypeError('except a function params');
-    // }
+    if (typeof fn !== "function") {
+      throw new TypeError("except a function params");
+    }
     // 初始化需要用到的值
     this.initValue();
     // 修改 this 绑定
@@ -1351,6 +1351,88 @@ class Promise {
       }
     });
     return promise2;
+  }
+
+  // Promise扩充方法
+  catch(onRejected) {
+    return this.then(null, onRejected);
+  }
+
+  finally(callback) {
+    return this.then(
+      (value) => Promise.resolve(callback()).then(() => value),
+      (err) =>
+        Promise.resolve(callback()).then(() => {
+          throw err;
+        })
+    );
+  }
+
+  static resolve(param) {
+    if (param instanceof Promise) {
+      return param;
+    }
+    return new Promise((resolve, reject) => {
+      if (param && param.then && typeof param.then === "function") {
+        setTimeout(() => {
+          param.then(resolve, reject);
+        });
+      } else {
+        resolve(param);
+      }
+    });
+  }
+
+  static reject(reason) {
+    return new Promise((resolve, reject) => {
+      reject(reason);
+    });
+  }
+
+  static all(promises) {
+    return new Promise((resolve, reject) => {
+      let index = 0;
+      let result = [];
+      if (promises.length === 0) {
+        resolve(result);
+      } else {
+        for (let i = 0; i < promises.length; i++) {
+          Promise.resolve(promises[i]).then(
+            (data) => {
+              result[i] = data;
+              if (++index === promises.length) {
+                resolve(result);
+              }
+            },
+            (err) => {
+              reject(err);
+              return;
+            }
+          );
+        }
+      }
+    });
+  }
+
+  static race(promises) {
+    return new Promise((resolve, reject) => {
+      if (promises.length === 0) {
+        return;
+      } else {
+        for (let i = 0; i < promises.length; i++) {
+          Promise.resolve(promises[i]).then(
+            (data) => {
+              resolve(data);
+              return;
+            },
+            (err) => {
+              reject(err);
+              return;
+            }
+          );
+        }
+      }
+    });
   }
 }
 ```
@@ -1552,16 +1634,11 @@ Promise.prototype.catch = function(onRejected) {
 // 不管成功还是失败，都会走到finally中,并且finally之后，还可以继续then。并且会将值原封不动的传递给后面的then.
 Promise.prototype.finally = function(callback) {
   return this.then(
-    (value) => {
-      return Promise.resolve(callback()).then(() => {
-        return value;
-      });
-    },
-    (err) => {
-      return Promise.resolve(callback()).then(() => {
+    (value) => Promise.resolve(callback()).then(() => value),
+    (err) =>
+      Promise.resolve(callback()).then(() => {
         throw err;
-      });
-    }
+      })
   );
 };
 
@@ -1580,17 +1657,14 @@ Promise.all = function(promises) {
     if (promises.length === 0) {
       resolve(result);
     } else {
-      function processValue(i, data) {
-        result[i] = data;
-        if (++index === promises.length) {
-          resolve(result);
-        }
-      }
       for (let i = 0; i < promises.length; i++) {
         //promises[i] 可能是普通值
         Promise.resolve(promises[i]).then(
           (data) => {
-            processValue(i, data);
+            result[i] = data;
+            if (++index === promises.length) {
+              resolve(result);
+            }
           },
           (err) => {
             reject(err);
@@ -2607,9 +2681,9 @@ function curry(fn) {
     if (args.length >= fn.length) {
       return fn.apply(this, args);
     } else {
-      return function (...args2) {
+      return function(...args2) {
         return curried.apply(this, args.concat(args2));
-      }
+      };
     }
   };
 }
