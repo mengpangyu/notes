@@ -1414,6 +1414,33 @@ class Promise {
     });
   }
 
+  static allSettled(promises) {
+    return new Promise((resolve, reject) => {
+      const result = [];
+      let index = 0;
+      if (promises.length === 0) {
+        resolve(result);
+      } else {
+        for (let i = 0; i < promises.length; i++) {
+          Promise.resolve(promises[i]).then(
+            (res) => {
+              result[i] = { status: "fulfilled", value: res };
+              if (++index === promises.length) {
+                resolve(result);
+              }
+            },
+            (err) => {
+              result[i] = { status: "rejected", reason: err };
+              if (++index === promises.length) {
+                resolve(result);
+              }
+            }
+          );
+        }
+      }
+    });
+  }
+
   static race(promises) {
     return new Promise((resolve, reject) => {
       if (promises.length === 0) {
@@ -1428,6 +1455,32 @@ class Promise {
             (err) => {
               reject(err);
               return;
+            }
+          );
+        }
+      }
+    });
+  }
+
+  static any(promises) {
+    return new Promise((resolve, reject) => {
+      const errors = [];
+      let completedCount = 0;
+      if (promises.length === 0) {
+        resolve();
+        return;
+      } else {
+        for (let i = 0; i < promises.length; i++) {
+          Promise.resolve(promises[i]).then(
+            (res) => {
+              resolve(res);
+              return;
+            },
+            (err) => {
+              errors[i] = err;
+              if (++completedCount === promises.length) {
+                reject(new AggregateError("All promises were rejected"));
+              }
             }
           );
         }
@@ -1675,6 +1728,34 @@ Promise.all = function(promises) {
     }
   });
 };
+// 所有promises都执行后结束,不会中断
+// 记录所有状态的promise结果: {status: 'fulfilled', value: xxx}, {status: 'rejected', reason: err}
+Promise.allSettled = function(promises) {
+  return new Promise((resolve, reject) => {
+    const result = [];
+    let index = 0;
+    if (promises.length === 0) {
+      resolve(result);
+    } else {
+      for (let i = 0; i < promises.length; i++) {
+        Promise.resolve(promises[i]).then(
+          (res) => {
+            result[i] = { status: "fulfilled", value: res };
+            if (++index === promises.length) {
+              resolve(result);
+            }
+          },
+          (err) => {
+            result[i] = { status: "rejected", reason: err };
+            if (++index === promises.length) {
+              resolve(result);
+            }
+          }
+        );
+      }
+    }
+  });
+};
 
 // Promise.race
 // Promise.race函数返回一个 Promise，它将与第一个传递的 promise 相同的完成方式被完成。它可以是完成（ resolves），也可以是失败（rejects），这要取决于第一个完成的方式是两个中的哪个。
@@ -1694,6 +1775,33 @@ Promise.race = function(promises) {
           (err) => {
             reject(err);
             return;
+          }
+        );
+      }
+    }
+  });
+};
+// 所有promises在rejected后结束
+// 其中一个promise在fulfilled后结束
+Promise.any = function(promises) {
+  return new Promise((resolve, reject) => {
+    const errors = [];
+    let completedCount = 0;
+    if (promises.length === 0) {
+      resolve();
+      return;
+    } else {
+      for (let i = 0; i < promises.length; i++) {
+        Promise.resolve(promises[i]).then(
+          (data) => {
+            resolve(data);
+            return;
+          },
+          (err) => {
+            errors[i] = err;
+            if (++completedCount === promises.length) {
+              reject(new AggregateError("All promises were rejected"));
+            }
           }
         );
       }
